@@ -1,0 +1,37 @@
+# Godot-specific folders
+.import/
+export.cfg
+export_presets.cfg
+.godot/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDE-specific
+.vscode/
+.idea/
+.clinerules/
+.editorconfig
+
+# Build outputs
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+*.zip
+*.tar.gz
+
+# Godot-generated files
+*.gen.*
+*.import
+*.log
+*.tmp
+
+# Python (if used in tooling)
+__pycache__/
+*.pyc
+.venv/
+
+addons/
