@@ -1,0 +1,31 @@
+[gd_resource type="SpriteFrames" load_steps=5 format=3 uid="uid://dpe4l4uad0kgl"]
+
+[ext_resource type="Texture2D" uid="uid://doufgekmctm46" path="res://assets/Pirate Treasure/Sprites/Gold Coin/01.png" id="1_8kgu0"]
+[ext_resource type="Texture2D" uid="uid://c0ca2l6otopu1" path="res://assets/Pirate Treasure/Sprites/Gold Coin/02.png" id="2_18uuv"]
+[ext_resource type="Texture2D" uid="uid://da2m70q5tb58g" path="res://assets/Pirate Treasure/Sprites/Gold Coin/03.png" id="3_bbbl2"]
+[ext_resource type="Texture2D" uid="uid://cjtysglo3v2we" path="res://assets/Pirate Treasure/Sprites/Gold Coin/04.png" id="4_bbtej"]
+
+[resource]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_8kgu0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_18uuv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_bbbl2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_bbtej")
+}],
+"loop": true,
+"name": &"spin",
+"speed": 8.0
+}]

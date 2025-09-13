@@ -1,7 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://b2cgknm4jfrk1"]
+[gd_scene load_steps=7 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://player.tscn" id="1_rnor3"]
 [ext_resource type="Texture2D" uid="uid://bl14jhy22cg2u" path="res://assets/Palm Tree Island/Sprites/Terrain/Terrain (32x32).png" id="2_ru564"]
+[ext_resource type="PackedScene" uid="uid://dhi7durjec88o" path="res://gold_coin.tscn" id="3_drh7r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
+size = Vector2(17.5, 7)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_drh7r"]
 texture = ExtResource("2_ru564")
@@ -109,9 +113,24 @@ sources/0 = SubResource("TileSetAtlasSource_drh7r")
 [node name="Platformer" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_rnor3")]
-position = Vector2(12, 117)
+z_index = 1
+position = Vector2(115, 142)
+
+[node name="SwordArea" type="Area2D" parent="Player"]
+position = Vector2(20, 0)
+monitoring = false
+
+[node name="SwordCollision" type="CollisionShape2D" parent="Player/SwordArea"]
+position = Vector2(-0.75, 5)
+shape = SubResource("RectangleShape2D_ru564")
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = SubResource("TileSet_gwrsa")
 format = 2
-layer_0/tile_data = PackedInt32Array(327680, 0, 0, 327681, 65536, 0, 327682, 65536, 0, 327683, 65536, 0, 327684, 65536, 0, 327685, 65536, 0, 327686, 131072, 0, 393222, 131072, 1, 393216, 0, 1, 458752, 0, 2, 458753, 65536, 2, 458754, 65536, 2, 458755, 65536, 2, 458756, 65536, 2, 458757, 65536, 2, 458758, 131072, 2, 393217, 65536, 1, 393218, 65536, 1, 393219, 65536, 1, 393220, 65536, 1, 393221, 65536, 1, 327688, 262144, 0, 393224, 262144, 1, 458760, 262144, 2, 327690, 0, 4, 327691, 65536, 4, 327692, 131072, 4)
+layer_0/tile_data = PackedInt32Array(327680, 0, 0, 327681, 65536, 0, 327682, 65536, 0, 327683, 65536, 0, 327684, 65536, 0, 327685, 65536, 0, 327686, 131072, 0, 393222, 131072, 1, 393216, 0, 1, 458752, 0, 2, 458753, 65536, 2, 458754, 65536, 2, 458755, 65536, 2, 458756, 65536, 2, 458757, 65536, 2, 458758, 131072, 2, 393217, 65536, 1, 393218, 65536, 1, 393219, 65536, 1, 393220, 65536, 1, 393221, 65536, 1, 327688, 262144, 0, 393224, 262144, 1, 458760, 262144, 2, 327690, 0, 4, 327691, 65536, 4, 327692, 131072, 4, 262150, 262144, 0, 262144, 262144, 0)
+
+[node name="GoldCoin" parent="." instance=ExtResource("3_drh7r")]
+position = Vector2(168, 131)
+
+[node name="GoldCoin2" parent="." instance=ExtResource("3_drh7r")]
+position = Vector2(208, 149)

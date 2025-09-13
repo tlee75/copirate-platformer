@@ -7,8 +7,8 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") a
 var was_airborne: bool = false
 var w_key_was_pressed: bool = false
 var is_attacking: bool = false
-
-
+var sword_area: Area2D
+var tilemap: TileMap
 # Remove old procedural Visual node if present
 func _ready():
 	var frames = load("res://player_sprites.tres")
@@ -30,6 +30,12 @@ func _ready():
 	
 	# Set initial animation
 	anim.play("idle")
+	
+	# Get references to sword area and tilemap
+	sword_area = $SwordArea
+	tilemap = get_node("../TileMap")
+	
+	# We'll check for tiles manually during attacks instead of using signals
 
 func _physics_process(delta):
 	var vel: Vector2 = velocity
@@ -68,6 +74,13 @@ func _physics_process(delta):
 		if not is_attacking:
 			is_attacking = true
 			$AnimatedSprite2D.play("attack")
+			# Position sword area based on facing direction
+			if $AnimatedSprite2D.flip_h:
+				sword_area.position.x = -20  # Left side when flipped
+			else:
+				sword_area.position.x = 20   # Right side when normal
+			# Destroy tiles in sword area
+			destroy_tiles_in_sword_area()
 			# Connect to animation finished signal to end attack
 			if not $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
 				$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
@@ -131,3 +144,48 @@ func _on_attack_animation_finished():
 			$AnimatedSprite2D.play("jump")
 		else:
 			$AnimatedSprite2D.play("fall")
+
+func destroy_tiles_in_sword_area():
+	# Use the ACTUAL collision shape position and size
+	var sword_collision = sword_area.get_node("SwordCollision")
+	var sword_shape = sword_collision.shape as RectangleShape2D
+	
+	# Get the actual global position of the collision shape
+	var sword_global_pos = sword_collision.global_position
+	var actual_shape_size = sword_shape.size
+	
+	# Create the rectangle representing the sword area in world space
+	var sword_rect = Rect2(
+		sword_global_pos - actual_shape_size / 2,
+		actual_shape_size
+	)
+	
+	print("SwordArea pos: ", sword_area.position)
+	print("SwordCollision global pos: ", sword_global_pos)
+	print("Shape size: ", actual_shape_size)
+	print("Sword rect: ", sword_rect)
+	print("Facing left: ", $AnimatedSprite2D.flip_h)
+	
+	# Convert world coordinates to tile coordinates
+	var tile_size = tilemap.tile_set.tile_size
+	var start_tile = Vector2i(
+		int(sword_rect.position.x / tile_size.x),
+		int(sword_rect.position.y / tile_size.y)
+	)
+	var end_tile = Vector2i(
+		int((sword_rect.position.x + sword_rect.size.x) / tile_size.x),
+		int((sword_rect.position.y + sword_rect.size.y) / tile_size.y)
+	)
+	
+	print("Tile range: ", start_tile, " to ", end_tile)
+	
+	# Remove tiles in the sword area
+	for x in range(start_tile.x, end_tile.x + 1):
+		for y in range(start_tile.y, end_tile.y + 1):
+			var tile_pos = Vector2i(x, y)
+			# Check if there's a tile at this position
+			var source_id = tilemap.get_cell_source_id(0, tile_pos)
+			if source_id != -1:  # -1 means no tile
+				# Remove the tile
+				tilemap.set_cell(0, tile_pos, -1)
+				print("Destroyed tile at: ", tile_pos, " (world pos: ", tile_pos * tile_size, ")")
