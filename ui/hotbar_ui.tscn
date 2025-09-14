@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://byuw62t87676l"]
+
+[ext_resource type="Script" uid="uid://byx4eic7px115" path="res://ui/hotbar_ui.gd" id="1_8xk2y"]
+
+[node name="HotbarUI" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_8xk2y")
+
+[node name="HotbarContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0

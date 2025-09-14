@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://coh6dori6t3on"]
+
+[ext_resource type="Script" uid="uid://ddjb7wr6rmg0c" path="res://ui/inventory_slot.gd" id="1_d1f1n"]
+
+[node name="InventorySlot" type="PanelContainer"]
+custom_minimum_size = Vector2(64, 64)
+script = ExtResource("1_d1f1n")
+
+[node name="ItemTexture" type="TextureRect" parent="."]
+layout_mode = 2
+
+[node name="QuantityLabel" type="Label" parent="."]
+layout_mode = 2
+
+[node name="Highlight" type="ColorRect" parent="."]
+visible = false
+layout_mode = 2
+color = Color(1, 1, 1, 0.2)

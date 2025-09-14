@@ -1,8 +1,16 @@
 extends CharacterBody2D
 
+class_name Player
+
 const SPEED := 200.0
 const JUMP_VELOCITY := -400.0
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") as float
+
+@onready var inventory_ui: Control = get_node("/root/Platformer/UI/InventoryUI")
+@onready var hotbar_ui: Control = get_node("/root/Platformer/UI/HotbarUI")
+
+var player_inventory: Inventory = Inventory.new()
+var gold_coin_item: Item = preload("res://assets/items/gold_coin_item.tres")
 
 var was_airborne: bool = false
 var w_key_was_pressed: bool = false
@@ -13,9 +21,17 @@ var highlighted_tiles: Array[Vector2i] = []
 var tile_highlights: Array[Node2D] = []
 var highlight_texture: ImageTexture
 var current_highlighted_tile: Vector2i = Vector2i(-999, -999)  # Invalid position to force initial update
+	
 
 # Remove old procedural Visual node if present
 func _ready():
+	# Setup Inventory UI
+	if inventory_ui:
+		inventory_ui.call_deferred("setup_inventory_ui", player_inventory)
+		inventory_ui.hide()
+	if hotbar_ui:
+		hotbar_ui.call_deferred("setup_hotbar_ui", player_inventory)
+
 	var frames = load("res://player_sprites.tres")
 	$AnimatedSprite2D.sprite_frames = frames
 	# Remove procedural Visual if it exists
@@ -42,8 +58,13 @@ func _ready():
 	
 	# Create reusable highlight texture
 	create_highlight_texture()
+	# Enable input processing so _input can capture key presses
+	set_process_input(true)
 	
-	# We'll check for tiles manually during attacks instead of using signals
+	# Ensure player receives input
+	# (No pause handling needed)
+	
+	# We'll check for aadddddatiles manually during attacks instead of using signals
 
 func _physics_process(delta):
 	var vel: Vector2 = velocity
@@ -98,6 +119,8 @@ func _physics_process(delta):
 
 	# Handle animations after physics update
 	handle_animations()
+	
+	
 
 func handle_animations():
 	# Don't change animations while attacking
@@ -206,6 +229,17 @@ func update_tile_highlights():
 	# Create highlight for new tile if it exists
 	if affected_tiles.size() > 0:
 		create_tile_highlight_optimized(affected_tiles[0])
+
+func _input(event):
+	# Direct key detection as a fallback if input actions are not recognized
+	if event is InputEventKey and event.pressed:
+		# Toggle inventory with TAB key only
+		if event.keycode == KEY_TAB:
+			if inventory_ui:
+				inventory_ui.visible = not inventory_ui.visible
+				print("Inventory toggled via TAB")
+
+# Removed unneeded unhandled input handling for inventory toggle
 
 func clear_tile_highlights():
 	# Remove all existing highlight sprites

@@ -28,7 +28,12 @@ func _ready():
 
 func _on_body_entered(body):
 	# Check if player collected the coin
-	if body.name == "Player":
-		print("Coin collected!")
-		# Remove the coin
-		queue_free()
+	if body is Player:
+		var player: Player = body
+		var remaining = player.player_inventory.add_item(player.gold_coin_item, 1)
+		if remaining == 0:
+			print("Coin collected!")
+			# Remove the coin
+			queue_free()
+		else:
+			print("Inventory full!")

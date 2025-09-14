@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Item" load_steps=3 format=3 uid="uid://dv7hw2k7kl43w"]
+
+[ext_resource type="Script" uid="uid://cj8pl81qfey4b" path="res://assets/items/item.gd" id="1_2rs0h"]
+[ext_resource type="Texture2D" uid="uid://doufgekmctm46" path="res://assets/Pirate Treasure/Sprites/Gold Coin/01.png" id="2_c5gt4"]
+
+[resource]
+script = ExtResource("1_2rs0h")
+item_name = "Gold Coin"
+texture = ExtResource("2_c5gt4")
+stackable = true
+max_stack_size = 99

@@ -39,3 +39,28 @@ ai_assistant_hub/preferences/always_scroll_to_bottom=false
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+
+[input]
+
+toggle_inventory={
+"deadzone": 0.5,
+"events": [
+{
+"device": 0,
+"keycode": &"Q",
+"strength": 1.0,
+"type": "InputEventKey"
+}
+]
+},
+"left_click": {
+"deadzone": 0.5,
+"events": [
+{
+"device": 0,
+"button_index": 1,
+"strength": 1.0,
+"type": "InputEventMouseButton"
+}
+]
+}
