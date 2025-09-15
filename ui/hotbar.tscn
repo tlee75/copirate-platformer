@@ -1,0 +1,64 @@
+[gd_scene load_steps=4 format=3 uid="uid://cbx3bvkti6f05"]
+
+[ext_resource type="PackedScene" uid="uid://x72kyodvepj7" path="res://ui/inventory_slot.tscn" id="1_2m22k"]
+[ext_resource type="Script" uid="uid://xofxqdch6rb2" path="res://ui/hotbar.gd" id="1_v0qo3"]
+[ext_resource type="Script" uid="uid://b7i7hh4qn7kp0" path="res://ui/inventory_slot.gd" id="2_v0qo3"]
+
+[node name="Hotbar" type="Control"]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -832.0
+offset_top = -728.0
+offset_right = -320.0
+offset_bottom = -664.0
+script = ExtResource("1_v0qo3")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+alignment = 1
+
+[node name="Slot0" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_v0qo3")
+
+[node name="Slot1" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_v0qo3")
+
+[node name="Slot2" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_v0qo3")
+
+[node name="Slot3" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_v0qo3")
+
+[node name="Slot4" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_v0qo3")
+
+[node name="Slot5" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_v0qo3")
+
+[node name="Slot6" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_v0qo3")
+
+[node name="Slot7" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_v0qo3")

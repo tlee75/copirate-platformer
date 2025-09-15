@@ -1,18 +1,43 @@
-[gd_scene load_steps=2 format=3 uid="uid://coh6dori6t3on"]
+[gd_scene load_steps=3 format=3 uid="uid://x72kyodvepj7"]
 
-[ext_resource type="Script" uid="uid://ddjb7wr6rmg0c" path="res://ui/inventory_slot.gd" id="1_d1f1n"]
+[ext_resource type="Texture2D" uid="uid://bi8liqum3r25" path="res://assets/Wood and Paper UI/Sprites/Inventory/1.png" id="1_d1f1n"]
+[ext_resource type="Script" uid="uid://b7i7hh4qn7kp0" path="res://ui/inventory_slot.gd" id="1_script"]
 
-[node name="InventorySlot" type="PanelContainer"]
+[node name="InventorySlot" type="Control"]
 custom_minimum_size = Vector2(64, 64)
-script = ExtResource("1_d1f1n")
+layout_mode = 3
+anchors_preset = 0
+offset_right = 64.0
+offset_bottom = 64.0
+script = ExtResource("1_script")
 
-[node name="ItemTexture" type="TextureRect" parent="."]
-layout_mode = 2
+[node name="Background" type="NinePatchRect" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("1_d1f1n")
+
+[node name="ItemIcon" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="QuantityLabel" type="Label" parent="."]
-layout_mode = 2
-
-[node name="Highlight" type="ColorRect" parent="."]
-visible = false
-layout_mode = 2
-color = Color(1, 1, 1, 0.2)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -34.0
+offset_right = -10.0
+offset_bottom = -11.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "1"

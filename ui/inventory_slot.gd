@@ -1,93 +1,91 @@
-extends PanelContainer
+extends Control
 
-signal slot_clicked(slot_index)
-signal slot_gui_input(event, slot_index)
-signal item_dropped_on_slot(source_slot_index, target_slot_index)
+# InventorySlot UI component - handles display and interaction
+# The actual data is managed by InventoryManager
 
-var item_texture: TextureRect
-var quantity_label: Label
-var highlight: ColorRect
+signal slot_clicked(slot_index: int, is_hotbar: bool)
+signal drag_started(slot_index: int, is_hotbar: bool)
+signal drag_ended(slot_index: int, is_hotbar: bool)
 
-var inventory_slot_data: InventorySlot = null
-var slot_index: int = -1
+@export var slot_index: int = 0
+@export var is_hotbar_slot: bool = false
+
+@onready var background: Control = get_node_or_null("Background")
+@onready var item_icon: TextureRect = get_node_or_null("ItemIcon")
+@onready var quantity_label: Label = get_node_or_null("QuantityLabel")
+
+var slot_data: InventoryManager.InventorySlotData
+var is_dragging: bool = false
 
 func _ready():
-	item_texture = get_node("ItemTexture")
-	quantity_label = get_node("QuantityLabel")
-	highlight = get_node("Highlight")
-	
-	# Ensure child controls do not block drag‑and‑drop input
-	if item_texture:
-		item_texture.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if quantity_label:
-		quantity_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if highlight:
-		highlight.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	
-	update_display()
-	# Ensure the slot receives drop events reliably
-	mouse_filter = Control.MOUSE_FILTER_PASS
-	
-	# Connect signals for hover effect
+	# Connect mouse events
+	gui_input.connect(_on_gui_input)
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
-
-func _gui_input(event: InputEvent):
-	# Only start a drag if this slot actually contains an item
-	if inventory_slot_data and inventory_slot_data.item:
-		if event.is_action_pressed("left_click"):
-			slot_clicked.emit(slot_index)
-		slot_gui_input.emit(event, slot_index)
-
-func _get_drag_data(at_position: Vector2) -> Variant:
-	if inventory_slot_data and inventory_slot_data.item:
-		var drag_preview = TextureRect.new()
-		drag_preview.texture = inventory_slot_data.item.texture
-		drag_preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		drag_preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		drag_preview.custom_minimum_size = size
-		
-		var data = {
-			"source_slot_index": slot_index,
-			"item": inventory_slot_data.item,
-			"quantity": inventory_slot_data.quantity
-		}
-		
-		set_drag_preview(drag_preview)
-		return data
-	return null
-
-func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
-	# Simple validation: accept any valid drag data as long as it's not the same slot
-	if not (data is Dictionary and data.has("source_slot_index")):
-		return false
-	return data["source_slot_index"] != slot_index
-
-func _drop_data(at_position: Vector2, data: Variant):
-	# Emit drop signal for any valid non‑self drop
-	if not (data is Dictionary and data.has("source_slot_index")):
-		return
-	var source_slot_index = data["source_slot_index"]
-	if source_slot_index != slot_index:
-		item_dropped_on_slot.emit(source_slot_index, slot_index)
-
-func update_display():
-	if inventory_slot_data and inventory_slot_data.item:
-		item_texture.texture = inventory_slot_data.item.texture
-		if inventory_slot_data.quantity > 1:
-			quantity_label.text = str(inventory_slot_data.quantity)
-		else:
-			quantity_label.text = ""
-	else:
-		item_texture.texture = null
+	
+	# Set up initial appearance
+	if quantity_label:
 		quantity_label.text = ""
+	if item_icon:
+		item_icon.texture = null
+	
+	# Style the quantity label
+	if quantity_label:
+		quantity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		quantity_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+		quantity_label.add_theme_color_override("font_color", Color.WHITE)
+		quantity_label.add_theme_color_override("font_shadow_color", Color.BLACK)
+		quantity_label.add_theme_constant_override("shadow_offset_x", 1)
+		quantity_label.add_theme_constant_override("shadow_offset_y", 1)
 
-func set_inventory_slot_data(data: InventorySlot):
-	inventory_slot_data = data
-	update_display()
+func _on_gui_input(event: InputEvent):
+	if event is InputEventMouseButton:
+		var mouse_event = event as InputEventMouseButton
+		if mouse_event.button_index == MOUSE_BUTTON_LEFT:
+			if mouse_event.pressed:
+				slot_clicked.emit(slot_index, is_hotbar_slot)
+				if slot_data and not slot_data.is_empty():
+					is_dragging = true
+					drag_started.emit(slot_index, is_hotbar_slot)
+			else:
+				if is_dragging:
+					is_dragging = false
+					drag_ended.emit(slot_index, is_hotbar_slot)
 
 func _on_mouse_entered():
-	highlight.visible = true
+	if not slot_data or slot_data.is_empty():
+		return
+	
+	# Add hover effect - could show tooltip here
+	modulate = Color(1.1, 1.1, 1.1, 1.0)
 
 func _on_mouse_exited():
-	highlight.visible = false
+	modulate = Color.WHITE
+
+func update_display(new_slot_data: InventoryManager.InventorySlotData):
+	slot_data = new_slot_data
+	
+	if slot_data.is_empty():
+		if item_icon:
+			item_icon.texture = null
+		if quantity_label:
+			quantity_label.text = ""
+	else:
+		if item_icon:
+			item_icon.texture = slot_data.item.texture
+		if quantity_label:
+			if slot_data.quantity > 1:
+				quantity_label.text = str(slot_data.quantity)
+			else:
+				quantity_label.text = ""
+
+func set_highlighted(highlighted: bool):
+	if background:
+		if highlighted:
+			background.modulate = Color(1.2, 1.2, 0.8, 1.0)  # Yellow tint
+		else:
+			background.modulate = Color.WHITE
+
+func can_accept_drop() -> bool:
+	# This will be called by the drag and drop system
+	return true

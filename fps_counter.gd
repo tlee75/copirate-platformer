@@ -2,7 +2,7 @@ extends Label
 
 func _ready():
 	# Set initial text
-	text = "FPS: 60"
+	text = "FPS: 6d0"
 
 func _process(_delta):
 	# Update FPS display every frame

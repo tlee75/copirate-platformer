@@ -3,13 +3,13 @@ extends Area2D
 func _ready():
 	# Create SpriteFrames resource for gold coin animation
 	var frames = SpriteFrames.new()
-	
+
 	# Load gold coin textures
 	var coin_01 = load("res://assets/Pirate Treasure/Sprites/Gold Coin/01.png")
 	var coin_02 = load("res://assets/Pirate Treasure/Sprites/Gold Coin/02.png")
 	var coin_03 = load("res://assets/Pirate Treasure/Sprites/Gold Coin/03.png")
 	var coin_04 = load("res://assets/Pirate Treasure/Sprites/Gold Coin/04.png")
-	
+
 	# Create animation
 	frames.add_animation("spin")
 	frames.add_frame("spin", coin_01)
@@ -18,22 +18,19 @@ func _ready():
 	frames.add_frame("spin", coin_04)
 	frames.set_animation_speed("spin", 8.0)
 	frames.set_animation_loop("spin", true)
-	
+
 	# Apply to AnimatedSprite2D
 	$AnimatedSprite2D.sprite_frames = frames
 	$AnimatedSprite2D.play("spin")
-	
+
 	# Connect area entered signal for collection
 	body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body):
-	# Check if player collected the coin
+	# If player touches coin, add to inventory
 	if body is Player:
-		var player: Player = body
-		var remaining = player.player_inventory.add_item(player.gold_coin_item, 1)
-		if remaining == 0:
-			print("Coin collected!")
-			# Remove the coin
+		if InventoryManager.add_item("gold_coin", 1):
+			print("Gold coin added to inventory!")
 			queue_free()
 		else:
-			print("Inventory full!")
+			print("Inventory full! Cannot pick up gold coin.")
