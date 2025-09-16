@@ -157,7 +157,6 @@ position = Vector2(47, 142)
 position = Vector2(12, 115)
 
 [node name="UI" type="CanvasLayer" parent="."]
-visible = false
 
 [node name="FPSCounter" type="Label" parent="UI"]
 modulate = Color(1, 1, 0, 1)

@@ -35,4 +35,9 @@ func _input(event):
 		if key_event.pressed and key_event.keycode == KEY_TAB:
 			main_inventory.toggle_inventory()
 			inventory_is_open = main_inventory.is_visible_flag
+			
+			# Notify player script about inventory state change
+			if player.has_signal("inventory_state_changed"):
+				player.inventory_state_changed.emit(inventory_is_open)
+			
 			get_viewport().set_input_as_handled()

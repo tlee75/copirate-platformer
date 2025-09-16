@@ -62,11 +62,20 @@ func _ready():
 	inventory_state_changed.connect(_on_inventory_state_changed)
 
 func _physics_process(delta):
+	var vel: Vector2 = velocity
+	
 	# Skip input handling if inventory is open
 	if inventory_is_open:
+		# Still apply gravity when inventory is open
+		if not is_on_floor():
+			vel.y += gravity * delta
+		# Stop horizontal movement gradually
+		vel.x = move_toward(vel.x, 0, SPEED * 2)  # Stop faster when inventory opens
+		velocity = vel
+		move_and_slide()
+		# Don't update sword position, mouse UI detection, or highlights when inventory is open
 		return
 	
-	var vel: Vector2 = velocity
 	if not is_on_floor():
 		vel.y += gravity * delta
 
@@ -213,6 +222,11 @@ func create_highlight_texture():
 	highlight_texture.set_image(image)
 
 func update_tile_highlights():
+	# Don't show tile highlights when inventory is open
+	if inventory_is_open:
+		clear_tile_highlights()
+		return
+		
 	# Get tiles that would be affected by sword
 	var affected_tiles = get_tiles_in_sword_area()
 	
