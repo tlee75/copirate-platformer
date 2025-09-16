@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://cbx3bvkti6f05"]
+[gd_scene load_steps=3 format=3 uid="uid://bl5dg3fjv4w6g"]
 
 [ext_resource type="PackedScene" uid="uid://x72kyodvepj7" path="res://ui/inventory_slot.tscn" id="1_2m22k"]
-[ext_resource type="Script" uid="uid://xofxqdch6rb2" path="res://ui/hotbar.gd" id="1_v0qo3"]
-[ext_resource type="Script" uid="uid://b7i7hh4qn7kp0" path="res://ui/inventory_slot.gd" id="2_v0qo3"]
+[ext_resource type="Script" path="res://ui/hotbar.gd" id="1_v0qo3"]
 
 [node name="Hotbar" type="Control"]
 layout_mode = 3
@@ -15,6 +14,8 @@ offset_left = -832.0
 offset_top = -728.0
 offset_right = -320.0
 offset_bottom = -664.0
+grow_horizontal = 2
+grow_vertical = 0
 script = ExtResource("1_v0qo3")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -23,42 +24,26 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 alignment = 1
 
-[node name="Slot0" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
-custom_minimum_size = Vector2(64, 64)
+[node name="Slot0" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
 layout_mode = 2
-script = ExtResource("2_v0qo3")
 
-[node name="Slot1" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
-custom_minimum_size = Vector2(64, 64)
+[node name="Slot1" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
 layout_mode = 2
-script = ExtResource("2_v0qo3")
 
-[node name="Slot2" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
-custom_minimum_size = Vector2(64, 64)
+[node name="Slot2" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
 layout_mode = 2
-script = ExtResource("2_v0qo3")
 
-[node name="Slot3" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
-custom_minimum_size = Vector2(64, 64)
+[node name="Slot3" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
 layout_mode = 2
-script = ExtResource("2_v0qo3")
 
-[node name="Slot4" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
-custom_minimum_size = Vector2(64, 64)
+[node name="Slot4" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
 layout_mode = 2
-script = ExtResource("2_v0qo3")
 
-[node name="Slot5" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
-custom_minimum_size = Vector2(64, 64)
+[node name="Slot5" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
 layout_mode = 2
-script = ExtResource("2_v0qo3")
 
-[node name="Slot6" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
-custom_minimum_size = Vector2(64, 64)
+[node name="Slot6" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
 layout_mode = 2
-script = ExtResource("2_v0qo3")
 
-[node name="Slot7" type="Control" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
-custom_minimum_size = Vector2(64, 64)
+[node name="Slot7" parent="HBoxContainer" instance=ExtResource("1_2m22k")]
 layout_mode = 2
-script = ExtResource("2_v0qo3")

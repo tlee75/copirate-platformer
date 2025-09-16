@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://x72kyodvepj7"]
 
-[ext_resource type="Texture2D" uid="uid://bi8liqum3r25" path="res://assets/Wood and Paper UI/Sprites/Inventory/1.png" id="1_d1f1n"]
-[ext_resource type="Script" uid="uid://b7i7hh4qn7kp0" path="res://ui/inventory_slot.gd" id="1_script"]
+[ext_resource type="Script" path="res://ui/inventory_slot.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c5y7uf3dspddx" path="res://assets/Wood and Paper UI/Sprites/Inventory/16.png" id="2_6t8ig"]
 
 [node name="InventorySlot" type="Control"]
 custom_minimum_size = Vector2(64, 64)
@@ -15,7 +15,7 @@ script = ExtResource("1_script")
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-texture = ExtResource("1_d1f1n")
+texture = ExtResource("2_6t8ig")
 
 [node name="ItemIcon" type="TextureRect" parent="."]
 layout_mode = 1
