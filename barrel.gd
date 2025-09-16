@@ -14,8 +14,8 @@ var health: int = max_health
 @onready var solid_collision: CollisionShape2D = $CollisionShape2D
 @onready var hit_collision: CollisionShape2D = $HitDetection/HitCollisionShape2D
 
-# Cooldown to prevent rapid double-hits
-@export var hit_cooldown_time: float = 0.15
+# Cooldown to prevent multiple hits from same attack
+@export var hit_cooldown_time: float = 0.6  # Longer than attack animation duration
 var hit_cooldown: float = 0.0
 
 # Loot table structure: [item_scene_path, drop_chance, min_quantity, max_quantity]
@@ -24,9 +24,7 @@ var loot_table: Array = [
 ]
 
 func _ready():
-	# Connect the area detection signal
-	hit_detection.area_entered.connect(_on_hit_by_attack)
-	hit_detection.area_exited.connect(_on_area_exited)
+	# No signal connections needed - using process-based aimed detection only
 	
 	# Set up animations if available
 	if animated_sprite.sprite_frames:
@@ -37,11 +35,12 @@ func _process(delta):
 	if hit_cooldown > 0.0:
 		hit_cooldown -= delta
 		
-	# Check if player is attacking and sword is overlapping
+	# Check for player actions if barrel isn't destroyed
 	if state != BarrelState.DESTROYED:
-		check_for_attack_overlap()
+		check_for_player_actions()
 
-func check_for_attack_overlap():
+# Modular action detection system
+func check_for_player_actions():
 	# Don't process if on cooldown
 	if hit_cooldown > 0.0:
 		return
@@ -53,25 +52,31 @@ func check_for_attack_overlap():
 		if area.name == "SwordArea":
 			var player = area.get_parent()
 			if player and player.is_attacking:
-				on_barrel_hit()
+				handle_action("attack", player)
 				return
 
-func _on_area_exited(area: Area2D):
+func _on_area_exited(_area: Area2D):
 	# Could be used for effects in the future
 	pass
 
-func _on_hit_by_attack(area: Area2D):
-	# Don't process if on cooldown or already destroyed
-	if hit_cooldown > 0.0 or state == BarrelState.DESTROYED:
-		return
-		
-	# Check if the attacking area is the player's sword AND the player is attacking
-	if area.name == "SwordArea":
-		var player = area.get_parent()
-		if player and player.is_attacking:
-			on_barrel_hit()
+# REMOVED: Signal-based detection to prevent duplicate hits
+# func _on_hit_by_attack(area: Area2D):
+#	# This was causing double-hits with the process-based system
 
-func on_barrel_hit():
+# Modular action handler system
+func handle_action(action_type: String, actor):
+	match action_type:
+		"attack":
+			handle_attack_action(actor)
+		"interact":
+			handle_interact_action(actor)
+		"use_item":
+			handle_use_item_action(actor)
+		_:
+			print("Unknown action type: ", action_type)
+
+# Attack action handler
+func handle_attack_action(player):
 	# Prevent multiple hits in quick succession
 	if state == BarrelState.DESTROYED or hit_cooldown > 0.0:
 		return
@@ -79,9 +84,27 @@ func on_barrel_hit():
 	# Set cooldown
 	hit_cooldown = hit_cooldown_time
 	
-	# Reduce health
-	health -= 1
-	print("Barrel hit! Health: ", health, "/", max_health)
+	# Apply attack damage
+	take_damage(1)
+
+# Interact action handler (for future use)
+func handle_interact_action(player):
+	if state == BarrelState.DESTROYED:
+		return
+	print("Player interacted with barrel")
+	# Could be used for examining, picking up, etc.
+
+# Use item action handler (for future use)  
+func handle_use_item_action(player):
+	if state == BarrelState.DESTROYED:
+		return
+	print("Player used item on barrel")
+	# Could be used for tools, keys, etc.
+
+# Damage system (separated from action handling)
+func take_damage(amount: int):
+	health -= amount
+	print("Barrel damaged! Health: ", health, "/", max_health, " - State: ", state)
 	
 	# Check if barrel should be destroyed
 	if health <= 0:
@@ -96,9 +119,9 @@ func on_barrel_hit():
 	if animated_sprite.sprite_frames:
 		if animated_sprite.sprite_frames.has_animation("damaged"):
 			animated_sprite.play("damaged")
-			# If damaged animation should play once and then stay on last frame
-			if not animated_sprite.sprite_frames.get_animation_loop("damaged"):
-				pass  # Animation will stop on last frame automatically
+
+# REMOVED: Old monolithic hit function - replaced by modular action system
+# func on_barrel_hit(): ...
 		elif animated_sprite.sprite_frames.has_animation("hit"):
 			animated_sprite.play("hit")
 		else:
