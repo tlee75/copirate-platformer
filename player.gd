@@ -247,12 +247,8 @@ func get_tiles_in_sword_area() -> Array[Vector2i]:
 	var sword_collision = sword_area.get_node("SwordCollision")
 	var crosshair_pos = sword_collision.global_position
 	
-	# Find the tile that contains the crosshair position
-	var tile_size = tilemap.tile_set.tile_size
-	var target_tile = Vector2i(
-		int(crosshair_pos.x / tile_size.x),
-		int(crosshair_pos.y / tile_size.y)
-	)
+	# Use Godot's built-in coordinate conversion to handle negative coordinates correctly
+	var target_tile = tilemap.local_to_map(tilemap.to_local(crosshair_pos))
 	
 	# Check if this tile exists
 	var source_id = tilemap.get_cell_source_id(0, target_tile)
