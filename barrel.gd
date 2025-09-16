@@ -76,7 +76,7 @@ func handle_action(action_type: String, actor):
 			print("Unknown action type: ", action_type)
 
 # Attack action handler
-func handle_attack_action(player):
+func handle_attack_action(_player):
 	# Prevent multiple hits in quick succession
 	if state == BarrelState.DESTROYED or hit_cooldown > 0.0:
 		return
@@ -88,14 +88,14 @@ func handle_attack_action(player):
 	take_damage(1)
 
 # Interact action handler (for future use)
-func handle_interact_action(player):
+func handle_interact_action(_player):
 	if state == BarrelState.DESTROYED:
 		return
 	print("Player interacted with barrel")
 	# Could be used for examining, picking up, etc.
 
 # Use item action handler (for future use)  
-func handle_use_item_action(player):
+func handle_use_item_action(_player):
 	if state == BarrelState.DESTROYED:
 		return
 	print("Player used item on barrel")
@@ -210,13 +210,13 @@ func find_valid_spawn_position(offset_index: int) -> Vector2:
 	print("Warning: Could not find valid spawn position, using barrel location")
 	return global_position
 
-func is_position_valid(position: Vector2) -> bool:
+func is_position_valid(pos: Vector2) -> bool:
 	# Get the world's space state for collision checking
 	var space_state = get_world_2d().direct_space_state
 	
 	# Create a small query to check for collisions at this position
 	var query = PhysicsPointQueryParameters2D.new()
-	query.position = position
+	query.position = pos
 	query.collision_mask = 1  # Check against collision layer 1 (adjust as needed)
 	
 	# Check for collisions with tiles/static bodies

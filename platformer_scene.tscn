@@ -181,17 +181,19 @@ grow_horizontal = 0
 [node name="InventorySystem" type="Node" parent="UI"]
 script = ExtResource("10_vj6te")
 
-[node name="Barrel" parent="." instance=ExtResource("6_vj6te")]
+[node name="Barrels" type="Node" parent="."]
+
+[node name="Barrel" parent="Barrels" instance=ExtResource("6_vj6te")]
 position = Vector2(-1026, 147)
 
-[node name="Barrel2" parent="." instance=ExtResource("6_vj6te")]
+[node name="Barrel2" parent="Barrels" instance=ExtResource("6_vj6te")]
 position = Vector2(-1130, 148)
 
-[node name="Barrel3" parent="." instance=ExtResource("6_vj6te")]
+[node name="Barrel3" parent="Barrels" instance=ExtResource("6_vj6te")]
 position = Vector2(-961, 148)
 
-[node name="Barrel4" parent="." instance=ExtResource("6_vj6te")]
+[node name="Barrel4" parent="Barrels" instance=ExtResource("6_vj6te")]
 position = Vector2(-1227, 149)
 
-[node name="Barrel5" parent="." instance=ExtResource("6_vj6te")]
+[node name="Barrel5" parent="Barrels" instance=ExtResource("6_vj6te")]
 position = Vector2(-1180, 149)
