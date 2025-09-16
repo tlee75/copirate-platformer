@@ -4,9 +4,9 @@
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://platformer_scene.gd" id="1_vn5xl"]
 [ext_resource type="Texture2D" uid="uid://xbvs700g2epd" path="res://crosshair.tres" id="2_gwrsa"]
 [ext_resource type="Texture2D" uid="uid://bl14jhy22cg2u" path="res://assets/Palm Tree Island/Sprites/Terrain/Terrain (32x32).png" id="2_ru564"]
-[ext_resource type="PackedScene" uid="uid://dhi7durjec88o" path="res://gold_coin.tscn" id="3_drh7r"]
 [ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://fps_counter.gd" id="5_sff61"]
 [ext_resource type="PackedScene" uid="uid://bl5dg3fjv4w6g" path="res://ui/hotbar.tscn" id="6_isrho"]
+[ext_resource type="PackedScene" uid="uid://dgdkbk47a63st" path="res://barrel.tscn" id="6_vj6te"]
 [ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://ui/main_inventory.tscn" id="8_cbdxa"]
 [ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://ui/inventory_system.gd" id="10_vj6te"]
 
@@ -144,18 +144,6 @@ layer_0/tile_data = PackedInt32Array(393197, 131072, 4, 393196, 65536, 4, 393195
 
 [node name="Coins" type="Node" parent="."]
 
-[node name="GoldCoin" parent="Coins" instance=ExtResource("3_drh7r")]
-position = Vector2(-1002, 128)
-
-[node name="GoldCoin2" parent="Coins" instance=ExtResource("3_drh7r")]
-position = Vector2(-962, 146)
-
-[node name="GoldCoin3" parent="Coins" instance=ExtResource("3_drh7r")]
-position = Vector2(-1144, 131)
-
-[node name="GoldCoin4" parent="Coins" instance=ExtResource("3_drh7r")]
-position = Vector2(-1200, 151)
-
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="FPSCounter" type="Label" parent="UI"]
@@ -193,14 +181,17 @@ grow_horizontal = 0
 [node name="InventorySystem" type="Node" parent="UI"]
 script = ExtResource("10_vj6te")
 
-[node name="GoldCoin" parent="." instance=ExtResource("3_drh7r")]
-position = Vector2(-895, 139)
+[node name="Barrel" parent="." instance=ExtResource("6_vj6te")]
+position = Vector2(-1026, 147)
 
-[node name="GoldCoin2" parent="." instance=ExtResource("3_drh7r")]
-position = Vector2(-842, 151)
+[node name="Barrel2" parent="." instance=ExtResource("6_vj6te")]
+position = Vector2(-1130, 148)
 
-[node name="GoldCoin3" parent="." instance=ExtResource("3_drh7r")]
-position = Vector2(-1253, 138)
+[node name="Barrel3" parent="." instance=ExtResource("6_vj6te")]
+position = Vector2(-961, 148)
 
-[node name="GoldCoin4" parent="." instance=ExtResource("3_drh7r")]
-position = Vector2(-1105, 146)
+[node name="Barrel4" parent="." instance=ExtResource("6_vj6te")]
+position = Vector2(-1227, 149)
+
+[node name="Barrel5" parent="." instance=ExtResource("6_vj6te")]
+position = Vector2(-1180, 149)

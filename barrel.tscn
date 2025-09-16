@@ -1,0 +1,41 @@
+[gd_scene load_steps=7 format=3 uid="uid://dgdkbk47a63st"]
+
+[ext_resource type="Script" uid="uid://d2quycw40yq08" path="res://barrel.gd" id="1_a12vh"]
+[ext_resource type="Texture2D" uid="uid://d0px3iyaxyaqi" path="res://assets/Merchant Ship/Sprites/Barrel/Idle/1.png" id="1_n8un1"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n8un1"]
+atlas = ExtResource("1_n8un1")
+region = Rect2(0, 0, 26, 30)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_a12vh"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n8un1")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a12vh"]
+size = Vector2(21, 23)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rdxsi"]
+size = Vector2(21, 23)
+
+[node name="Barrel" type="StaticBody2D"]
+script = ExtResource("1_a12vh")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_a12vh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-0.5, 0.5)
+shape = SubResource("RectangleShape2D_a12vh")
+
+[node name="HitDetection" type="Area2D" parent="."]
+
+[node name="HitCollisionShape2D" type="CollisionShape2D" parent="HitDetection"]
+position = Vector2(-0.5, 0.5)
+shape = SubResource("RectangleShape2D_rdxsi")
