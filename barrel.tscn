@@ -1,7 +1,52 @@
-[gd_scene load_steps=7 format=3 uid="uid://dgdkbk47a63st"]
+[gd_scene load_steps=25 format=3 uid="uid://dgdkbk47a63st"]
 
 [ext_resource type="Script" uid="uid://d2quycw40yq08" path="res://barrel.gd" id="1_a12vh"]
 [ext_resource type="Texture2D" uid="uid://d0px3iyaxyaqi" path="res://assets/Merchant Ship/Sprites/Barrel/Idle/1.png" id="1_n8un1"]
+[ext_resource type="Texture2D" uid="uid://c7i5fal2t1ik6" path="res://assets/Merchant Ship/Sprites/Barrel/Destroyed/1.png" id="2_rdalc"]
+[ext_resource type="Texture2D" uid="uid://cvey44dixxrvq" path="res://assets/Merchant Ship/Sprites/Barrel/Destroyed/2.png" id="3_jxg48"]
+[ext_resource type="Texture2D" uid="uid://c7fcnlh24ne7f" path="res://assets/Merchant Ship/Sprites/Barrel/Destroyed/3.png" id="4_cicwk"]
+[ext_resource type="Texture2D" uid="uid://dcdaw74noipne" path="res://assets/Merchant Ship/Sprites/Barrel/Destroyed/4.png" id="5_o7wr3"]
+[ext_resource type="Texture2D" uid="uid://bel2v4pa808t5" path="res://assets/Merchant Ship/Sprites/Barrel/Destroyed/5.png" id="6_7u0qa"]
+[ext_resource type="Texture2D" uid="uid://b4hue1i7nx2qy" path="res://assets/Merchant Ship/Sprites/Barrel/Hit/1.png" id="7_v5a3k"]
+[ext_resource type="Texture2D" uid="uid://bhw12q022j0an" path="res://assets/Merchant Ship/Sprites/Barrel/Hit/2.png" id="8_3frlg"]
+[ext_resource type="Texture2D" uid="uid://dui22drb8450" path="res://assets/Merchant Ship/Sprites/Barrel/Hit/3.png" id="9_rwr60"]
+[ext_resource type="Texture2D" uid="uid://b717rvbl3j4xt" path="res://assets/Merchant Ship/Sprites/Barrel/Hit/4.png" id="10_hqqah"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6ktb2"]
+atlas = ExtResource("2_rdalc")
+region = Rect2(0, 0, 26, 30)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_367px"]
+atlas = ExtResource("3_jxg48")
+region = Rect2(0, 0, 16, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vic04"]
+atlas = ExtResource("4_cicwk")
+region = Rect2(0, 0, 16, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s7pbk"]
+atlas = ExtResource("5_o7wr3")
+region = Rect2(0, 0, 16, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oty72"]
+atlas = ExtResource("6_7u0qa")
+region = Rect2(0, 0, 16, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6o66h"]
+atlas = ExtResource("7_v5a3k")
+region = Rect2(0, 0, 26, 30)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6eibf"]
+atlas = ExtResource("8_3frlg")
+region = Rect2(0, 0, 26, 30)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nu52k"]
+atlas = ExtResource("9_rwr60")
+region = Rect2(0, 0, 26, 30)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b7dmw"]
+atlas = ExtResource("10_hqqah")
+region = Rect2(0, 0, 26, 30)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_n8un1"]
 atlas = ExtResource("1_n8un1")
@@ -11,11 +56,48 @@ region = Rect2(0, 0, 26, 30)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_6ktb2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_367px")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vic04")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s7pbk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oty72")
+}],
+"loop": false,
+"name": &"break",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6o66h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6eibf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nu52k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b7dmw")
+}],
+"loop": false,
+"name": &"damaged",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_n8un1")
 }],
 "loop": true,
-"name": &"default",
-"speed": 5.0
+"name": &"idle",
+"speed": 1.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a12vh"]
@@ -29,6 +111,7 @@ script = ExtResource("1_a12vh")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_a12vh")
+animation = &"break"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-0.5, 0.5)

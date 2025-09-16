@@ -2,12 +2,21 @@ extends StaticBody2D
 
 # Breakable barrel that can be destroyed by player attacks
 
+# Barrel states
+enum BarrelState { INTACT, DAMAGED, DESTROYED }
+var state: int = BarrelState.INTACT
+
+@export var max_health: int = 3
+var health: int = max_health
+
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hit_detection: Area2D = $HitDetection
 @onready var solid_collision: CollisionShape2D = $CollisionShape2D
 @onready var hit_collision: CollisionShape2D = $HitDetection/HitCollisionShape2D
 
-var is_destroyed: bool = false
+# Cooldown to prevent rapid double-hits
+@export var hit_cooldown_time: float = 0.15
+var hit_cooldown: float = 0.0
 
 # Loot table structure: [item_scene_path, drop_chance, min_quantity, max_quantity]
 var loot_table: Array = [
@@ -21,14 +30,22 @@ func _ready():
 	
 	# Set up animations if available
 	if animated_sprite.sprite_frames:
-		animated_sprite.play("default")
+		animated_sprite.play("idle")
 
-func _process(_delta):
+func _process(delta):
+	# Reduce hit cooldown
+	if hit_cooldown > 0.0:
+		hit_cooldown -= delta
+		
 	# Check if player is attacking and sword is overlapping
-	if not is_destroyed:
+	if state != BarrelState.DESTROYED:
 		check_for_attack_overlap()
 
 func check_for_attack_overlap():
+	# Don't process if on cooldown
+	if hit_cooldown > 0.0:
+		return
+		
 	# Get all areas currently overlapping with hit detection
 	var overlapping_areas = hit_detection.get_overlapping_areas()
 	
@@ -36,32 +53,62 @@ func check_for_attack_overlap():
 		if area.name == "SwordArea":
 			var player = area.get_parent()
 			if player and player.is_attacking:
-				print("Destroying barrel via overlap check!")
-				destroy_barrel()
+				on_barrel_hit()
 				return
 
 func _on_area_exited(area: Area2D):
-	if area.name == "SwordArea":
-		print("SwordArea exited barrel detection")
+	# Could be used for effects in the future
+	pass
 
 func _on_hit_by_attack(area: Area2D):
-	print("Area entered: ", area.name, " from parent: ", area.get_parent().name if area.get_parent() else "no parent")
+	# Don't process if on cooldown or already destroyed
+	if hit_cooldown > 0.0 or state == BarrelState.DESTROYED:
+		return
+		
 	# Check if the attacking area is the player's sword AND the player is attacking
-	if area.name == "SwordArea" and not is_destroyed:
+	if area.name == "SwordArea":
 		var player = area.get_parent()
-		print("Player attacking state: ", player.is_attacking if player else "no player")
 		if player and player.is_attacking:
-			print("Destroying barrel!")
-			destroy_barrel()
-		else:
-			print("Player not attacking or no player found")
+			on_barrel_hit()
 
-func destroy_barrel():
-	if is_destroyed:
+func on_barrel_hit():
+	# Prevent multiple hits in quick succession
+	if state == BarrelState.DESTROYED or hit_cooldown > 0.0:
+		return
+		
+	# Set cooldown
+	hit_cooldown = hit_cooldown_time
+	
+	# Reduce health
+	health -= 1
+	print("Barrel hit! Health: ", health, "/", max_health)
+	
+	# Check if barrel should be destroyed
+	if health <= 0:
+		break_barrel()
 		return
 	
-	is_destroyed = true
-	
+	# Update state to damaged if not already
+	if state == BarrelState.INTACT:
+		state = BarrelState.DAMAGED
+		
+	# Play damaged animation or sprite
+	if animated_sprite.sprite_frames:
+		if animated_sprite.sprite_frames.has_animation("damaged"):
+			animated_sprite.play("damaged")
+			# If damaged animation should play once and then stay on last frame
+			if not animated_sprite.sprite_frames.get_animation_loop("damaged"):
+				pass  # Animation will stop on last frame automatically
+		elif animated_sprite.sprite_frames.has_animation("hit"):
+			animated_sprite.play("hit")
+		else:
+			animated_sprite.play("idle")
+
+func break_barrel():
+	if state == BarrelState.DESTROYED:
+		return
+		
+	state = BarrelState.DESTROYED
 	print("Barrel destroyed!")
 	
 	# Drop loot before destruction
