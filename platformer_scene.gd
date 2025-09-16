@@ -29,15 +29,28 @@ func _on_inventory_toggled(is_open: bool):
 		player.inventory_state_changed.emit(is_open)
 
 func _input(event):
-	# Handle TAB key for inventory
+	# Handle TAB and ESC keys for inventory
 	if event is InputEventKey:
 		var key_event = event as InputEventKey
-		if key_event.pressed and key_event.keycode == KEY_TAB:
-			main_inventory.toggle_inventory()
-			inventory_is_open = main_inventory.is_visible_flag
+		if key_event.pressed:
+			if key_event.keycode == KEY_TAB:
+				# TAB toggles inventory open/closed
+				main_inventory.toggle_inventory()
+				inventory_is_open = main_inventory.is_visible_flag
+				
+				# Notify player script about inventory state change
+				if player.has_signal("inventory_state_changed"):
+					player.inventory_state_changed.emit(inventory_is_open)
+				
+				get_viewport().set_input_as_handled()
 			
-			# Notify player script about inventory state change
-			if player.has_signal("inventory_state_changed"):
-				player.inventory_state_changed.emit(inventory_is_open)
-			
-			get_viewport().set_input_as_handled()
+			elif key_event.keycode == KEY_ESCAPE and inventory_is_open:
+				# ESC only closes inventory when it's open
+				main_inventory.hide_inventory()
+				inventory_is_open = false
+				
+				# Notify player script about inventory state change
+				if player.has_signal("inventory_state_changed"):
+					player.inventory_state_changed.emit(inventory_is_open)
+				
+				get_viewport().set_input_as_handled()

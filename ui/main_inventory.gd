@@ -40,18 +40,8 @@ func _ready():
 	# Connect to inventory manager
 	InventoryManager.inventory_changed.connect(_update_display)
 	
-	# Set up background to catch clicks (for closing inventory)
-	background.gui_input.connect(_on_background_input)
-	
 	# Initial display update
 	_update_display()
-
-func _on_background_input(event: InputEvent):
-	# Close inventory when clicking on background
-	if event is InputEventMouseButton:
-		var mouse_event = event as InputEventMouseButton
-		if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
-			hide_inventory()
 
 func show_inventory():
 	is_visible_flag = true

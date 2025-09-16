@@ -110,8 +110,8 @@ func _physics_process(delta):
 	# Update tile highlights
 	update_tile_highlights()
 	
-	# Attack input - left mouse button
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+	# Attack input - left mouse button (but not when clicking on hotbar)
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not is_mouse_over_hotbar():
 		if not is_attacking:
 			is_attacking = true
 			$AnimatedSprite2D.play("attack")
@@ -300,3 +300,17 @@ func destroy_tiles_in_sword_area():
 func _on_inventory_state_changed(is_open: bool):
 	inventory_is_open = is_open
 	print("Player: Inventory is now ", "open" if is_open else "closed")
+
+func is_mouse_over_hotbar() -> bool:
+	# Check if mouse is over the hotbar
+	var ui_layer = get_parent().get_node_or_null("UI")
+	if not ui_layer:
+		return false
+	
+	var hotbar = ui_layer.get_node_or_null("Hotbar")
+	if not hotbar or not hotbar.visible:
+		return false
+	
+	var mouse_pos = get_viewport().get_mouse_position()
+	var hotbar_rect = Rect2(hotbar.global_position, hotbar.size)
+	return hotbar_rect.has_point(mouse_pos)
