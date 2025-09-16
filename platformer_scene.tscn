@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://fps_counter.gd" id="5_sff61"]
 [ext_resource type="PackedScene" uid="uid://bl5dg3fjv4w6g" path="res://ui/hotbar.tscn" id="6_isrho"]
 [ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://ui/main_inventory.tscn" id="8_cbdxa"]
-[ext_resource type="Script" path="res://ui/inventory_system.gd" id="10_vj6te"]
+[ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://ui/inventory_system.gd" id="10_vj6te"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(13, 3.5)
@@ -192,3 +192,15 @@ grow_horizontal = 0
 
 [node name="InventorySystem" type="Node" parent="UI"]
 script = ExtResource("10_vj6te")
+
+[node name="GoldCoin" parent="." instance=ExtResource("3_drh7r")]
+position = Vector2(-895, 139)
+
+[node name="GoldCoin2" parent="." instance=ExtResource("3_drh7r")]
+position = Vector2(-842, 151)
+
+[node name="GoldCoin3" parent="." instance=ExtResource("3_drh7r")]
+position = Vector2(-1253, 138)
+
+[node name="GoldCoin4" parent="." instance=ExtResource("3_drh7r")]
+position = Vector2(-1105, 146)

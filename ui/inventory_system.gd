@@ -8,6 +8,7 @@ signal inventory_toggled(is_open: bool)
 var hotbar_ui: Control
 var main_inventory_ui: Control
 
+# Public drag state variables for slots to check
 var drag_source_slot: int = -1
 var drag_source_is_hotbar: bool = false
 var is_dragging: bool = false
@@ -15,7 +16,60 @@ var drag_preview: Control
 
 func _ready():
 	# This will be connected when added to the main scene
-	pass
+	# Set process input to handle global mouse releases
+	set_process_input(true)
+
+func _input(event):
+	if event is InputEventMouseButton:
+		var mouse_event = event as InputEventMouseButton
+		if mouse_event.button_index == MOUSE_BUTTON_LEFT:
+			if not mouse_event.pressed and is_dragging:
+				print("Mouse button released while dragging - processing drop")
+				# Mouse released - check what's under the mouse cursor
+				var drop_target = find_slot_under_mouse()
+				if drop_target:
+					print("Drop target found: slot ", drop_target.slot_index, " (", "hotbar" if drop_target.is_hotbar_slot else "inventory", ")")
+					end_drag(drop_target.slot_index, drop_target.is_hotbar_slot)
+				else:
+					print("Drag cancelled - mouse released outside any slot")
+					cancel_drag()
+				get_viewport().set_input_as_handled()
+			elif mouse_event.pressed and is_dragging:
+				print("Mouse button pressed while already dragging - ignoring")
+
+func find_slot_under_mouse():
+	var mouse_pos = get_viewport().get_mouse_position()
+	
+	# Check hotbar slots
+	if hotbar_ui:
+		var hotbar_slots = get_all_slots_from_container(hotbar_ui)
+		for slot in hotbar_slots:
+			if slot.get_global_rect().has_point(mouse_pos):
+				return slot
+	
+	# Check inventory slots (only if inventory is open)
+	if main_inventory_ui and main_inventory_ui.visible:
+		var inventory_slots = get_all_slots_from_container(main_inventory_ui)
+		for slot in inventory_slots:
+			if slot.get_global_rect().has_point(mouse_pos):
+				return slot
+	
+	return null
+
+func get_all_slots_from_container(container: Control) -> Array:
+	var slots = []
+	
+	# Recursively find all inventory slot nodes
+	var stack = [container]
+	while stack.size() > 0:
+		var current = stack.pop_back()
+		for child in current.get_children():
+			if child.has_method("update_display") and child.has_method("get_script") and child.get_script() and child.get_script().resource_path.ends_with("inventory_slot.gd"):
+				slots.append(child)
+			else:
+				stack.push_back(child)
+	
+	return slots
 
 func setup_ui_references(hotbar: Control, inventory: Control):
 	hotbar_ui = hotbar
@@ -96,21 +150,43 @@ func create_drag_preview(slot_data: InventoryManager.InventorySlotData):
 	# Create a simple preview that follows the mouse
 	drag_preview = Control.new()
 	drag_preview.name = "DragPreview"
+	drag_preview.z_index = 1000  # Make sure it appears on top
 	
 	var icon = TextureRect.new()
 	icon.texture = slot_data.item.texture
 	icon.size = Vector2(48, 48)
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.modulate = Color(1, 1, 1, 0.8)  # Semi-transparent
 	
 	drag_preview.add_child(icon)
-	get_tree().current_scene.add_child(drag_preview)
+	
+	# Add to the main scene's UI layer for proper layering
+	var ui_layer = get_node("/root/Platformer/UI")
+	if ui_layer:
+		ui_layer.add_child(drag_preview)
+	else:
+		get_tree().current_scene.add_child(drag_preview)
 	
 	# Update preview position
 	drag_preview.global_position = get_viewport().get_mouse_position() - Vector2(24, 24)
+	
+	print("Created drag preview with texture: ", slot_data.item.texture)
 
 func _process(_delta):
 	if is_dragging and drag_preview:
+		# Update drag preview position to follow mouse
 		drag_preview.global_position = get_viewport().get_mouse_position() - Vector2(24, 24)
+		
+		# Check if mouse button is still held down
+		if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			print("Mouse button no longer pressed - ending drag via process check")
+			var drop_target = find_slot_under_mouse()
+			if drop_target:
+				print("Drop target found via process: slot ", drop_target.slot_index, " (", "hotbar" if drop_target.is_hotbar_slot else "inventory", ")")
+				end_drag(drop_target.slot_index, drop_target.is_hotbar_slot)
+			else:
+				print("Drag cancelled via process - mouse outside any slot")
+				cancel_drag()
 
 func toggle_inventory():
 	print("InventorySystem: toggle_inventory called")

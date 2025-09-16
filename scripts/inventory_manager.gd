@@ -79,6 +79,31 @@ func _ready():
 func register_item(id: String, item_name: String, texture: Texture2D, max_stack: int = 1, description: String = ""):
 	item_database[id] = InventoryItem.new(id, item_name, texture, max_stack, description)
 
+func add_test_items():
+	# Add some gold coins to test drag and drop
+	if item_database.has("gold_coin"):
+		var gold_coin = item_database["gold_coin"]
+		
+		# Add coins to hotbar slots
+		hotbar_slots[0].item = gold_coin
+		hotbar_slots[0].quantity = 3
+		
+		hotbar_slots[2].item = gold_coin
+		hotbar_slots[2].quantity = 5
+		
+		# Add coins to inventory slots
+		inventory_slots[0].item = gold_coin
+		inventory_slots[0].quantity = 7
+		
+		inventory_slots[4].item = gold_coin
+		inventory_slots[4].quantity = 2
+		
+		print("Added test items to inventory and hotbar")
+		
+		# Emit signals to update UI
+		hotbar_changed.emit()
+		inventory_changed.emit()
+
 func get_item_data(id: String) -> InventoryItem:
 	return item_database.get(id, null)
 

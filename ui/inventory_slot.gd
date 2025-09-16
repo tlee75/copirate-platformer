@@ -45,12 +45,11 @@ func _on_gui_input(event: InputEvent):
 			if mouse_event.pressed:
 				slot_clicked.emit(slot_index, is_hotbar_slot)
 				if slot_data and not slot_data.is_empty():
-					is_dragging = true
-					drag_started.emit(slot_index, is_hotbar_slot)
-			else:
-				if is_dragging:
-					is_dragging = false
-					drag_ended.emit(slot_index, is_hotbar_slot)
+					# Start drag through inventory system
+					var inventory_system = get_inventory_system()
+					if inventory_system:
+						inventory_system.start_drag(slot_index, is_hotbar_slot)
+			# Mouse release is now handled by the inventory system globally
 
 func _on_mouse_entered():
 	if not slot_data or slot_data.is_empty():
@@ -89,3 +88,11 @@ func set_highlighted(highlighted: bool):
 func can_accept_drop() -> bool:
 	# This will be called by the drag and drop system
 	return true
+
+func get_inventory_system() -> Node:
+	# Navigate up to find the inventory system
+	# UI/InventorySystem from the slot's perspective
+	var ui_layer = get_node("/root/Platformer/UI")
+	if ui_layer:
+		return ui_layer.get_node_or_null("InventorySystem")
+	return null
