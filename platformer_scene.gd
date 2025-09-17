@@ -8,10 +8,18 @@ extends Node2D
 @onready var main_inventory: Control = $UI/MainInventory
 @onready var inventory_system: Node = $UI/InventorySystem
 @onready var player: CharacterBody2D = $Player
+@onready var pause_menu = $UI/PauseMenu
 
 var inventory_is_open: bool = false
 
-func _ready():
+func _ready():	
+
+	print("PauseMenu found: ", pause_menu != null)
+	print("PauseMenu visible: ", pause_menu.visible)
+	print("PauseMenu size: ", pause_menu.size)
+	print("PauseMenu position: ", pause_menu.position)
+
+
 	# Set up inventory system references
 	inventory_system.setup_ui_references(hotbar, main_inventory)
 	
@@ -19,6 +27,9 @@ func _ready():
 	inventory_system.inventory_toggled.connect(_on_inventory_toggled)
 	
 	print("Game scene initialized with inventory system")
+	
+	pause_menu.resume_requested.connect(_on_resume)
+	pause_menu.restart_requested.connect(_on_restart)
 
 func _on_inventory_toggled(is_open: bool):
 	inventory_is_open = is_open
@@ -44,13 +55,26 @@ func _input(event):
 				
 				get_viewport().set_input_as_handled()
 			
-			elif key_event.keycode == KEY_ESCAPE and inventory_is_open:
-				# ESC only closes inventory when it's open
-				main_inventory.hide_inventory()
-				inventory_is_open = false
+			elif key_event.keycode == KEY_ESCAPE:
+				if inventory_is_open:
+					# ESC only closes inventory when it's open
+					main_inventory.hide_inventory()
+					inventory_is_open = false
 				
-				# Notify player script about inventory state change
-				if player.has_signal("inventory_state_changed"):
-					player.inventory_state_changed.emit(inventory_is_open)
+					# Notify player script about inventory state change
+					if player.has_signal("inventory_state_changed"):
+						player.inventory_state_changed.emit(inventory_is_open)
+				else:
+					# Escape opens pause menu
+					pause_menu.show()
+					get_tree().paused = true
 				
 				get_viewport().set_input_as_handled()
+
+func _on_resume():
+	pause_menu.hide()
+	get_tree().paused = false
+
+func _on_restart():
+	get_tree().paused = false
+	get_tree().reload_current_scene()

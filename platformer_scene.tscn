@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=14 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://player.tscn" id="1_rnor3"]
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://platformer_scene.gd" id="1_vn5xl"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://dgdkbk47a63st" path="res://barrel.tscn" id="6_vj6te"]
 [ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://ui/main_inventory.tscn" id="8_cbdxa"]
 [ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://ui/inventory_system.gd" id="10_vj6te"]
+[ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://ui/pause_menu.tscn" id="10_vn5xl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(13, 3.5)
@@ -180,6 +181,13 @@ grow_horizontal = 0
 
 [node name="InventorySystem" type="Node" parent="UI"]
 script = ExtResource("10_vj6te")
+
+[node name="PauseMenu" parent="UI" instance=ExtResource("10_vn5xl")]
+visible = false
+offset_left = 482.0
+offset_top = 235.0
+offset_right = -448.0
+offset_bottom = -325.0
 
 [node name="Barrels" type="Node" parent="."]
 
