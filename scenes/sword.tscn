@@ -1,0 +1,89 @@
+[gd_scene load_steps=20 format=3 uid="uid://gc64jn5o6v6i"]
+
+[ext_resource type="Texture2D" uid="uid://c0ewinxvoplun" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 01.png" id="1_ml5hy"]
+[ext_resource type="Script" uid="uid://dhnrxu4hloio4" path="res://scripts/sword.gd" id="1_xccsb"]
+[ext_resource type="Texture2D" uid="uid://wwgb343vjns8" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 02.png" id="2_xccsb"]
+[ext_resource type="Texture2D" uid="uid://5py7o2h7fk3m" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 03.png" id="3_p4x8v"]
+[ext_resource type="Texture2D" uid="uid://dci2ban56inps" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 04.png" id="4_3oqan"]
+[ext_resource type="Texture2D" uid="uid://jo8r4aggueuq" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 05.png" id="5_sjcpw"]
+[ext_resource type="Texture2D" uid="uid://burq5e6b6t2cx" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 06.png" id="6_mma44"]
+[ext_resource type="Texture2D" uid="uid://b1032htiece6r" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 07.png" id="7_mqgyi"]
+[ext_resource type="Texture2D" uid="uid://ckkouahomggeq" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 08.png" id="8_ogkfw"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ejoqe"]
+atlas = ExtResource("1_ml5hy")
+region = Rect2(0, 0, 20, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jvvga"]
+atlas = ExtResource("2_xccsb")
+region = Rect2(0, 0, 20, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_05hgr"]
+atlas = ExtResource("3_p4x8v")
+region = Rect2(0, 0, 20, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cgffg"]
+atlas = ExtResource("4_3oqan")
+region = Rect2(0, 0, 20, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nyjpp"]
+atlas = ExtResource("5_sjcpw")
+region = Rect2(0, 0, 20, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p4qfc"]
+atlas = ExtResource("6_mma44")
+region = Rect2(0, 0, 20, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sjv4m"]
+atlas = ExtResource("7_mqgyi")
+region = Rect2(0, 0, 20, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lnbtq"]
+atlas = ExtResource("8_ogkfw")
+region = Rect2(0, 0, 20, 20)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_63by1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ejoqe")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jvvga")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_05hgr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cgffg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nyjpp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p4qfc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sjv4m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lnbtq")
+}],
+"loop": true,
+"name": &"sword_idle",
+"speed": 7.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mcaqy"]
+size = Vector2(20, 8)
+
+[node name="Sword" type="Area2D"]
+script = ExtResource("1_xccsb")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_63by1")
+animation = &"sword_idle"
+frame_progress = 0.875599
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_mcaqy")

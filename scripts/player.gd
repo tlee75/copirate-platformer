@@ -121,8 +121,10 @@ func _physics_process(delta):
 				# Fallback to hook attack, e.g. melee
 				is_trigger_action = true
 				$AnimatedSprite2D.play("hook")
+				
 				# Destroy tiles in sword area
 				#destroy_tiles_in_sword_area()
+				
 				# Connect to animation finished signal to end attack
 				if not $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
 					$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)

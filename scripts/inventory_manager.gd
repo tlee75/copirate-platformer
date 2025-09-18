@@ -74,35 +74,38 @@ func _ready():
 	# Initialize item database with gold coin
 	register_item("gold_coin", "Gold Coin", load("res://assets/Pirate Treasure/Sprites/Gold Coin/01.png"), 9, "Shiny gold coins!")
 	
+	# Initialize item database with sword
+	register_item("sword", "Sword", load("res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 01.png"), 1, "Cool Sword!")
+
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
 func register_item(id: String, item_name: String, texture: Texture2D, max_stack: int = 1, description: String = ""):
 	item_database[id] = InventoryItem.new(id, item_name, texture, max_stack, description)
 
-func add_test_items():
-	# Add some gold coins to test drag and drop
-	if item_database.has("gold_coin"):
-		var gold_coin = item_database["gold_coin"]
-		
-		# Add coins to hotbar slots
-		hotbar_slots[0].item = gold_coin
-		hotbar_slots[0].quantity = 3
-		
-		hotbar_slots[2].item = gold_coin
-		hotbar_slots[2].quantity = 5
-		
-		# Add coins to inventory slots
-		inventory_slots[0].item = gold_coin
-		inventory_slots[0].quantity = 7
-		
-		inventory_slots[4].item = gold_coin
-		inventory_slots[4].quantity = 2
-		
-		print("Added test items to inventory and hotbar")
-		
-		# Emit signals to update UI
-		hotbar_changed.emit()
-		inventory_changed.emit()
+#func add_test_items():
+	## Add some gold coins to test drag and drop
+	#if item_database.has("gold_coin"):
+		#var gold_coin = item_database["gold_coin"]
+		#
+		## Add coins to hotbar slots
+		#hotbar_slots[0].item = gold_coin
+		#hotbar_slots[0].quantity = 3
+		#
+		#hotbar_slots[2].item = gold_coin
+		#hotbar_slots[2].quantity = 5
+		#
+		## Add coins to inventory slots
+		#inventory_slots[0].item = gold_coin
+		#inventory_slots[0].quantity = 7
+		#
+		#inventory_slots[4].item = gold_coin
+		#inventory_slots[4].quantity = 2
+		#
+		#print("Added test items to inventory and hotbar")
+		#
+		## Emit signals to update UI
+		#hotbar_changed.emit()
+		#inventory_changed.emit()
 
 func get_item_data(id: String) -> InventoryItem:
 	return item_database.get(id, null)
