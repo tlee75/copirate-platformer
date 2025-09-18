@@ -10,7 +10,7 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") a
 
 var was_airborne: bool = false
 var w_key_was_pressed: bool = false
-var is_using_item: bool = false
+var is_trigger_action: bool = false
 var sword_area: Area2D
 var tilemap: TileMap
 var highlighted_tiles: Array[Vector2i] = []
@@ -112,16 +112,17 @@ func _physics_process(delta):
 	
 	# Attack input - left mouse button (but not when clicking on hotbar)
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not is_mouse_over_hotbar():
-		if not is_using_item:
+		# Only perform an action if one is not already in progress
+		if not is_trigger_action:
 			var selected_item = get_selected_hotbar_item()
 			if selected_item and selected_item.has_method("action"):
 				selected_item.action(self)
 			else:
-				# Fallback to default attack, e.g. melee
-				is_using_item = true
-				$AnimatedSprite2D.play("attack")
+				# Fallback to hook attack, e.g. melee
+				is_trigger_action = true
+				$AnimatedSprite2D.play("hook")
 				# Destroy tiles in sword area
-				destroy_tiles_in_sword_area()
+				#destroy_tiles_in_sword_area()
 				# Connect to animation finished signal to end attack
 				if not $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
 					$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
@@ -136,8 +137,8 @@ func _physics_process(delta):
 	
 
 func handle_animations():
-	# Don't change animations while attacking
-	if is_using_item:
+	# Don't change animations while in the middle of an action
+	if is_trigger_action:
 		return
 		
 	var on_floor = is_on_floor()
@@ -175,7 +176,7 @@ func _on_ground_animation_finished():
 
 func _on_attack_animation_finished():
 	# When attack animation finishes, end attack state
-	is_using_item = false
+	is_trigger_action = false
 	# Transition to appropriate animation
 	if is_on_floor():
 		if abs(velocity.x) > 1.0:

@@ -13,7 +13,6 @@ script = ExtResource("1_4flbx")
 sprite_frames = ExtResource("2_onrkg")
 animation = &"attack"
 autoplay = "idle"
-frame = 1
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(3, 3)

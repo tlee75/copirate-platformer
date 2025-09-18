@@ -21,8 +21,7 @@ func _ready():
 		# Connect slot signals
 		slot_node.slot_clicked.connect(_on_slot_clicked)
 	
-	# Start the game with slot 0 selected
-	print("selecting slot")
+	# Start the game with slot 0 selectedF
 	select_slot(0)
 	
 	# Connect to inventory manager signals

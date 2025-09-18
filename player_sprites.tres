@@ -1,10 +1,13 @@
-[gd_resource type="SpriteFrames" load_steps=21 format=3 uid="uid://byhcsye5efc0e"]
+[gd_resource type="SpriteFrames" load_steps=27 format=3 uid="uid://byhcsye5efc0e"]
 
 [ext_resource type="Texture2D" uid="uid://d2bd47iewlqe8" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/01-Idle/Idle 01.png" id="2_ojh6c"]
 [ext_resource type="Texture2D" uid="uid://nt3muxlrfcpg" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/01-Idle/Idle 02.png" id="3_xdt03"]
 [ext_resource type="Texture2D" uid="uid://e0qyl0bloovl" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/01-Idle/Idle 03.png" id="4_2e2mp"]
 [ext_resource type="Texture2D" uid="uid://ckot7n6d4ygvr" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/01-Idle/Idle 04.png" id="5_rfjc7"]
 [ext_resource type="Texture2D" uid="uid://i0ftbdmstahp" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/01-Idle/Idle 05.png" id="6_17b3r"]
+[ext_resource type="Texture2D" uid="uid://via5p8rsud0p" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/09-Hook/Hook_1.png" id="7_537aw"]
+[ext_resource type="Texture2D" uid="uid://c5aaukj7rv3ha" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/09-Hook/Hook_2.png" id="8_xye0i"]
+[ext_resource type="Texture2D" uid="uid://bqx0ds8o23ugo" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/09-Hook/Hook_3.png" id="9_45k13"]
 [ext_resource type="Texture2D" uid="uid://c1gkg1pldlyfm" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/02-Run/Run 01.png" id="10_xye0i"]
 [ext_resource type="Texture2D" uid="uid://cwdkb8r5u45qg" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/02-Run/Run 02.png" id="11_45k13"]
 [ext_resource type="Texture2D" uid="uid://dd63ekjlvc4aj" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose without Sword/02-Run/Run 03.png" id="12_glgr8"]
@@ -21,6 +24,18 @@
 [ext_resource type="Texture2D" uid="uid://c73rcd3ff7umh" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose with Sword/15-Attack 1/Attack 1 02.png" id="23_attack2"]
 [ext_resource type="Texture2D" uid="uid://dnpp4n2fddpvk" path="res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Captain Clown Nose with Sword/15-Attack 1/Attack 1 03.png" id="24_attack3"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_glgr8"]
+atlas = ExtResource("7_537aw")
+region = Rect2(0, 0, 64, 40)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2652v"]
+atlas = ExtResource("8_xye0i")
+region = Rect2(0, 0, 64, 40)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3wkde"]
+atlas = ExtResource("9_45k13")
+region = Rect2(0, 0, 64, 40)
+
 [resource]
 animations = [{
 "frames": [{
@@ -35,7 +50,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"attack",
-"speed": 12.0
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -55,6 +70,20 @@ animations = [{
 "loop": false,
 "name": &"ground",
 "speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_glgr8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2652v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3wkde")
+}],
+"loop": false,
+"name": &"hook",
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,

@@ -54,29 +54,14 @@ func check_for_player_actions():
 	for area in overlapping_areas:
 		if area.name == "SwordArea":
 			var player = area.get_parent()
-			if player and player.is_using_item:
-				handle_action("attack", player)
+			if player and player.is_trigger_action:
+				handle_attack_action(player)
 				return
 
 func _on_area_exited(_area: Area2D):
 	# Could be used for effects in the future
 	pass
 
-# REMOVED: Signal-based detection to prevent duplicate hits
-# func _on_hit_by_attack(area: Area2D):
-#	# This was causing double-hits with the process-based system
-
-# Modular action handler system
-func handle_action(action_type: String, actor):
-	match action_type:
-		"attack":
-			handle_attack_action(actor)
-		"interact":
-			handle_interact_action(actor)
-		"use_item":
-			handle_use_item_action(actor)
-		_:
-			print("Unknown action type: ", action_type)
 
 # Attack action handler
 func handle_attack_action(_player):
