@@ -10,7 +10,7 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") a
 
 var was_airborne: bool = false
 var w_key_was_pressed: bool = false
-var is_attacking: bool = false
+var is_using_item: bool = false
 var sword_area: Area2D
 var tilemap: TileMap
 var highlighted_tiles: Array[Vector2i] = []
@@ -112,14 +112,19 @@ func _physics_process(delta):
 	
 	# Attack input - left mouse button (but not when clicking on hotbar)
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not is_mouse_over_hotbar():
-		if not is_attacking:
-			is_attacking = true
-			$AnimatedSprite2D.play("attack")
-			# Destroy tiles in sword area
-			destroy_tiles_in_sword_area()
-			# Connect to animation finished signal to end attack
-			if not $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
-				$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
+		if not is_using_item:
+			var selected_item = get_selected_hotbar_item()
+			if selected_item and selected_item.has_method("action"):
+				selected_item.action(self)
+			else:
+				# Fallback to default attack, e.g. melee
+				is_using_item = true
+				$AnimatedSprite2D.play("attack")
+				# Destroy tiles in sword area
+				destroy_tiles_in_sword_area()
+				# Connect to animation finished signal to end attack
+				if not $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
+					$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
 
 	# Update physics first
 	velocity = vel
@@ -132,7 +137,7 @@ func _physics_process(delta):
 
 func handle_animations():
 	# Don't change animations while attacking
-	if is_attacking:
+	if is_using_item:
 		return
 		
 	var on_floor = is_on_floor()
@@ -170,7 +175,7 @@ func _on_ground_animation_finished():
 
 func _on_attack_animation_finished():
 	# When attack animation finishes, end attack state
-	is_attacking = false
+	is_using_item = false
 	# Transition to appropriate animation
 	if is_on_floor():
 		if abs(velocity.x) > 1.0:
@@ -314,3 +319,12 @@ func is_mouse_over_hotbar() -> bool:
 	var mouse_pos = get_viewport().get_mouse_position()
 	var hotbar_rect = Rect2(hotbar.global_position, hotbar.size)
 	return hotbar_rect.has_point(mouse_pos)
+
+func get_selected_hotbar_item():
+	var ui_layer = get_parent().get_node_or_null("UI")
+	if not ui_layer:
+		return null
+	var hotbar = ui_layer.get_node_or_null("Hotbar")
+	if not hotbar:
+		return null
+	return hotbar.get_selected_item()

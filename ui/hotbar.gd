@@ -21,6 +21,10 @@ func _ready():
 		# Connect slot signals
 		slot_node.slot_clicked.connect(_on_slot_clicked)
 	
+	# Start the game with slot 0 selected
+	print("selecting slot")
+	select_slot(0)
+	
 	# Connect to inventory manager signals
 	InventoryManager.hotbar_changed.connect(_update_display)
 	
@@ -46,6 +50,7 @@ func _on_drag_ended(slot_index: int, _is_hotbar: bool):
 
 func select_slot(index: int):
 	selected_slot = clamp(index, 0, get_slot_count() -1)
+	print("selected_slot: ", selected_slot)
 	update_slot_highlight()
 
 func update_slot_highlight():
@@ -57,3 +62,8 @@ func update_slot_highlight():
 
 func get_slot_count():
 	return slot_nodes.size()
+
+func get_selected_item():
+	if selected_slot >= 0 and selected_slot < slot_nodes.size():
+		return slot_nodes[selected_slot].slot_data.item
+	return null

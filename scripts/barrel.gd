@@ -54,7 +54,7 @@ func check_for_player_actions():
 	for area in overlapping_areas:
 		if area.name == "SwordArea":
 			var player = area.get_parent()
-			if player and player.is_attacking:
+			if player and player.is_using_item:
 				handle_action("attack", player)
 				return
 
