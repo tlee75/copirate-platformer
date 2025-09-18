@@ -3,6 +3,8 @@ extends Control
 # Hotbar UI - displays the 8 hotbar slots at the bottom of the screen
 # Connects to InventoryManager for data
 
+var selected_slot: int = 0
+
 @onready var slot_container: HBoxContainer = $HBoxContainer
 var slot_nodes: Array[Control] = []
 
@@ -41,3 +43,17 @@ func _on_drag_started(slot_index: int, _is_hotbar: bool):
 func _on_drag_ended(slot_index: int, _is_hotbar: bool):
 	print("Drag ended on hotbar slot ", slot_index)
 	# TODO: Implement drag and drop logic
+
+func select_slot(index: int):
+	selected_slot = clamp(index, 0, get_slot_count() -1)
+	update_slot_highlight()
+
+func update_slot_highlight():
+	for i in slot_nodes.size():
+		if i == selected_slot:
+			slot_nodes[i].modulate = Color(1, 1, 0.5) # Highlighted yellowish
+		else:
+			slot_nodes[i].modulate = Color(1, 1, 1) # Normal
+
+func get_slot_count():
+	return slot_nodes.size()

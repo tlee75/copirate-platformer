@@ -4,7 +4,7 @@ extends Node2D
 # Handles coordination between game systems and UI
 
 @onready var ui_layer: CanvasLayer = $UI
-@onready var hotbar: Control = $UI/Hotbar
+@onready var hotbar = $UI/Hotbar
 @onready var main_inventory: Control = $UI/MainInventory
 @onready var inventory_system: Node = $UI/InventorySystem
 @onready var player: CharacterBody2D = $Player
@@ -70,6 +70,13 @@ func _input(event):
 					get_tree().paused = true
 				
 				get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			hotbar.select_slot(hotbar.selected_slot - 1)
+			get_viewport().set_input_as_handled()
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			hotbar.select_slot(hotbar.selected_slot + 1)
+			get_viewport().set_input_as_handled()
 
 func _on_resume():
 	pause_menu.hide()
