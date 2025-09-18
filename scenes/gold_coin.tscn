@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dhi7durjec88o"]
 
-[ext_resource type="Script" uid="uid://btunmvjgcyo0m" path="res://gold_coin.gd" id="1_3fd4r"]
+[ext_resource type="Script" uid="uid://btunmvjgcyo0m" path="res://scripts/gold_coin.gd" id="1_3fd4r"]
 [ext_resource type="SpriteFrames" uid="uid://dpe4l4uad0kgl" path="res://gold_coin_frames.tres" id="2_sslou"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qg3m1"]

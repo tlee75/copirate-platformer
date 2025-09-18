@@ -1,7 +1,8 @@
-[gd_scene load_steps=25 format=3 uid="uid://dgdkbk47a63st"]
+[gd_scene load_steps=26 format=3 uid="uid://dgdkbk47a63st"]
 
-[ext_resource type="Script" uid="uid://d2quycw40yq08" path="res://barrel.gd" id="1_a12vh"]
+[ext_resource type="Script" uid="uid://d2quycw40yq08" path="res://scripts/barrel.gd" id="1_a12vh"]
 [ext_resource type="Texture2D" uid="uid://d0px3iyaxyaqi" path="res://assets/Merchant Ship/Sprites/Barrel/Idle/1.png" id="1_n8un1"]
+[ext_resource type="PackedScene" uid="uid://dhi7durjec88o" path="res://scenes/gold_coin.tscn" id="2_61w87"]
 [ext_resource type="Texture2D" uid="uid://c7i5fal2t1ik6" path="res://assets/Merchant Ship/Sprites/Barrel/Destroyed/1.png" id="2_rdalc"]
 [ext_resource type="Texture2D" uid="uid://cvey44dixxrvq" path="res://assets/Merchant Ship/Sprites/Barrel/Destroyed/2.png" id="3_jxg48"]
 [ext_resource type="Texture2D" uid="uid://c7fcnlh24ne7f" path="res://assets/Merchant Ship/Sprites/Barrel/Destroyed/3.png" id="4_cicwk"]
@@ -108,6 +109,7 @@ size = Vector2(21, 23)
 
 [node name="Barrel" type="StaticBody2D"]
 script = ExtResource("1_a12vh")
+gold_coin_scene = ExtResource("2_61w87")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_a12vh")

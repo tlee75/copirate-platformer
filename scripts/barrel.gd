@@ -18,13 +18,16 @@ var health: int = max_health
 @export var hit_cooldown_time: float = 0.6  # Longer than attack animation duration
 var hit_cooldown: float = 0.0
 
+@export var gold_coin_scene: PackedScene
+
 # Loot table structure: [item_scene_path, drop_chance, min_quantity, max_quantity]
-var loot_table: Array = [
-	["res://gold_coin.tscn", 1.0, 1, 3]  # 100% chance to drop 1-3 gold coins
-]
+var loot_table: Array
 
 func _ready():
-	# No signal connections needed - using process-based aimed detection only
+	# Setup loot table after exported variables are set
+	loot_table = [
+		[gold_coin_scene, 1.0, 1, 3]  # 100% chance to drop 1-3 gold coins
+	]
 	
 	# Set up animations if available
 	if animated_sprite.sprite_frames:
@@ -156,7 +159,7 @@ func break_barrel():
 # Loot dropping system
 func drop_loot():
 	for loot_entry in loot_table:
-		var item_scene_path = loot_entry[0]
+		var item_scene = loot_entry[0]
 		var drop_chance = loot_entry[1]
 		var min_quantity = loot_entry[2] 
 		var max_quantity = loot_entry[3]
@@ -167,13 +170,11 @@ func drop_loot():
 			
 			# Spawn the items
 			for i in quantity:
-				spawn_loot_item(item_scene_path, i)
+				spawn_loot_item(item_scene, i)
 
-func spawn_loot_item(scene_path: String, offset_index: int):
-	# Load the item scene
-	var item_scene = load(scene_path)
+func spawn_loot_item(item_scene: PackedScene, offset_index: int):
 	if not item_scene:
-		print("Failed to load loot item scene: ", scene_path)
+		print("Failed to spawn loot: PackedScene is null")
 		return
 	
 	# Instantiate the item
@@ -186,7 +187,7 @@ func spawn_loot_item(scene_path: String, offset_index: int):
 	# Add to the scene
 	get_parent().add_child(item_instance)
 	
-	print("Spawned loot item: ", scene_path, " at position: ", item_instance.global_position)
+	print("Spawned loot item at position: ", item_instance.global_position)
 
 func find_valid_spawn_position(offset_index: int) -> Vector2:
 	var max_attempts = 20

@@ -1,21 +1,21 @@
 [gd_scene load_steps=14 format=3 uid="uid://dj3pqaq3v6bwo"]
 
-[ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://player.tscn" id="1_rnor3"]
-[ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://platformer_scene.gd" id="1_vn5xl"]
-[ext_resource type="Texture2D" uid="uid://xbvs700g2epd" path="res://crosshair.tres" id="2_gwrsa"]
-[ext_resource type="Texture2D" uid="uid://bl14jhy22cg2u" path="res://assets/Palm Tree Island/Sprites/Terrain/Terrain (32x32).png" id="2_ru564"]
-[ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://fps_counter.gd" id="5_sff61"]
-[ext_resource type="PackedScene" uid="uid://bl5dg3fjv4w6g" path="res://ui/hotbar.tscn" id="6_isrho"]
-[ext_resource type="PackedScene" uid="uid://dgdkbk47a63st" path="res://barrel.tscn" id="6_vj6te"]
-[ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://ui/main_inventory.tscn" id="8_cbdxa"]
-[ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://ui/inventory_system.gd" id="10_vj6te"]
-[ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://ui/pause_menu.tscn" id="10_vn5xl"]
+[ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_yte5o"]
+[ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_8w8yu"]
+[ext_resource type="Texture2D" uid="uid://xbvs700g2epd" path="res://crosshair.tres" id="3_xoih0"]
+[ext_resource type="Texture2D" uid="uid://bl14jhy22cg2u" path="res://assets/Palm Tree Island/Sprites/Terrain/Terrain (32x32).png" id="4_mx3pc"]
+[ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://scripts/fps_counter.gd" id="5_f15g2"]
+[ext_resource type="PackedScene" uid="uid://bl5dg3fjv4w6g" path="res://ui/hotbar.tscn" id="6_atnpy"]
+[ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://ui/main_inventory.tscn" id="7_cy82x"]
+[ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://ui/inventory_system.gd" id="8_q5qfs"]
+[ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://ui/pause_menu.tscn" id="9_btm0u"]
+[ext_resource type="PackedScene" uid="uid://dgdkbk47a63st" path="res://scenes/barrel.tscn" id="10_nrqbv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(13, 3.5)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_drh7r"]
-texture = ExtResource("2_ru564")
+texture = ExtResource("4_mx3pc")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
@@ -118,9 +118,9 @@ physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_drh7r")
 
 [node name="Platformer" type="Node2D"]
-script = ExtResource("1_vn5xl")
+script = ExtResource("1_yte5o")
 
-[node name="Player" parent="." instance=ExtResource("1_rnor3")]
+[node name="Player" parent="." instance=ExtResource("2_8w8yu")]
 z_index = 1
 position = Vector2(-1078, 138)
 
@@ -136,7 +136,7 @@ shape = SubResource("RectangleShape2D_ru564")
 modulate = Color(1, 1, 1, 0.7)
 position = Vector2(8, 3)
 scale = Vector2(0.8, 0.8)
-texture = ExtResource("2_gwrsa")
+texture = ExtResource("3_xoih0")
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = SubResource("TileSet_gwrsa")
@@ -160,15 +160,15 @@ offset_right = 27.5599
 offset_bottom = -29.32
 grow_horizontal = 0
 text = "FPS: 60"
-script = ExtResource("5_sff61")
+script = ExtResource("5_f15g2")
 
-[node name="Hotbar" parent="UI" instance=ExtResource("6_isrho")]
+[node name="Hotbar" parent="UI" instance=ExtResource("6_atnpy")]
 offset_left = -251.0
 offset_top = -93.0
 offset_right = 261.0
 offset_bottom = -29.0
 
-[node name="MainInventory" parent="UI" instance=ExtResource("8_cbdxa")]
+[node name="MainInventory" parent="UI" instance=ExtResource("7_cy82x")]
 anchors_preset = 6
 anchor_left = 1.0
 anchor_top = 0.5
@@ -180,9 +180,9 @@ offset_bottom = 13.0
 grow_horizontal = 0
 
 [node name="InventorySystem" type="Node" parent="UI"]
-script = ExtResource("10_vj6te")
+script = ExtResource("8_q5qfs")
 
-[node name="PauseMenu" parent="UI" instance=ExtResource("10_vn5xl")]
+[node name="PauseMenu" parent="UI" instance=ExtResource("9_btm0u")]
 visible = false
 offset_left = 482.0
 offset_top = 235.0
@@ -191,17 +191,17 @@ offset_bottom = -325.0
 
 [node name="Barrels" type="Node" parent="."]
 
-[node name="Barrel" parent="Barrels" instance=ExtResource("6_vj6te")]
+[node name="Barrel" parent="Barrels" instance=ExtResource("10_nrqbv")]
 position = Vector2(-1026, 147)
 
-[node name="Barrel2" parent="Barrels" instance=ExtResource("6_vj6te")]
+[node name="Barrel2" parent="Barrels" instance=ExtResource("10_nrqbv")]
 position = Vector2(-1130, 148)
 
-[node name="Barrel3" parent="Barrels" instance=ExtResource("6_vj6te")]
+[node name="Barrel3" parent="Barrels" instance=ExtResource("10_nrqbv")]
 position = Vector2(-961, 148)
 
-[node name="Barrel4" parent="Barrels" instance=ExtResource("6_vj6te")]
+[node name="Barrel4" parent="Barrels" instance=ExtResource("10_nrqbv")]
 position = Vector2(-1227, 149)
 
-[node name="Barrel5" parent="Barrels" instance=ExtResource("6_vj6te")]
+[node name="Barrel5" parent="Barrels" instance=ExtResource("10_nrqbv")]
 position = Vector2(-1180, 149)
