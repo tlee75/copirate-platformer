@@ -18,8 +18,6 @@ func _ready():
 		
 		# Connect slot signals
 		slot_node.slot_clicked.connect(_on_slot_clicked)
-		slot_node.drag_started.connect(_on_drag_started)
-		slot_node.drag_ended.connect(_on_drag_ended)
 	
 	# Connect to inventory manager signals
 	InventoryManager.hotbar_changed.connect(_update_display)

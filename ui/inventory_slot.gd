@@ -4,8 +4,6 @@ extends Control
 # The actual data is managed by InventoryManager
 
 signal slot_clicked(slot_index: int, is_hotbar: bool)
-signal drag_started(slot_index: int, is_hotbar: bool)
-signal drag_ended(slot_index: int, is_hotbar: bool)
 
 @export var slot_index: int = 0
 @export var is_hotbar_slot: bool = false

@@ -31,8 +31,6 @@ func _ready():
 		
 		# Connect signals
 		slot_instance.slot_clicked.connect(_on_slot_clicked)
-		slot_instance.drag_started.connect(_on_drag_started)
-		slot_instance.drag_ended.connect(_on_drag_ended)
 		
 		grid_container.add_child(slot_instance)
 		slot_nodes.append(slot_instance)
