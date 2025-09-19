@@ -9,7 +9,8 @@ func _ready():
 func _on_body_entered(body):
 	# If player touches coin, add to inventory
 	if body is Player:
-		if InventoryManager.add_item("gold_coin", 1):
+		var gold_coin_item = InventoryManager.item_database["gold_coin"]
+		if InventoryManager.add_item(gold_coin_item, 1):
 			print("Gold coin added to inventory!")
 			queue_free()
 		else:

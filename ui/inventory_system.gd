@@ -153,7 +153,7 @@ func create_drag_preview(slot_data: InventoryManager.InventorySlotData):
 	drag_preview.z_index = 1000  # Make sure it appears on top
 	
 	var icon = TextureRect.new()
-	icon.texture = slot_data.item.texture
+	icon.texture = slot_data.item.icon
 	icon.size = Vector2(48, 48)
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.modulate = Color(1, 1, 1, 0.8)  # Semi-transparent
@@ -170,7 +170,7 @@ func create_drag_preview(slot_data: InventoryManager.InventorySlotData):
 	# Update preview position
 	drag_preview.global_position = get_viewport().get_mouse_position() - Vector2(24, 24)
 	
-	print("Created drag preview with texture: ", slot_data.item.texture)
+	print("Created drag preview with texture: ", slot_data.item.icon)
 
 func _process(_delta):
 	if is_dragging and drag_preview:

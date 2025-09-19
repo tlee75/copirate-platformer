@@ -69,7 +69,7 @@ func update_display(new_slot_data: InventoryManager.InventorySlotData):
 			quantity_label.text = ""
 	else:
 		if item_icon:
-			item_icon.texture = slot_data.item.texture
+			item_icon.texture = slot_data.item.icon
 		if quantity_label:
 			if slot_data.quantity > 1:
 				quantity_label.text = str(slot_data.quantity)

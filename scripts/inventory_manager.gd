@@ -7,38 +7,25 @@ signal inventory_changed
 signal hotbar_changed
 
 # Item data structure
-class InventoryItem:
-	var id: String = ""
-	var name: String = ""
-	var texture: Texture2D = null
-	var stack_size: int = 1
-	var description: String = ""
-	
-	func _init(item_id: String = "", item_name: String = "", item_texture: Texture2D = null, max_stack: int = 1, item_desc: String = ""):
-		id = item_id
-		name = item_name
-		texture = item_texture
-		stack_size = max_stack
-		description = item_desc
 
 class InventorySlotData:
-	var item: InventoryItem = null
+	var item: Item = null
 	var quantity: int = 0
 	
 	func is_empty() -> bool:
 		return item == null or quantity <= 0
 	
-	func can_add_item(new_item: InventoryItem, amount: int = 1) -> bool:
+	func can_add_item(new_item: Item, amount: int = 1) -> bool:
 		if is_empty():
 			return true
-		return item.id == new_item.id and quantity + amount <= item.stack_size
+		return item.name == new_item.name and quantity + amount <= item.stack_size
 	
-	func add_item(new_item: InventoryItem, amount: int = 1) -> int:
+	func add_item(new_item: Item, amount: int = 1) -> int:
 		if is_empty():
 			item = new_item
 			quantity = min(amount, new_item.stack_size)
 			return amount - quantity
-		elif item.id == new_item.id:
+		elif item.name == new_item.name:
 			var can_add = min(amount, item.stack_size - quantity)
 			quantity += can_add
 			return amount - can_add
@@ -71,16 +58,20 @@ func _ready():
 	for i in 16:  # 16 inventory slots
 		inventory_slots.append(InventorySlotData.new())
 	
-	# Initialize item database with gold coin
-	register_item("gold_coin", "Gold Coin", load("res://assets/Pirate Treasure/Sprites/Gold Coin/01.png"), 9, "Shiny gold coins!")
+	# Initialize item database with gold coin	
+	var gold_coin_item = GoldCoinItem.new()
+	gold_coin_item.name = "Gold Coin"
+	gold_coin_item.icon = load("res://assets/Pirate Treasure/Sprites/Gold Coin/01.png")
+	gold_coin_item.stack_size = 10
+	item_database["gold_coin"] = gold_coin_item
 	
 	# Initialize item database with sword
-	register_item("sword", "Sword", load("res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 01.png"), 1, "Cool Sword!")
-
+	var sword_item = SwordItem.new()
+	sword_item.name = "Sword"
+	sword_item.icon = load("res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 01.png")
+	sword_item.stack_size = 1
+	item_database["sword"] = sword_item
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
-
-func register_item(id: String, item_name: String, texture: Texture2D, max_stack: int = 1, description: String = ""):
-	item_database[id] = InventoryItem.new(id, item_name, texture, max_stack, description)
 
 #func add_test_items():
 	## Add some gold coins to test drag and drop
@@ -107,30 +98,23 @@ func register_item(id: String, item_name: String, texture: Texture2D, max_stack:
 		#hotbar_changed.emit()
 		#inventory_changed.emit()
 
-func get_item_data(id: String) -> InventoryItem:
-	return item_database.get(id, null)
 
 # Add item to inventory (tries hotbar first, then main inventory)
-func add_item(item_id: String, amount: int = 1) -> bool:
-	var item_data = get_item_data(item_id)
-	if not item_data:
-		print("Item not found in database: ", item_id)
-		return false
-	
+func add_item(item: Item, amount: int = 1) -> bool:	
 	var remaining = amount
 	
 	# Try to add to existing stacks in hotbar first
 	for slot in hotbar_slots:
-		if not slot.is_empty() and slot.item.id == item_id:
-			remaining = slot.add_item(item_data, remaining)
+		if not slot.is_empty() and slot.item.name == item.name:
+			remaining = slot.add_item(item, remaining)
 			if remaining <= 0:
 				hotbar_changed.emit()
 				return true
 	
 	# Try to add to existing stacks in main inventory
 	for slot in inventory_slots:
-		if not slot.is_empty() and slot.item.id == item_id:
-			remaining = slot.add_item(item_data, remaining)
+		if not slot.is_empty() and slot.item.name == item.name:
+			remaining = slot.add_item(item, remaining)
 			if remaining <= 0:
 				inventory_changed.emit()
 				return true
@@ -138,7 +122,7 @@ func add_item(item_id: String, amount: int = 1) -> bool:
 	# Try to add to empty slots in hotbar
 	for slot in hotbar_slots:
 		if slot.is_empty():
-			remaining = slot.add_item(item_data, remaining)
+			remaining = slot.add_item(item, remaining)
 			if remaining <= 0:
 				hotbar_changed.emit()
 				return true
@@ -146,7 +130,7 @@ func add_item(item_id: String, amount: int = 1) -> bool:
 	# Try to add to empty slots in main inventory
 	for slot in inventory_slots:
 		if slot.is_empty():
-			remaining = slot.add_item(item_data, remaining)
+			remaining = slot.add_item(item, remaining)
 			if remaining <= 0:
 				inventory_changed.emit()
 				return true
@@ -155,10 +139,10 @@ func add_item(item_id: String, amount: int = 1) -> bool:
 	if remaining < amount:
 		hotbar_changed.emit()
 		inventory_changed.emit()
-		print("Added ", amount - remaining, " of ", amount, " ", item_data.name, "(s). ", remaining, " couldn't fit.")
+		print("Added ", amount - remaining, " of ", amount, " ", item.name, "(s). ", remaining, " couldn't fit.")
 		return true
 	
-	print("Inventory full! Couldn't add ", item_data.name)
+	print("Inventory full! Couldn't add ", item.name)
 	return false
 
 # Move item between slots (for drag and drop)
