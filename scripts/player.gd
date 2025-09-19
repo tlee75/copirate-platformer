@@ -111,7 +111,7 @@ func _physics_process(delta):
 	update_tile_highlights()
 	
 	# Attack input - left mouse button (but not when clicking on hotbar)
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not is_mouse_over_hotbar():
+	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar():
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
 			var selected_item = get_selected_hotbar_item()
@@ -120,6 +120,7 @@ func _physics_process(delta):
 			else:
 				# Fallback to hook attack, e.g. melee
 				is_trigger_action = true
+				print("Hook used by %s" % self.name)
 				$AnimatedSprite2D.play("hook")
 				
 				# Destroy tiles in sword area
