@@ -149,7 +149,7 @@ func handle_animations():
 	if not on_floor:
 		# Airborne
 		was_airborne = true
-		if velocity.y < 0:
+		if velocity.y < -10:  # Add threshold to prevent false positives at apex
 			$AnimatedSprite2D.play("jump")
 		else:
 			$AnimatedSprite2D.play("fall")
