@@ -17,6 +17,7 @@ var highlighted_tiles: Array[Vector2i] = []
 var tile_highlights: Array[Node2D] = []
 var highlight_texture: ImageTexture
 var current_highlighted_tile: Vector2i = Vector2i(-999, -999)  # Invalid position to force initial update
+var last_move_dir: int = 1  # 1 for right, -1 for left
 
 # Inventory state
 var inventory_is_open: bool = false
@@ -91,6 +92,7 @@ func _physics_process(delta):
 	
 	if dir != 0:
 		vel.x = dir * SPEED
+		last_move_dir = dir
 	else:
 		vel.x = move_toward(vel.x, 0, SPEED)
 
@@ -204,8 +206,11 @@ func update_sword_position():
 	var sword_distance = 30.0  # Fixed distance to prevent infinite range
 	sword_area.position = direction * sword_distance
 	
-	# Update sprite flipping based on mouse direction
-	$AnimatedSprite2D.flip_h = direction.x < 0
+	# Face the direction of movement when moving; otherwise, face the mouse direction when idle
+	if abs(velocity.x) > 1.0:
+		$AnimatedSprite2D.flip_h = last_move_dir < 0
+	else:
+		$AnimatedSprite2D.flip_h = direction.x < 0
 	
 	# Ensure crosshair position is not affected by sprite flipping
 	# Reset any transform that might be affected by parent flipping
