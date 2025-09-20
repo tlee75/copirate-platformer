@@ -6,21 +6,21 @@ extends Node
 signal inventory_changed
 signal hotbar_changed
 
-# Item data structure
+# GameItem data structure
 
 class InventorySlotData:
-	var item: Item = null
+	var item: GameItem = null
 	var quantity: int = 0
 	
 	func is_empty() -> bool:
 		return item == null or quantity <= 0
 	
-	func can_add_item(new_item: Item, amount: int = 1) -> bool:
+	func can_add_item(new_item: GameItem, amount: int = 1) -> bool:
 		if is_empty():
 			return true
 		return item.name == new_item.name and quantity + amount <= item.stack_size
 	
-	func add_item(new_item: Item, amount: int = 1) -> int:
+	func add_item(new_item: GameItem, amount: int = 1) -> int:
 		if is_empty():
 			item = new_item
 			quantity = min(amount, new_item.stack_size)
@@ -47,7 +47,7 @@ class InventorySlotData:
 var hotbar_slots: Array[InventorySlotData] = []
 var inventory_slots: Array[InventorySlotData] = []
 
-# Item database - you can add more items here
+# GameItem database - you can add more items here
 var item_database: Dictionary = {}
 
 func _ready():
@@ -100,7 +100,7 @@ func _ready():
 
 
 # Add item to inventory (tries hotbar first, then main inventory)
-func add_item(item: Item, amount: int = 1) -> bool:	
+func add_item(item: GameItem, amount: int = 1) -> bool:	
 	var remaining = amount
 	
 	# Try to add to existing stacks in hotbar first

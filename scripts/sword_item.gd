@@ -1,4 +1,4 @@
-extends Item
+extends GameItem
 class_name SwordItem
 
 func action(user):
