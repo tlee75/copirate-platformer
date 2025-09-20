@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=57 format=3 uid="uid://byhcsye5efc0e"]
+[gd_resource type="SpriteFrames" load_steps=55 format=3 uid="uid://byhcsye5efc0e"]
 
 [ext_resource type="Texture2D" uid="uid://dw54h67vvekul" path="res://assets/pixel-man/attack/throw/throw_0001.png" id="1_3wkde"]
 [ext_resource type="Texture2D" uid="uid://cts6cpke801s8" path="res://assets/pixel-man/attack/throw/throw_0002.png" id="2_c6j7u"]
@@ -19,7 +19,6 @@
 [ext_resource type="Texture2D" uid="uid://smjx81om5sba" path="res://assets/pixel-man/attack/melee/melee_attack_0002.png" id="13_a28m2"]
 [ext_resource type="Texture2D" uid="uid://bqw1r1tm5ey5x" path="res://assets/pixel-man/attack/melee/melee_attack_0003.png" id="14_2hoxh"]
 [ext_resource type="Texture2D" uid="uid://cxgwonbtr7jbk" path="res://assets/pixel-man/movement/jump/jump_0001.png" id="14_glgr8"]
-[ext_resource type="Texture2D" uid="uid://bygvnq4bl6l4e" path="res://assets/pixel-man/movement/jump/jump_0004.png" id="17_c6j7u"]
 [ext_resource type="Texture2D" uid="uid://3xlgropnhbpg" path="res://assets/pixel-man/movement/running/running_0001.png" id="17_qmwcf"]
 [ext_resource type="Texture2D" uid="uid://drh20rf2iafve" path="res://assets/pixel-man/movement/running/running_0002.png" id="18_537aw"]
 [ext_resource type="Texture2D" uid="uid://bcm43avqejvf2" path="res://assets/pixel-man/movement/jump/jump_0005.png" id="18_i71vv"]
@@ -103,10 +102,6 @@ region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2jccx"]
 atlas = ExtResource("14_glgr8")
-region = Rect2(0, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_tck63"]
-atlas = ExtResource("17_c6j7u")
 region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_khi33"]
@@ -227,9 +222,6 @@ animations = [{
 "texture": SubResource("AtlasTexture_2jccx")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_tck63")
-}, {
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_khi33")
 }, {
 "duration": 1.0,
@@ -237,7 +229,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"jump",
-"speed": 10.0
+"speed": 6.0
 }, {
 "frames": [{
 "duration": 1.0,

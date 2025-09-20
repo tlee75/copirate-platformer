@@ -79,7 +79,7 @@ func _physics_process(delta):
 	if not is_on_floor():
 		vel.y += gravity * delta
 
-	# WASD + Arrow key input
+	#  WASD + Arrow key input
 	var left_pressed = Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A)
 	var right_pressed = Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D)
 	
