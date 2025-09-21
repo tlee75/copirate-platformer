@@ -11,11 +11,16 @@ var slot_nodes: Array[Control] = []
 var is_visible_flag: bool = false
 
 func _ready():
-	# Initially hidden
-	visible = false
-	is_visible_flag = false
+	## Initially hidden
+	#visible = false
+	#is_visible_flag = false
 	
-	# Create 16 inventory slots
+	# Always visible since we're in a tab
+	var parent_tab = get_parent()
+	visible = true
+	is_visible_flag = true
+	
+	## Create 16 inventory slots
 	var inventory_slot_scene = preload("res://ui/inventory_slot.tscn")
 	
 	# Clear any existing slots first

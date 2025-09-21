@@ -6,10 +6,10 @@
 [ext_resource type="Texture2D" uid="uid://bl14jhy22cg2u" path="res://assets/Palm Tree Island/Sprites/Terrain/Terrain (32x32).png" id="4_mx3pc"]
 [ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://scripts/fps_counter.gd" id="5_f15g2"]
 [ext_resource type="PackedScene" uid="uid://bl5dg3fjv4w6g" path="res://ui/hotbar.tscn" id="6_atnpy"]
-[ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://ui/main_inventory.tscn" id="7_cy82x"]
 [ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://ui/inventory_system.gd" id="8_q5qfs"]
 [ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://ui/pause_menu.tscn" id="9_btm0u"]
 [ext_resource type="PackedScene" uid="uid://dgdkbk47a63st" path="res://scenes/barrel.tscn" id="10_nrqbv"]
+[ext_resource type="PackedScene" uid="uid://k0kkh12kws3d" path="res://ui/crafting_menu.tscn" id="10_xoih0"]
 [ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/sword.tscn" id="11_8w8yu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
@@ -169,17 +169,6 @@ offset_top = -93.0
 offset_right = 261.0
 offset_bottom = -29.0
 
-[node name="MainInventory" parent="UI" instance=ExtResource("7_cy82x")]
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = -599.0
-offset_top = 13.0
-offset_right = -599.0
-offset_bottom = 13.0
-grow_horizontal = 0
-
 [node name="InventorySystem" type="Node" parent="UI"]
 script = ExtResource("8_q5qfs")
 
@@ -189,6 +178,13 @@ offset_left = 482.0
 offset_top = 235.0
 offset_right = -448.0
 offset_bottom = -325.0
+
+[node name="CraftingMenu" parent="UI" instance=ExtResource("10_xoih0")]
+visible = false
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Barrels" type="Node" parent="."]
 

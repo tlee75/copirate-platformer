@@ -1,0 +1,68 @@
+[gd_scene load_steps=2 format=3 uid="uid://k0kkh12kws3d"]
+
+[ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://ui/main_inventory.tscn" id="1_srlpo"]
+
+[node name="CraftingMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1152.0
+offset_bottom = -648.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TabBar" type="TabContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+
+[node name="InventoryTab" type="Control" parent="TabBar"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="MainInventory" parent="TabBar/InventoryTab" instance=ExtResource("1_srlpo")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.014
+anchor_top = -0.051
+offset_left = 565.858
+offset_top = 351.569
+offset_right = -570.0
+offset_bottom = -299.0
+grow_horizontal = 0
+
+[node name="CraftTab" type="Control" parent="TabBar"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabBar/CraftTab"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer"]
+layout_mode = 2
+
+[node name="ToolsButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Tools"
+
+[node name="StructuresButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Structures"
+
+[node name="ConsumablesButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Consumables"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TabBar/CraftTab/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer/ScrollContainer"]
+layout_mode = 2
