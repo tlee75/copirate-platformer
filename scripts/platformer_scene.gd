@@ -6,7 +6,7 @@ extends Node2D
 @onready var ui_layer: CanvasLayer = $UI
 @onready var hotbar = $UI/Hotbar
 @onready var crafting_menu: Control = $UI/CraftingMenu
-@onready var main_inventory: Control = $UI/MainInventory
+@onready var main_inventory: Control = $UI/CraftingMenu/TabBar/InventoryTab/MainInventory
 @onready var inventory_system: Node = $UI/InventorySystem
 @onready var player: CharacterBody2D = $Player
 @onready var pause_menu = $UI/PauseMenu
