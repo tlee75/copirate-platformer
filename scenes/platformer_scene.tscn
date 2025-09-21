@@ -180,11 +180,10 @@ offset_right = -448.0
 offset_bottom = -325.0
 
 [node name="CraftingMenu" parent="UI" instance=ExtResource("10_xoih0")]
-visible = false
-offset_right = 0.0
-offset_bottom = 0.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = 4.0
+offset_top = 24.0
+offset_right = -4.0
+offset_bottom = -140.0
 
 [node name="Barrels" type="Node" parent="."]
 
