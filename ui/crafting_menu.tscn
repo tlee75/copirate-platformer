@@ -3,34 +3,36 @@
 [ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://ui/main_inventory.tscn" id="1_srlpo"]
 
 [node name="CraftingMenu" type="Control"]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 413.0
-offset_top = 68.0
-offset_right = -289.0
-offset_bottom = -366.0
+offset_left = 332.0
+offset_top = 74.0
+offset_right = -194.0
+offset_bottom = -85.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="TabBar" type="TabContainer" parent="."]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = -0.202
-anchor_top = 0.079
+anchor_top = 0.07
 anchor_right = 1.124
-anchor_bottom = 1.117
-offset_left = -0.0999985
-offset_top = -46.906
-offset_right = 0.199982
-offset_bottom = -13.038
+anchor_bottom = 0.759
+offset_left = -0.397995
+offset_top = -43.8
+offset_right = 0.0759277
+offset_bottom = 134.94
 grow_horizontal = 2
 grow_vertical = 2
-current_tab = 1
+current_tab = 0
 
 [node name="InventoryTab" type="Control" parent="TabBar"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -47,6 +49,7 @@ offset_bottom = 279.0
 grow_horizontal = 0
 
 [node name="CraftTab" type="Control" parent="TabBar"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
@@ -87,3 +90,27 @@ size_flags_horizontal = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer/ScrollContainer"]
 layout_mode = 2
+
+[node name="CraftDetailsPanel" type="Panel" parent="TabBar/CraftTab/HBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ItemImage" type="TextureRect" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ItemNameLabel" type="Label" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="RequirementsList" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="CraftButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
+layout_mode = 2
+text = "Craft"

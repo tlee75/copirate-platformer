@@ -7,6 +7,7 @@ class_name GameItem
 @export var stack_size: int = 1
 @export var craftable: bool = false
 @export var category: String = ""
+@export var craft_requirements: Dictionary = {}
 
 func action(user):
 	pass

@@ -73,8 +73,9 @@ func _ready():
 	sword_item.icon = load("res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 01.png")
 	sword_item.stack_size = 1
 	sword_item.craftable = true
-	sword_item.category = "tool"
+	sword_item.category = "weapon"
 	item_database["sword"] = sword_item
+	sword_item.craft_requirements = {"Wood": 2, "Iron": 1}
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
 #func add_test_items():
