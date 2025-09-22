@@ -113,7 +113,7 @@ func _physics_process(delta):
 	update_tile_highlights()
 	
 	# Attack input - left mouse button (but not when clicking on hotbar)
-	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar():
+	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu():
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
 			var selected_item = get_selected_hotbar_item()
@@ -314,6 +314,27 @@ func destroy_tiles_in_sword_area():
 func _on_inventory_state_changed(is_open: bool):
 	inventory_is_open = is_open
 	print("Player: Inventory is now ", "open" if is_open else "closed")
+
+func is_mouse_over_combined_menu() -> bool:
+	var ui_layer = get_parent().get_node_or_null("UI")
+	if not ui_layer:
+		return false
+	var combined_menu = ui_layer.get_node_or_null("CraftingMenu")
+	if not combined_menu or not combined_menu.visible:
+		return false
+	
+	var mouse_pos = get_viewport().get_mouse_position()
+	
+	# Check if mouse is over the main CraftingMenu control
+	if combined_menu.get_global_rect().has_point(mouse_pos):
+		return true
+	
+	# Also check the TabContainer specifically since it extends beyond the parent
+	var tab_container = combined_menu.get_node_or_null("TabBar")
+	if tab_container and tab_container.get_global_rect().has_point(mouse_pos):
+		return true
+
+	return false
 
 func is_mouse_over_hotbar() -> bool:
 	# Check if mouse is over the hotbar

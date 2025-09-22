@@ -71,6 +71,7 @@ text = "Tools"
 
 [node name="WeaponsButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
 layout_mode = 2
+text = "Weapons"
 
 [node name="StructuresButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
 layout_mode = 2
