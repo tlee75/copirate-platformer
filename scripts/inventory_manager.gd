@@ -63,6 +63,8 @@ func _ready():
 	gold_coin_item.name = "Gold Coin"
 	gold_coin_item.icon = load("res://assets/Pirate Treasure/Sprites/Gold Coin/01.png")
 	gold_coin_item.stack_size = 10
+	gold_coin_item.craftable = false
+	gold_coin_item.category = "currency"
 	item_database["gold_coin"] = gold_coin_item
 	
 	# Initialize item database with sword
@@ -70,6 +72,8 @@ func _ready():
 	sword_item.name = "Sword"
 	sword_item.icon = load("res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 01.png")
 	sword_item.stack_size = 1
+	sword_item.craftable = true
+	sword_item.category = "tool"
 	item_database["sword"] = sword_item
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 

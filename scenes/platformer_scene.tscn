@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=16 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_yte5o"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_8w8yu"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://dgdkbk47a63st" path="res://scenes/barrel.tscn" id="10_nrqbv"]
 [ext_resource type="PackedScene" uid="uid://k0kkh12kws3d" path="res://ui/crafting_menu.tscn" id="10_xoih0"]
 [ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/sword.tscn" id="11_8w8yu"]
+[ext_resource type="Script" uid="uid://covte3n64vx2f" path="res://ui/crafting_menu.gd" id="11_mx3pc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(13, 3.5)
@@ -180,10 +181,12 @@ offset_right = -448.0
 offset_bottom = -325.0
 
 [node name="CraftingMenu" parent="UI" instance=ExtResource("10_xoih0")]
-offset_left = 4.0
+visible = true
+offset_left = 241.0
 offset_top = 24.0
-offset_right = -4.0
+offset_right = -175.0
 offset_bottom = -140.0
+script = ExtResource("11_mx3pc")
 
 [node name="Barrels" type="Node" parent="."]
 

@@ -15,8 +15,7 @@ func _ready():
 	#visible = false
 	#is_visible_flag = false
 	
-	# Always visible since we're in a tab
-	var parent_tab = get_parent()
+	# Always visible since we're in a tab	
 	visible = true
 	is_visible_flag = true
 	

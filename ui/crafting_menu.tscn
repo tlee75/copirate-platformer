@@ -7,26 +7,30 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 581.0
-offset_top = 117.0
-offset_right = -571.0
-offset_bottom = -531.0
+offset_left = 413.0
+offset_top = 68.0
+offset_right = -289.0
+offset_bottom = -366.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="TabBar" type="TabContainer" parent="."]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -118.0
-offset_top = 41.0
-offset_right = 103.0
-offset_bottom = 75.0
+anchors_preset = -1
+anchor_left = -0.202
+anchor_top = 0.079
+anchor_right = 1.124
+anchor_bottom = 1.117
+offset_left = -0.0999985
+offset_top = -46.906
+offset_right = 0.199982
+offset_bottom = -13.038
 grow_horizontal = 2
-current_tab = 0
+grow_vertical = 2
+current_tab = 1
 
 [node name="InventoryTab" type="Control" parent="TabBar"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -43,14 +47,20 @@ offset_bottom = 279.0
 grow_horizontal = 0
 
 [node name="CraftTab" type="Control" parent="TabBar"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="TabBar/CraftTab"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 13.0
+offset_top = 9.0
+offset_right = -11.0
+offset_bottom = -9.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer"]
 layout_mode = 2
@@ -58,6 +68,9 @@ layout_mode = 2
 [node name="ToolsButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "Tools"
+
+[node name="WeaponsButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
+layout_mode = 2
 
 [node name="StructuresButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -69,6 +82,7 @@ text = "Consumables"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="TabBar/CraftTab/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer/ScrollContainer"]
 layout_mode = 2
