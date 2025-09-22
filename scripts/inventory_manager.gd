@@ -237,6 +237,35 @@ func remove_item_from_total(item_name: String, quantity: int):
 func get_total_item_count(item_name: String) -> int:
 	return item_totals.get(item_name, 0)
 
+func remove_items_by_name(item_name: String, quantity: int) -> bool:
+	var remaining = quantity
+	
+	# Remove from hotbarslots first
+	for slot in hotbar_slots:
+		if not slot.is_empty() and slot.item.name == item_name:
+			var removed = slot.remove_item(remaining)
+			remaining -= removed
+			if remaining <= 0:
+				hotbar_changed.emit()
+				break
+	
+	# Remove from inventory slots if still needed
+	if remaining > 0:
+		for slot in inventory_slots:
+			if not slot.is_empty() and slot.item.name == item_name:
+				var removed = slot.remove_item(remaining)
+				remaining -= removed
+				if remaining <= 0:
+					inventory_changed.emit()
+					break
+	
+	# Emit signals for UI updates
+	if remaining < quantity:
+		hotbar_changed.emit()
+		inventory_changed.emit()
+	
+	return remaining == 0 # Return true if all items were removed
+
 # Debug functions
 func print_inventory():
 	print("=== HOTBAR ===")

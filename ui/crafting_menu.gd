@@ -82,8 +82,25 @@ func show_craft_details(item):
 	craft_button.pressed.connect(func(): craft_item(item))
 	
 func craft_item(item):
-	# TODO: Implement crafting logic (check resources, remove, add crafted item, etc)
 	print("Crafting: ", item.name)
+	
+	# Double-check we have all required resources
+	for resource_name in item.craft_requirements.keys():
+		var required = item.craft_requirements[resource_name]
+		var owned = InventoryManager.get_total_item_count(resource_name)
+		if owned < required:
+			print("Not enough ", resource_name, " to craft ", item.name)
+			return
+	
+	# Remove required resources from inventory
+	for resource_name in item.craft_requirements.keys():
+		var required = item.craft_requirements[resource_name]
+		InventoryManager.remove_items_by_name(resource_name, required)
+	
+	# Add the crafted item to inventory
+	InventoryManager.add_item(item, 1)
+	
+	print("Successfully crafted ", item.name)
 
 func _on_inventory_changed():
 	# Refresh craft details if something is currently displayed
