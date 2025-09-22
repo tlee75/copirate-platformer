@@ -181,7 +181,6 @@ offset_right = -448.0
 offset_bottom = -325.0
 
 [node name="CraftingMenu" parent="UI" instance=ExtResource("10_xoih0")]
-anchors_preset = 15
 offset_left = 241.0
 offset_top = 24.0
 offset_right = -175.0

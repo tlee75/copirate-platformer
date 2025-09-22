@@ -35,8 +35,13 @@ class InventorySlotData:
 		var removed = min(amount, quantity)
 		quantity -= removed
 		if quantity <= 0:
+			if item:
+				InventoryManager.remove_item_from_total(item.name, removed)
 			item = null
 			quantity = 0
+		else:
+			if item:
+				InventoryManager.remove_item_from_total(item.name, removed)
 		return removed
 	
 	func clear():
@@ -46,6 +51,7 @@ class InventorySlotData:
 # Inventory data
 var hotbar_slots: Array[InventorySlotData] = []
 var inventory_slots: Array[InventorySlotData] = []
+var item_totals: Dictionary = {}
 
 # GameItem database - you can add more items here
 var item_database: Dictionary = {}
@@ -75,7 +81,7 @@ func _ready():
 	sword_item.craftable = true
 	sword_item.category = "weapon"
 	item_database["sword"] = sword_item
-	sword_item.craft_requirements = {"Wood": 2, "Iron": 1}
+	sword_item.craft_requirements = {"Gold Coin": 2}
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
 #func add_test_items():
@@ -107,11 +113,16 @@ func _ready():
 # Add item to inventory (tries hotbar first, then main inventory)
 func add_item(item: GameItem, amount: int = 1) -> bool:	
 	var remaining = amount
+	var original_remaining = remaining
 	
 	# Try to add to existing stacks in hotbar first
 	for slot in hotbar_slots:
 		if not slot.is_empty() and slot.item.name == item.name:
+			var before_remaining = remaining
 			remaining = slot.add_item(item, remaining)
+			var added = before_remaining - remaining
+			if added > 0:
+				add_item_to_total(item.name, added)
 			if remaining <= 0:
 				hotbar_changed.emit()
 				return true
@@ -119,7 +130,11 @@ func add_item(item: GameItem, amount: int = 1) -> bool:
 	# Try to add to existing stacks in main inventory
 	for slot in inventory_slots:
 		if not slot.is_empty() and slot.item.name == item.name:
+			var before_remaining = remaining
 			remaining = slot.add_item(item, remaining)
+			var added = before_remaining - remaining
+			if added > 0:
+				add_item_to_total(item.name, added)
 			if remaining <= 0:
 				inventory_changed.emit()
 				return true
@@ -127,7 +142,11 @@ func add_item(item: GameItem, amount: int = 1) -> bool:
 	# Try to add to empty slots in hotbar
 	for slot in hotbar_slots:
 		if slot.is_empty():
+			var before_remaining = remaining
 			remaining = slot.add_item(item, remaining)
+			var added = before_remaining - remaining
+			if added > 0:
+				add_item_to_total(item.name, added)
 			if remaining <= 0:
 				hotbar_changed.emit()
 				return true
@@ -135,13 +154,18 @@ func add_item(item: GameItem, amount: int = 1) -> bool:
 	# Try to add to empty slots in main inventory
 	for slot in inventory_slots:
 		if slot.is_empty():
+			var before_remaining = remaining
 			remaining = slot.add_item(item, remaining)
+			var added = before_remaining - remaining
+			if added > 0:
+				add_item_to_total(item.name, added)
 			if remaining <= 0:
 				inventory_changed.emit()
 				return true
 	
 	# If we couldn't add everything, emit signals anyway for partial adds
 	if remaining < amount:
+		add_item_to_total(item.name, amount - remaining)
 		hotbar_changed.emit()
 		inventory_changed.emit()
 		print("Added ", amount - remaining, " of ", amount, " ", item.name, "(s). ", remaining, " couldn't fit.")
@@ -196,6 +220,22 @@ func get_inventory_slot(index: int) -> InventorySlotData:
 	if index >= 0 and index < inventory_slots.size():
 		return inventory_slots[index]
 	return null
+
+func add_item_to_total(item_name: String, quantity: int):
+	if item_name in item_totals:
+		item_totals[item_name] += quantity
+	else:
+		item_totals[item_name] = quantity
+	print("Total for ", item_name, " is now: ", item_totals[item_name])
+
+func remove_item_from_total(item_name: String, quantity: int):
+	if item_name in item_totals:
+		item_totals[item_name] -= quantity
+		if item_totals[item_name] <= 0:
+			item_totals.erase(item_name)
+
+func get_total_item_count(item_name: String) -> int:
+	return item_totals.get(item_name, 0)
 
 # Debug functions
 func print_inventory():
