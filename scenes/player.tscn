@@ -4,7 +4,7 @@
 [ext_resource type="SpriteFrames" uid="uid://byhcsye5efc0e" path="res://player_sprites.tres" id="2_onrkg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_onrkg"]
-size = Vector2(10, 52)
+size = Vector2(20, 57)
 
 [node name="PlayerBody" type="CharacterBody2D"]
 script = ExtResource("1_4flbx")
@@ -17,4 +17,5 @@ animation = &"jump"
 zoom = Vector2(3, 3)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2.5)
 shape = SubResource("RectangleShape2D_onrkg")

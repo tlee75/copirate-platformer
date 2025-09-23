@@ -128,9 +128,13 @@ func _physics_process(delta):
 				# Destroy tiles in sword area
 				#destroy_tiles_in_sword_area()
 				
-				# Connect to animation finished signal to end attack
-				if not $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
-					$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
+				# Disconnect any existing connections first, then connect
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
+					$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
+					$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
+
+				$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
 
 	# Update physics first
 	velocity = vel
@@ -145,16 +149,20 @@ func handle_animations():
 	# Don't change animations while in the middle of an action
 	if is_trigger_action:
 		return
-		
+	
 	var on_floor = is_on_floor()
 	
 	if not on_floor:
 		# Airborne
 		was_airborne = true
-		if velocity.y < -10:  # Add threshold to prevent false positives at apex
-			$AnimatedSprite2D.play("jump")
-		else:
-			$AnimatedSprite2D.play("fall")
+
+		if velocity.y < -5:  # Going up
+			if $AnimatedSprite2D.animation != "jump":
+				$AnimatedSprite2D.play("jump")
+		elif velocity.y > 5:  # Going down  
+			if $AnimatedSprite2D.animation != "fall":
+				$AnimatedSprite2D.play("fall")
+		# At apex (-5 to 5), maintain current animation
 	else:
 		# On ground
 		if was_airborne:
@@ -167,32 +175,28 @@ func handle_animations():
 		elif $AnimatedSprite2D.animation != "ground":
 			# Only change animation if not currently playing ground animation
 			if abs(velocity.x) > 1.0:
-				$AnimatedSprite2D.play("run")
+				$AnimatedSprite2D.play("walk")
 			else:
 				$AnimatedSprite2D.play("idle")
 
 func _on_ground_animation_finished():
-	# When ground animation finishes, transition to appropriate animation
+	# Only transition if we're still on the ground
 	if is_on_floor():
 		if abs(velocity.x) > 1.0:
-			$AnimatedSprite2D.play("run")
+			$AnimatedSprite2D.play("walk")
 		else:
 			$AnimatedSprite2D.play("idle")
 
 func _on_attack_animation_finished():
+	# Disconnect the signal immediately to prevent interference
+	if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
+		$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
+
 	# When attack animation finishes, end attack state
 	is_trigger_action = false
-	# Transition to appropriate animation
-	if is_on_floor():
-		if abs(velocity.x) > 1.0:
-			$AnimatedSprite2D.play("run")
-		else:
-			$AnimatedSprite2D.play("idle")
-	else:
-		if velocity.y < 0:
-			$AnimatedSprite2D.play("jump")
-		else:
-			$AnimatedSprite2D.play("fall")
+
+	# Don't force animation change here - let handle_animations() handle it
+	# This prevents interference with jump/fall animations
 
 func update_sword_position():
 	# Get mouse position in world coordinates
