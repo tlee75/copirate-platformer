@@ -11,7 +11,8 @@ script = ExtResource("1_4flbx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = ExtResource("2_onrkg")
-animation = &"jump"
+animation = &"run"
+frame_progress = 0.848883
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(3, 3)

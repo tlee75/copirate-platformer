@@ -4,8 +4,10 @@ class_name Player
 
 signal inventory_state_changed(is_open: bool)
 
-const SPEED := 200.0
+const WALK_SPEED := 200.0
+const RUN_SPEED := 350.0
 const JUMP_VELOCITY := -400.0
+
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") as float
 
 var was_airborne: bool = false
@@ -71,7 +73,7 @@ func _physics_process(delta):
 		if not is_on_floor():
 			vel.y += gravity * delta
 		# Stop horizontal movement gradually
-		vel.x = move_toward(vel.x, 0, SPEED * 2)  # Stop faster when inventory opens
+		vel.x = move_toward(vel.x, 0, WALK_SPEED * 2)  # Stop faster when inventory opens
 		velocity = vel
 		move_and_slide()
 		# Don't update sword position, mouse UI detection, or highlights when inventory is open
@@ -91,10 +93,12 @@ func _physics_process(delta):
 		dir += 1
 	
 	if dir != 0:
-		vel.x = dir * SPEED
+		var is_running = Input.is_key_pressed(KEY_SHIFT)
+		var current_speed = RUN_SPEED if is_running else WALK_SPEED
+		vel.x = dir * current_speed
 		last_move_dir = dir
 	else:
-		vel.x = move_toward(vel.x, 0, SPEED)
+		vel.x = move_toward(vel.x, 0, WALK_SPEED)
 
 	# Jump input - detect just pressed for W key
 	var jump_pressed = Input.is_action_just_pressed("ui_accept") or Input.is_action_just_pressed("ui_up")
@@ -175,7 +179,11 @@ func handle_animations():
 		elif $AnimatedSprite2D.animation != "ground":
 			# Only change animation if not currently playing ground animation
 			if abs(velocity.x) > 1.0:
-				$AnimatedSprite2D.play("walk")
+				var is_running = Input.is_key_pressed(KEY_SHIFT)
+				if is_running:
+					$AnimatedSprite2D.play("run")
+				else:
+					$AnimatedSprite2D.play("walk")
 			else:
 				$AnimatedSprite2D.play("idle")
 
@@ -183,7 +191,11 @@ func _on_ground_animation_finished():
 	# Only transition if we're still on the ground
 	if is_on_floor():
 		if abs(velocity.x) > 1.0:
-			$AnimatedSprite2D.play("walk")
+			var is_running = Input.is_key_pressed(KEY_SHIFT)
+			if is_running:
+				$AnimatedSprite2D.play("runa")
+			else:
+				$AnimatedSprite2D.play("walk")
 		else:
 			$AnimatedSprite2D.play("idle")
 
