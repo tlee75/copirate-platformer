@@ -4,8 +4,8 @@ class_name Player
 
 signal inventory_state_changed(is_open: bool)
 
-const WALK_SPEED := 200.0
-const RUN_SPEED := 350.0
+const WALK_SPEED := 100.0
+const RUN_SPEED := 250.0
 const JUMP_VELOCITY := -400.0
 
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") as float
@@ -180,10 +180,10 @@ func handle_animations():
 			# Only change animation if not currently playing ground animation
 			if abs(velocity.x) > 1.0:
 				var is_running = Input.is_key_pressed(KEY_SHIFT)
-				if is_running:
-					$AnimatedSprite2D.play("run")
-				else:
-					$AnimatedSprite2D.play("walk")
+				var target_anim = "run" if is_running else "walk"
+				# Only change animation if it's different from current
+				if $AnimatedSprite2D.animation != target_anim:
+					$AnimatedSprite2D.play(target_anim)
 			else:
 				$AnimatedSprite2D.play("idle")
 
@@ -192,10 +192,8 @@ func _on_ground_animation_finished():
 	if is_on_floor():
 		if abs(velocity.x) > 1.0:
 			var is_running = Input.is_key_pressed(KEY_SHIFT)
-			if is_running:
-				$AnimatedSprite2D.play("runa")
-			else:
-				$AnimatedSprite2D.play("walk")
+			var target_anim = "run" if is_running else "walk"
+			$AnimatedSprite2D.play(target_anim)
 		else:
 			$AnimatedSprite2D.play("idle")
 
