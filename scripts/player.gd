@@ -20,8 +20,8 @@ var tile_highlights: Array[Node2D] = []
 var highlight_texture: ImageTexture
 var current_highlighted_tile: Vector2i = Vector2i(-999, -999)  # Invalid position to force initial update
 var last_move_dir: int = 1  # 1 for right, -1 for left
-
-# Inventory state
+var was_running_when_jumped: bool = false
+var jump_speed: float = 0.0
 var inventory_is_open: bool = false
 
 
@@ -93,8 +93,15 @@ func _physics_process(delta):
 		dir += 1
 	
 	if dir != 0:
-		var is_running = Input.is_key_pressed(KEY_SHIFT)
-		var current_speed = RUN_SPEED if is_running else WALK_SPEED
+		var current_speed: float
+		if not is_on_floor():
+			# Use locked jump speed when airborne
+			current_speed = jump_speed
+		else:
+			# Use normal speed logic when on ground
+			var is_running = Input.is_key_pressed(KEY_SHIFT)
+			current_speed = RUN_SPEED if is_running else WALK_SPEED
+
 		vel.x = dir * current_speed
 		last_move_dir = dir
 	else:
@@ -109,6 +116,8 @@ func _physics_process(delta):
 
 	if jump_pressed and is_on_floor():
 		vel.y = JUMP_VELOCITY
+		was_running_when_jumped = Input.is_key_pressed(KEY_SHIFT)
+		jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
 
 	# Update sword area position based on mouse position
 	update_sword_position()
@@ -159,20 +168,25 @@ func handle_animations():
 	if not on_floor:
 		# Airborne
 		was_airborne = true
+		
+		var use_running_anims = was_running_when_jumped
 
 		if velocity.y < -5:  # Going up
-			if $AnimatedSprite2D.animation != "jump":
-				$AnimatedSprite2D.play("jump")
+			var target_anim = "run_jump" if use_running_anims else "jump"
+			if $AnimatedSprite2D.animation != target_anim:
+				$AnimatedSprite2D.play(target_anim)
 		elif velocity.y > 5:  # Going down  
-			if $AnimatedSprite2D.animation != "fall":
-				$AnimatedSprite2D.play("fall")
+			var target_anim = "run_fall" if use_running_anims else "fall"
+			if $AnimatedSprite2D.animation != target_anim:
+				$AnimatedSprite2D.play(target_anim)
 		# At apex (-5 to 5), maintain current animation
 	else:
 		# On ground
 		if was_airborne:
-			# Just landed - play ground animation
+			# Just landed - play appropriate ground animation
 			was_airborne = false
-			$AnimatedSprite2D.play("ground")
+			var ground_anim = "run_ground" if was_running_when_jumped else "ground"
+			$AnimatedSprite2D.play(ground_anim)
 			# Connect to animation finished signal to transition to idle
 			if not $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
 				$AnimatedSprite2D.animation_finished.connect(_on_ground_animation_finished)
