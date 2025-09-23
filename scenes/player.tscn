@@ -11,9 +11,7 @@ script = ExtResource("1_4flbx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = ExtResource("2_onrkg")
-animation = &"run_ground"
-frame = 2
-frame_progress = 1.0
+animation = &"punch"
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.5, 1.5)

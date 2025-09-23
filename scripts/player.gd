@@ -133,10 +133,10 @@ func _physics_process(delta):
 			if selected_item and selected_item.has_method("action"):
 				selected_item.action(self)
 			else:
-				# Fallback to hook attack, e.g. melee
+				# Fallback to punch attack, e.g. melee
 				is_trigger_action = true
 				print("Hook used by %s" % self.name)
-				$AnimatedSprite2D.play("hook")
+				$AnimatedSprite2D.play("punch")
 				
 				# Destroy tiles in sword area
 				#destroy_tiles_in_sword_area()
