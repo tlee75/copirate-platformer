@@ -1,10 +1,10 @@
 extends GameItem
-class_name PickAxeItem
+class_name WoodAxeItem
 
 func action(user):
-	print("Pick Axe attack by %s" % user.name)
+	print("Wood Axe attack by %s" % user.name)
 	user.is_trigger_action = true
-	user.get_node("AnimatedSprite2D").play("pickaxe_attack")
+	user.get_node("AnimatedSprite2D").play("woodaxe_attack")
 	
 	# Clean up any existing connections first
 	var anim_sprite = user.get_node("AnimatedSprite2D")

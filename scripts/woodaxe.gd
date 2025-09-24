@@ -1,7 +1,7 @@
 extends Area2D
 
 func _ready():
-	$AnimatedSprite2D.play("pickaxe_idle")
+	$AnimatedSprite2D.play("woodaxe_idle")
 
 	# Connect area entered signal for collection
 	body_entered.connect(_on_body_entered)
@@ -9,9 +9,9 @@ func _ready():
 func _on_body_entered(body):
 	# If player touches coin, add to inventory
 	if body is Player:
-		var pickaxe_item = InventoryManager.item_database["pickaxe"]
-		if InventoryManager.add_item(pickaxe_item, 1):
-			print("Pick Axe added to inventory!")
+		var woodaxe_item = InventoryManager.item_database["woodaxe"]
+		if InventoryManager.add_item(woodaxe_item, 1):
+			print("Wood Axe added to inventory!")
 			queue_free()
 		else:
 			print("Inventory full! Cannot pick up pickaxe.")

@@ -448,7 +448,7 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gw7q8"]
 size = Vector2(18, 26)
 
-[node name="Pickaxe" type="Area2D"]
+[node name="PickAxe" type="Area2D"]
 script = ExtResource("1_2ikqw")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

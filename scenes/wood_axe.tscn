@@ -1,0 +1,32 @@
+[gd_scene load_steps=6 format=3 uid="uid://bau4ht0cid8a1"]
+
+[ext_resource type="Script" uid="uid://b4n6fqydnqkmn" path="res://scripts/woodaxe.gd" id="1_b2gdx"]
+[ext_resource type="Texture2D" uid="uid://cb5gqmiu3bp6c" path="res://assets/sprite-man/wood_axe_icon_01.png" id="1_nr2tc"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b2gdx"]
+atlas = ExtResource("1_nr2tc")
+region = Rect2(0, 0, 111, 112)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_c2w6g"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b2gdx")
+}],
+"loop": true,
+"name": &"woodaxe_attack",
+"speed": 30.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s00l6"]
+
+[node name="WoodAxe" type="Area2D"]
+script = ExtResource("1_b2gdx")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_c2w6g")
+animation = &"woodaxe_attack"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_s00l6")
