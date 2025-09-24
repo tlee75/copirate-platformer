@@ -2370,7 +2370,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_ka8wc")
 }],
 "loop": false,
-"name": &"pick_axe",
+"name": &"pickaxe_attack",
 "speed": 30.0
 }, {
 "frames": [{

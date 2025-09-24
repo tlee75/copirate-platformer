@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=17 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_yte5o"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_8w8yu"]
@@ -10,7 +10,9 @@
 [ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://ui/pause_menu.tscn" id="9_btm0u"]
 [ext_resource type="PackedScene" uid="uid://dgdkbk47a63st" path="res://scenes/barrel.tscn" id="10_nrqbv"]
 [ext_resource type="PackedScene" uid="uid://k0kkh12kws3d" path="res://ui/crafting_menu.tscn" id="10_xoih0"]
+[ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/sword.tscn" id="11_8w8yu"]
 [ext_resource type="Script" uid="uid://covte3n64vx2f" path="res://ui/crafting_menu.gd" id="11_mx3pc"]
+[ext_resource type="PackedScene" uid="uid://buc368tv0cjic" path="res://scenes/pickaxe.tscn" id="12_xoih0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(13, 3.5)
@@ -202,3 +204,9 @@ position = Vector2(-1227, 149)
 
 [node name="Barrel5" parent="Barrels" instance=ExtResource("10_nrqbv")]
 position = Vector2(-1180, 149)
+
+[node name="Pickaxe" parent="." instance=ExtResource("12_xoih0")]
+position = Vector2(-993, 101)
+
+[node name="Sword" parent="." instance=ExtResource("11_8w8yu")]
+position = Vector2(-1139, 110)

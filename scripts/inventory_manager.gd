@@ -83,6 +83,17 @@ func _ready():
 	item_database["sword"] = sword_item
 	sword_item.craft_requirements = {"Gold Coin": 2}
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
+	
+	# Initialize item database with Pickaxe
+	var pickaxe_item = PickaxeItem.new()
+	pickaxe_item.name = "Pickaxe"
+	pickaxe_item.icon = load("res://assets/sprite-man/pick_axe_icon_01.png")
+	pickaxe_item.stack_size = 1
+	pickaxe_item.craftable = true
+	pickaxe_item.category = "tool"
+	item_database["pickaxe"] = pickaxe_item
+	pickaxe_item.craft_requirements = {"Gold Coin": 3}
+	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
 #func add_test_items():
 	## Add some gold coins to test drag and drop
