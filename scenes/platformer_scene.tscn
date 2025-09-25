@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=19 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_yte5o"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_8w8yu"]
@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://covte3n64vx2f" path="res://ui/crafting_menu.gd" id="11_mx3pc"]
 [ext_resource type="PackedScene" uid="uid://buc368tv0cjic" path="res://scenes/pickaxe.tscn" id="12_xoih0"]
 [ext_resource type="PackedScene" uid="uid://bau4ht0cid8a1" path="res://scenes/wood_axe.tscn" id="14_f15g2"]
+[ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/shovel.tscn" id="15_atnpy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(13, 3.5)
@@ -126,7 +127,7 @@ script = ExtResource("1_yte5o")
 
 [node name="Player" parent="." instance=ExtResource("2_8w8yu")]
 z_index = 1
-position = Vector2(-1078, 138)
+position = Vector2(-1078, 127)
 
 [node name="SwordArea" type="Area2D" parent="Player"]
 position = Vector2(20, 0)
@@ -214,3 +215,6 @@ position = Vector2(-1139, 110)
 
 [node name="WoodAxe" parent="." instance=ExtResource("14_f15g2")]
 position = Vector2(-1036, 87)
+
+[node name="Shovel" parent="." instance=ExtResource("15_atnpy")]
+position = Vector2(-1090, 75)

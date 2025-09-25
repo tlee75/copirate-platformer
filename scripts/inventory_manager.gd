@@ -106,6 +106,17 @@ func _ready():
 	woodaxe_item.craft_requirements = {"Gold Coin": 3}
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
+	# Initialize item database with Wood Axe
+	var shovel_item = ShovelItem.new()
+	shovel_item.name = "Shovel"
+	shovel_item.icon = load("res://assets/sprite-man/shovel_icon_01.png")
+	shovel_item.stack_size = 1
+	shovel_item.craftable = true
+	shovel_item.category = "tool"
+	item_database["shovel"] = shovel_item
+	shovel_item.craft_requirements = {"Gold Coin": 2}
+	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
+
 
 #func add_test_items():
 	## Add some gold coins to test drag and drop
