@@ -23,7 +23,15 @@ var last_move_dir: int = 1  # 1 for right, -1 for left
 var was_running_when_jumped: bool = false
 var jump_speed: float = 0.0
 var inventory_is_open: bool = false
+var water_depth: int = 0
+var sea_level_y: float = 0.0 # Y=0 represents Sea Level
+var is_in_water: bool = false
+var previous_water_depth: int = 0
+var tile_size: float = 32.0
 
+# Water movement effects
+var water_slow_factor: float = 0.7
+var swim_speed: float = 80.0
 
 # Remove old procedural Visual node if present
 func _ready():
@@ -63,6 +71,9 @@ func _ready():
 	
 	# Connect to inventory state changes
 	inventory_state_changed.connect(_on_inventory_state_changed)
+	
+	# Add player to group so other scripts can find it easily
+	add_to_group("player")
 
 func _physics_process(delta):
 	var vel: Vector2 = velocity
@@ -78,7 +89,10 @@ func _physics_process(delta):
 		move_and_slide()
 		# Don't update sword position, mouse UI detection, or highlights when inventory is open
 		return
-	
+
+	# Calculate current water depth (Y=0 is sea level)
+	calculate_water_depth()
+
 	if not is_on_floor():
 		vel.y += gravity * delta
 
@@ -386,3 +400,32 @@ func get_selected_hotbar_item():
 	if not hotbar:
 		return null
 	return hotbar.get_selected_item()
+
+func calculate_water_depth():
+	# Y=0 is sea level, positive Y values are underwater
+	if global_position.y > sea_level_y:
+		# Player is underwater - calculate depth in tiles
+		var depth_pixels = global_position.y - sea_level_y
+		var new_depth = int(depth_pixels / tile_size) + 1
+		
+		# Store previous depth for comparison
+		previous_water_depth = water_depth
+		water_depth = max(0, new_depth) # Ensure depth is never negative
+		is_in_water = true
+		
+		# Emit signal if depth changed significantly
+		if abs(water_depth - previous_water_depth) >= 1:
+			_on_depth_changed()
+	else:
+		# Player is above sea level (on land or air)
+		previous_water_depth = water_depth
+		water_depth = 0
+		is_in_water = false
+		
+		if previous_water_depth > 0:
+			_on_depth_changed()
+	
+	return water_depth
+	
+func _on_depth_changed():
+	print("Depth changed from ", previous_water_depth, " to ", water_depth, " tiles below sea level")
