@@ -93,10 +93,6 @@ func _physics_process(delta):
 
 	# Calculate current water depth (Y=0 is sea level)
 	calculate_water_depth()
-	
-	## Force gravity when exiting water to prevent floating
-	#if not is_underwater and global_position.y <= sea_level_y and vel.y < 0:
-		#vel.y = 0 # Stop upward movment when leaving water
 
 	if not is_on_floor():
 		if is_underwater:
@@ -478,14 +474,20 @@ func calculate_water_depth():
 		water_depth = max(0, new_depth) # Ensure depth is never negative
 		is_in_water = true
 		
-		# Check if underwater (2+ tiles deep) with hysteresis to prevent oscillation
+		# Shallow water walking - use collision detection + depth
+		var player_height_in_tiles = 2.0 # Approximate player height in tiles
+		var shallow_water_threshold = player_height_in_tiles * 0.6 # 60% submerged = still walking
+				
+		# Check if underwater with ground-based shallow water walking
 		if not is_underwater:
-			# Only enter swimming mode if we're clearly underwater (2+ tiles)
-			is_underwater = water_depth >= 2
+			# Only enter swimming if water is deeper than walking threshold
+			is_underwater = water_depth > shallow_water_threshold + 0.5 # Hysteresis buffer
 		else:
-			# Stay in swimming mode u ntil we're clearly in shallow water (1 tile or less)
-			is_underwater = water_depth >= 1
-		
+			# Exit swimming mode only if in shallow water AND on walkable ground
+			var is_shallow_water = water_depth < 1.5
+			var has_walkable_ground = is_on_floor()
+			is_underwater = not (is_shallow_water and has_walkable_ground)
+			
 		# Emit signal if depth changed significantly
 		if abs(water_depth - previous_water_depth) >= 1:
 			_on_depth_changed()
