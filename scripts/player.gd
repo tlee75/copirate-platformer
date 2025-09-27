@@ -75,6 +75,7 @@ func _ready():
 	# Add player to group so other scripts can find it easily
 	add_to_group("player")
 
+
 func _physics_process(delta):
 	var vel: Vector2 = velocity
 	
@@ -92,6 +93,10 @@ func _physics_process(delta):
 
 	# Calculate current water depth (Y=0 is sea level)
 	calculate_water_depth()
+	
+	## Force gravity when exiting water to prevent floating
+	#if not is_underwater and global_position.y <= sea_level_y and vel.y < 0:
+		#vel.y = 0 # Stop upward movment when leaving water
 
 	if not is_on_floor():
 		if is_underwater:
@@ -145,11 +150,15 @@ func _physics_process(delta):
 			# Swimming up/down when underwater
 			var is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
 			var current_swim_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
-			vel.y = vertical_dir * current_swim_speed
+			
+			# Prevent swimming above water surface
+			if vertical_dir < 0 and global_position.y <= sea_level_y + 16: # 16px buffer from surface
+				vel.y = 0 # Stop upward movement at surface
+			else:
+				vel.y = vertical_dir * current_swim_speed
 		else:
 			# Climbing placeholder for on land
 			print("Trying to climb ", "up" if vertical_dir < 0 else "down", " - no climable serface found")
-			# Apply underwater swimming speed (ignore running underwater)
 
 	# Jump input - detect just pressed for the jump action
 	if Input.is_action_just_pressed("jump") and is_on_floor() and not is_underwater:
@@ -506,31 +515,34 @@ func can_use_item_in_current_environment(item) -> bool:
 		return item.get("land_compatible", true)
 		
 
+#func update_collision_orientation():
+	#var collision_shape = $CollisionShape2D
+	#
+	#if is_underwater:
+		## When swimming, always use sprite swimming angle for collision shape
+		#var target_rotation = deg_to_rad(45.0)
+		## Flip collision shape to match sprite direction
+		#if $AnimatedSprite2D.flip_h:
+			#target_rotation = -target_rotation
+		#
+		#collision_shape.rotation = lerp(collision_shape.rotation, target_rotation, 0.1)
+	#else:
+		## On land or in air - always vertical collision
+		#collision_shape.rotation = lerp(collision_shape.rotation, 0.0, 0.2)
+
 func update_collision_orientation():
 	var collision_shape = $CollisionShape2D
-	
+
 	if is_underwater:
-		# Calculate movement direction for collision optimization
-		var movement_vector = Vector2(velocity.x, velocity.y)
+		# Always use a consistent swimming angle when underwater
+		var base_angle = 45.0  # Base swimming angle in degrees
+
+		# Flip collision shape to match sprite direction
+		if $AnimatedSprite2D.flip_h:
+			base_angle = -base_angle  # Flip the angle
 		
-		if movement_vector.length() > 10.0: # Only rotate  if moving with sufficient speed
-			# Get the angle of movement direction
-			var movement_angle = movement_vector.angle()
-			
-			# Convert to degrees and clamp rotation for better collision
-			var rotation_degrees = rad_to_deg(movement_angle)
-			
-			# Limit rotation to reasonable swimming angles
-			if abs(rotation_degrees) > 90:
-				# Swimming backwards - flip the angle
-				rotation_degrees = rotation_degrees + 180 if rotation_degrees < 0 else rotation_degrees - 180
-				
-			# Apply smooth rotation with limts for realistic swimming
-			var target_rotation = deg_to_rad(clamp(rotation_degrees, -45, 45))
-			collision_shape.rotation = lerp(collision_shape.rotation, target_rotation, 0.1)
-		else:
-			# When not moving underwater, return to neutral horizontal position
-			collision_shape.rotation = lerp(collision_shape.rotation, 0.0, 0.1)
+		var target_rotation = deg_to_rad(base_angle)
+		collision_shape.rotation = lerp(collision_shape.rotation, target_rotation, 0.1)
 	else:
 		# On land or in air - always vertical collision
 		collision_shape.rotation = lerp(collision_shape.rotation, 0.0, 0.2)
