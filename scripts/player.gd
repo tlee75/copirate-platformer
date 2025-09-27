@@ -11,7 +11,6 @@ const JUMP_VELOCITY := -400.0
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") as float
 
 var was_airborne: bool = false
-var w_key_was_pressed: bool = false
 var is_trigger_action: bool = false
 var sword_area: Area2D
 var tilemap: TileMap
@@ -31,7 +30,7 @@ var tile_size: float = 32.0
 
 # Water movement effects
 var water_slow_factor: float = 0.7
-var swim_speed: float = 80.0
+var swim_speed: float = 150.0
 var is_underwater: bool = false
 
 # Remove old procedural Visual node if present
@@ -103,8 +102,10 @@ func _physics_process(delta):
 			vel.y += gravity * delta
 
 	#  WASD + Arrow key input
-	var left_pressed = Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A)
-	var right_pressed = Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D)
+	var left_pressed = Input.is_action_pressed("move_left") 
+	var right_pressed = Input.is_action_pressed("move_right")
+	var up_pressed = Input.is_action_pressed("move_up")
+	var down_pressed = Input.is_action_pressed("move_down")
 	
 	var dir = 0
 	if left_pressed:
@@ -114,34 +115,44 @@ func _physics_process(delta):
 	
 	if dir != 0:
 		var current_speed: float
-		if not is_on_floor():
+		
+		if is_underwater:
+			# Always use swim speed when underwater, regardless of floor contact
+			current_speed = swim_speed
+		elif not is_on_floor():
 			# Use locked jump speed when airborne
 			current_speed = jump_speed
 		else:
 			# Use normal speed logic when on ground
 			var is_running = Input.is_key_pressed(KEY_SHIFT)
 			var base_speed = RUN_SPEED if is_running else WALK_SPEED
-			
-			# Apply underwater swimming speed (ignore running underwater)
-			if is_underwater:
-				current_speed = swim_speed
-			else:
-				current_speed = base_speed
-			
-
+			current_speed = base_speed
+		
 		vel.x = dir * current_speed
 		last_move_dir = dir
 	else:
 		vel.x = move_toward(vel.x, 0, WALK_SPEED)
+	
+	# Vertical movement
+	var vertical_dir = 0
+	if up_pressed:
+		vertical_dir -= 1
+	if down_pressed:
+		vertical_dir += 1
+	
+	if vertical_dir != 0:
+		if is_underwater:
+			# Swimming up/down when underwater
+			var is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
+			var current_swim_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
+			vel.y = vertical_dir * current_swim_speed
+		else:
+			# Climbing placeholder for on land
+			print("Trying to climb ", "up" if vertical_dir < 0 else "down", " - no climable serface found")
+			# Apply underwater swimming speed (ignore running underwater)
 
-	# Jump input - detect just pressed for W key
-	var jump_pressed = Input.is_action_just_pressed("ui_accept") or Input.is_action_just_pressed("ui_up")
-	if Input.is_key_pressed(KEY_W):
-		if not w_key_was_pressed:
-			jump_pressed = true
-	w_key_was_pressed = Input.is_key_pressed(KEY_W)
-
-	if jump_pressed and is_on_floor() and not is_underwater:
+	# Jump input - detect just pressed for the jump action
+	if Input.is_action_just_pressed("jump") and is_on_floor() and not is_underwater:
 		vel.y = JUMP_VELOCITY
 		was_running_when_jumped = Input.is_key_pressed(KEY_SHIFT)
 		jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
@@ -186,6 +197,9 @@ func _physics_process(delta):
 	velocity = vel
 	move_and_slide()
 
+	# Update collision shape orientation for swimming
+	update_collision_orientation()
+
 	# Handle animations after physics update
 	handle_animations()
 	
@@ -202,17 +216,28 @@ func handle_animations():
 		# Airborne
 		was_airborne = true
 		
-		var use_running_anims = was_running_when_jumped
+		if is_underwater:
+			# When airborne but underwater, use swimming animations
+			if abs(velocity.x) > 1.0:
+				# Swimming while moving
+				if $AnimatedSprite2D.animation != "swim":
+					$AnimatedSprite2D.play("swim")
+			else:
+				# Swim while stationary
+				if $AnimatedSprite2D.animation != "swim_idle":
+					$AnimatedSprite2D.play("swim_idle")
+		else:
+			# Normal airborne animations when not underwater
+			var use_running_anims = was_running_when_jumped
 
-		if velocity.y < -5:  # Going up
-			var target_anim = "run_jump" if use_running_anims else "jump"
-			if $AnimatedSprite2D.animation != target_anim:
-				$AnimatedSprite2D.play(target_anim)
-		elif velocity.y > 5:  # Going down  
-			var target_anim = "run_fall" if use_running_anims else "fall"
-			if $AnimatedSprite2D.animation != target_anim:
-				$AnimatedSprite2D.play(target_anim)
-		# At apex (-5 to 5), maintain current animation
+			if velocity.y < -5:  # Going up
+				var target_anim = "run_jump" if use_running_anims else "jump"
+				if $AnimatedSprite2D.animation != target_anim:
+					$AnimatedSprite2D.play(target_anim)
+			elif velocity.y > 5:  # Going down  
+				var target_anim = "run_fall" if use_running_anims else "fall"
+				if $AnimatedSprite2D.animation != target_anim:
+					$AnimatedSprite2D.play(target_anim)
 	else:
 		# On ground
 		if was_airborne:
@@ -480,5 +505,32 @@ func can_use_item_in_current_environment(item) -> bool:
 	else:
 		return item.get("land_compatible", true)
 		
+
+func update_collision_orientation():
+	var collision_shape = $CollisionShape2D
+	
+	if is_underwater:
+		# Calculate movement direction for collision optimization
+		var movement_vector = Vector2(velocity.x, velocity.y)
 		
-		
+		if movement_vector.length() > 10.0: # Only rotate  if moving with sufficient speed
+			# Get the angle of movement direction
+			var movement_angle = movement_vector.angle()
+			
+			# Convert to degrees and clamp rotation for better collision
+			var rotation_degrees = rad_to_deg(movement_angle)
+			
+			# Limit rotation to reasonable swimming angles
+			if abs(rotation_degrees) > 90:
+				# Swimming backwards - flip the angle
+				rotation_degrees = rotation_degrees + 180 if rotation_degrees < 0 else rotation_degrees - 180
+				
+			# Apply smooth rotation with limts for realistic swimming
+			var target_rotation = deg_to_rad(clamp(rotation_degrees, -45, 45))
+			collision_shape.rotation = lerp(collision_shape.rotation, target_rotation, 0.1)
+		else:
+			# When not moving underwater, return to neutral horizontal position
+			collision_shape.rotation = lerp(collision_shape.rotation, 0.0, 0.1)
+	else:
+		# On land or in air - always vertical collision
+		collision_shape.rotation = lerp(collision_shape.rotation, 0.0, 0.2)
