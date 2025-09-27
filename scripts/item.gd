@@ -8,6 +8,9 @@ class_name GameItem
 @export var craftable: bool = false
 @export var category: String = ""
 @export var craft_requirements: Dictionary = {}
+@export var underwater_compatible: bool = false
+@export var land_compatible: bool = true
+
 
 func action(user):
 	pass

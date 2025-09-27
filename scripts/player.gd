@@ -32,6 +32,7 @@ var tile_size: float = 32.0
 # Water movement effects
 var water_slow_factor: float = 0.7
 var swim_speed: float = 80.0
+var is_underwater: bool = false
 
 # Remove old procedural Visual node if present
 func _ready():
@@ -94,7 +95,12 @@ func _physics_process(delta):
 	calculate_water_depth()
 
 	if not is_on_floor():
-		vel.y += gravity * delta
+		if is_underwater:
+			# In water: dampen vertical movement to simulate water resistance
+			vel.y = move_toward(vel.y, 0, gravity *2 * delta)
+		else:
+			# Normal land gravity
+			vel.y += gravity * delta
 
 	#  WASD + Arrow key input
 	var left_pressed = Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A)
@@ -114,7 +120,14 @@ func _physics_process(delta):
 		else:
 			# Use normal speed logic when on ground
 			var is_running = Input.is_key_pressed(KEY_SHIFT)
-			current_speed = RUN_SPEED if is_running else WALK_SPEED
+			var base_speed = RUN_SPEED if is_running else WALK_SPEED
+			
+			# Apply underwater swimming speed (ignore running underwater)
+			if is_underwater:
+				current_speed = swim_speed
+			else:
+				current_speed = base_speed
+			
 
 		vel.x = dir * current_speed
 		last_move_dir = dir
@@ -128,7 +141,7 @@ func _physics_process(delta):
 			jump_pressed = true
 	w_key_was_pressed = Input.is_key_pressed(KEY_W)
 
-	if jump_pressed and is_on_floor():
+	if jump_pressed and is_on_floor() and not is_underwater:
 		vel.y = JUMP_VELOCITY
 		was_running_when_jumped = Input.is_key_pressed(KEY_SHIFT)
 		jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
@@ -145,6 +158,12 @@ func _physics_process(delta):
 		if not is_trigger_action:
 			var selected_item = get_selected_hotbar_item()
 			if selected_item and selected_item.has_method("action"):
+				# Check if this item can be used in current environment
+				if not can_use_item_in_current_environment(selected_item):
+					var item_name = selected_item.name if selected_item.has_method("get_name") else str(selected_item)
+					var environment_msg = "underwater" if is_underwater else "on land"
+					print("Cannot use ", item_name, " ", environment_msg, "!")
+					return
 				selected_item.action(self)
 			else:
 				# Fallback to punch attack, e.g. melee
@@ -207,13 +226,25 @@ func handle_animations():
 		elif $AnimatedSprite2D.animation != "ground":
 			# Only change animation if not currently playing ground animation
 			if abs(velocity.x) > 1.0:
-				var is_running = Input.is_key_pressed(KEY_SHIFT)
-				var target_anim = "run" if is_running else "walk"
-				# Only change animation if it's different from current
-				if $AnimatedSprite2D.animation != target_anim:
-					$AnimatedSprite2D.play(target_anim)
+				if is_underwater:
+					# Swimming animation when moving underwater
+					if $AnimatedSprite2D.animation != "swim":
+						$AnimatedSprite2D.play("swim")
+				else:
+					# Normal land animations
+					var is_running = Input.is_key_pressed(KEY_SHIFT)
+					var target_anim = "run" if is_running else "walk"
+					# Only change animation if it's different from current
+					if $AnimatedSprite2D.animation != target_anim:
+						$AnimatedSprite2D.play(target_anim)
 			else:
-				$AnimatedSprite2D.play("idle")
+				if is_underwater:
+					# Swimming idle when not moving underwater
+					if $AnimatedSprite2D.animation != "swim_idle":
+						$AnimatedSprite2D.play("swim_idle")
+				else:
+					# Normal idle on land
+					$AnimatedSprite2D.play("idle")
 
 func _on_ground_animation_finished():
 	# Only transition if we're still on the ground
@@ -413,6 +444,14 @@ func calculate_water_depth():
 		water_depth = max(0, new_depth) # Ensure depth is never negative
 		is_in_water = true
 		
+		# Check if underwater (2+ tiles deep) with hysteresis to prevent oscillation
+		if not is_underwater:
+			# Only enter swimming mode if we're clearly underwater (2+ tiles)
+			is_underwater = water_depth >= 2
+		else:
+			# Stay in swimming mode u ntil we're clearly in shallow water (1 tile or less)
+			is_underwater = water_depth >= 1
+		
 		# Emit signal if depth changed significantly
 		if abs(water_depth - previous_water_depth) >= 1:
 			_on_depth_changed()
@@ -429,3 +468,17 @@ func calculate_water_depth():
 	
 func _on_depth_changed():
 	print("Depth changed from ", previous_water_depth, " to ", water_depth, " tiles below sea level")
+
+func can_use_item_in_current_environment(item) -> bool:
+	if not item:
+		return false
+		
+	# Check if item has environment compatibility properties
+	if is_underwater:
+		# Check if item works underwater
+		return item.get("underwater_compatible", false)
+	else:
+		return item.get("land_compatible", true)
+		
+		
+		

@@ -71,6 +71,8 @@ func _ready():
 	gold_coin_item.stack_size = 10
 	gold_coin_item.craftable = false
 	gold_coin_item.category = "currency"
+	gold_coin_item.underwater_compatible = false
+	gold_coin_item.land_compatible = true
 	item_database["gold_coin"] = gold_coin_item
 	
 	# Initialize item database with sword
@@ -80,6 +82,8 @@ func _ready():
 	sword_item.stack_size = 1
 	sword_item.craftable = true
 	sword_item.category = "weapon"
+	sword_item.underwater_compatible = false
+	sword_item.land_compatible = true
 	item_database["sword"] = sword_item
 	sword_item.craft_requirements = {"Gold Coin": 2}
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
@@ -91,6 +95,8 @@ func _ready():
 	pickaxe_item.stack_size = 1
 	pickaxe_item.craftable = true
 	pickaxe_item.category = "tool"
+	pickaxe_item.underwater_compatible = false
+	pickaxe_item.land_compatible = true
 	item_database["pickaxe"] = pickaxe_item
 	pickaxe_item.craft_requirements = {"Gold Coin": 3}
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
@@ -102,6 +108,8 @@ func _ready():
 	woodaxe_item.stack_size = 1
 	woodaxe_item.craftable = true
 	woodaxe_item.category = "tool"
+	woodaxe_item.underwater_compatible = false
+	woodaxe_item.land_compatible = true
 	item_database["woodaxe"] = woodaxe_item
 	woodaxe_item.craft_requirements = {"Gold Coin": 3}
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
@@ -113,6 +121,8 @@ func _ready():
 	shovel_item.stack_size = 1
 	shovel_item.craftable = true
 	shovel_item.category = "tool"
+	shovel_item.underwater_compatible = false
+	shovel_item.land_compatible = true
 	item_database["shovel"] = shovel_item
 	shovel_item.craft_requirements = {"Gold Coin": 2}
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
