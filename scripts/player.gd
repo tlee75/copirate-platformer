@@ -35,7 +35,7 @@ var is_underwater: bool = false
 
 # Remove old procedural Visual node if present
 func _ready():
-	var frames = load("res://player_sprites.tres")
+	var frames = load("res://resources/player_sprites.tres")
 	$AnimatedSprite2D.sprite_frames = frames
 	# Remove procedural Visual if it exists
 	if has_node("Visual"):
@@ -520,9 +520,9 @@ func can_use_item_in_current_environment(item) -> bool:
 	# Check if item has environment compatibility properties
 	if is_underwater:
 		# Check if item works underwater
-		return item.get("underwater_compatible", false)
+		return item.underwater_compatible if item.has_method("action") else false
 	else:
-		return item.get("land_compatible", true)
+		return item.land_compatible if item.has_method("action") else true
 		
 
 #func update_collision_orientation():
