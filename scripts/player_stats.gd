@@ -30,6 +30,7 @@ var stamina_usage_modifier: float = 1.0
 # Status tracking
 var is_underwater: bool = false
 var is_sprinting: bool = false
+var stamina_depleted: bool = false
 
 func _ready():
 	# Initialize stats to full
@@ -87,9 +88,13 @@ func modify_stamina(amount: float):
 
 	if current_stamina != old_stamina:
 		stamina_changed.emit(current_stamina, max_stamina)
-		
-	if current_stamina <= 0.0:
+	
+	# Only emit stat_depleted once when stamina hits zero
+	if current_stamina <= 0.0 and not stamina_depleted:
 		stat_depleted.emit("stamina")
+		stamina_depleted = true
+	elif current_stamina > 0.0:
+		stamina_depleted = false
 
 # Modifier functions for items/effects
 func set_oxygen_depletion_modifier(modifier: float):

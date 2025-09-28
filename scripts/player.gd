@@ -151,6 +151,7 @@ func _physics_process(delta):
 		last_move_dir = dir
 	else:
 		vel.x = move_toward(vel.x, 0, WALK_SPEED)
+		player_stats.set_sprinting_status(false)
 	
 	# Vertical movement
 	var vertical_dir = 0
@@ -179,7 +180,8 @@ func _physics_process(delta):
 				vel.y = movement_vector.y
 		else:
 			# Climbing placeholder for on land
-			print("Trying to climb ", "up" if vertical_dir < 0 else "down", " - no climable serface found")
+			if Input.is_action_just_pressed("move_up") or Input.is_action_just_pressed("move_down"):
+				print("Trying to climb ", "up" if vertical_dir < 0 else "down", " - no climable serface found")
 
 	# Jump input - detect just pressed for the jump action
 	if Input.is_action_just_pressed("jump") and is_on_floor() and not is_underwater:
