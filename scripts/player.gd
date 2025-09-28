@@ -148,10 +148,17 @@ func _physics_process(delta):
 			var current_swim_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
 			
 			# Prevent swimming above water surface
-			if vertical_dir < 0 and global_position.y <= sea_level_y + 16: # 16px buffer from surface
+			if vertical_dir < 0 and global_position.y <= sea_level_y + 5: # 16px buffer from surface
 				vel.y = 0 # Stop upward movement at surface
 			else:
 				vel.y = vertical_dir * current_swim_speed
+			
+			# Normalize diagonal movement
+			if dir != 0 and vertical_dir !=0:
+				var movement_vector = Vector2(vel.x, vel.y)
+				movement_vector = movement_vector.normalized() * current_swim_speed
+				vel.x = movement_vector.x
+				vel.y = movement_vector.y
 		else:
 			# Climbing placeholder for on land
 			print("Trying to climb ", "up" if vertical_dir < 0 else "down", " - no climable serface found")
