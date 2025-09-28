@@ -78,6 +78,7 @@ func _ready():
 
 func _physics_process(delta):
 	var vel: Vector2 = velocity
+	var tile_pos = tilemap.local_to_map(global_position)
 	
 	# Skip input handling if inventory is open
 	if inventory_is_open:
@@ -91,18 +92,24 @@ func _physics_process(delta):
 		# Don't update sword position, mouse UI detection, or highlights when inventory is open
 		return
 
-	# Determine if player is in water
-	is_underwater = is_on_water_tile()
-
-	var tile_pos = tilemap.local_to_map(global_position)
-
-	if is_underwater:
+	if is_on_water_tile():
 		if water_surface_y == -1:
 			water_surface_y = find_water_surface_y()
 		water_depth = tile_pos.y - water_surface_y
 		print("Water depth: %", water_depth)
+		if water_depth == 0:
+			var tile_below = tile_pos + Vector2i(0, 1)
+			var tile_data_below = tilemap.get_cell_tile_data(0, tile_below)
+			var is_water_below = tile_data_below and tile_data_below.has_custom_data("is_water") and tile_data_below.get_custom_data("is_water")
+			if is_water_below: # Determine if we're underwater or standing in shallow water
+				is_underwater = true
+			else:
+				is_underwater = false # Shallow water
+		else:
+			is_underwater = true
 	else:
 		water_surface_y = -1
+		is_underwater = false
 
 	if not is_on_floor():
 		if is_underwater:
