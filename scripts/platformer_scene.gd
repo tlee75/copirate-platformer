@@ -10,10 +10,11 @@ extends Node2D
 @onready var inventory_system: Node = $UI/InventorySystem
 @onready var player: CharacterBody2D = $Player
 @onready var pause_menu = $UI/PauseMenu
+@onready var player_stats: PlayerStats
 
 var inventory_is_open: bool = false
 
-func _ready():	
+func _ready():
 
 	print("PauseMenu found: ", pause_menu != null)
 	print("PauseMenu visible: ", pause_menu.visible)
@@ -31,6 +32,14 @@ func _ready():
 	
 	pause_menu.resume_requested.connect(_on_resume)
 	pause_menu.restart_requested.connect(_on_restart)
+	
+	# Add stats display
+	var stats_display = preload("res://ui/stats_display.tscn").instantiate()
+	stats_display.position = Vector2(10,100) # Position below other UI elements
+	$UI.add_child(stats_display)
+	
+	# Get reference to player stats
+	player_stats = player.player_stats
 
 func _on_inventory_toggled(is_open: bool):
 	inventory_is_open = is_open
@@ -85,6 +94,20 @@ func _input(event):
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
 			hotbar.select_slot(hotbar.selected_slot + 1)
 			get_viewport().set_input_as_handled()
+	
+	# Debug keys to test stats system
+	if event.is_action_pressed("ui_accept"):  # Enter key
+		# Test damage
+		if player_stats:
+			player_stats.modify_health(-10)
+			print("Debug: Took 10 damage")
+	
+	if event.is_action_pressed("ui_cancel"):  # Escape key  
+		# Test oxygen depletion
+		if player_stats:
+			player_stats.modify_oxygen(-20)
+			print("Debug: Lost 20 oxygen")
+
 
 func _on_resume():
 	pause_menu.hide()

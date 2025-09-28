@@ -28,6 +28,9 @@ var is_in_water: bool = false
 var previous_water_depth: int = 0
 var tile_size: float = 32.0
 
+# Player stats system
+var player_stats: PlayerStats
+
 # Water movement effects
 var water_slow_factor: float = 0.7
 var swim_speed: float = 150.0
@@ -75,6 +78,13 @@ func _ready():
 	# Add player to group so other scripts can find it easily
 	add_to_group("player")
 
+	# Initialize player stats
+	player_stats = PlayerStats.new()
+	add_child(player_stats)
+	
+	# Connect to stat depletion events
+	player_stats.stat_depleted.connect(_on_stat_depleted)
+
 
 func _physics_process(delta):
 	var vel: Vector2 = velocity
@@ -121,14 +131,21 @@ func _physics_process(delta):
 			# Always use swim speed when underwater, regardless of floor contact
 			var is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
 			current_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
+			
+			# Update stats for sprint swimming
+			player_stats.set_sprinting_status(is_sprint_swimming)
 		elif not is_on_floor():
 			# Use locked jump speed when airborne
 			current_speed = jump_speed
+			player_stats.set_sprinting_status(false)
 		else:
 			# Use normal speed logic when on ground
 			var is_running = Input.is_key_pressed(KEY_SHIFT)
 			var base_speed = RUN_SPEED if is_running else WALK_SPEED
 			current_speed = base_speed
+			
+			# Update stats for land sprinting
+			player_stats.set_sprinting_status(is_running)
 		
 		vel.x = dir * current_speed
 		last_move_dir = dir
@@ -505,6 +522,9 @@ func calculate_water_depth():
 		water_depth = 0
 		is_in_water = false
 		
+		# Update stats system
+		player_stats.set_underwater_status(false)
+		
 		if previous_water_depth > 0:
 			_on_depth_changed()
 	
@@ -556,3 +576,16 @@ func update_collision_orientation():
 	else:
 		# On land or in air - always vertical collision
 		collision_shape.rotation = lerp(collision_shape.rotation, 0.0, 0.2)
+
+func _on_stat_depleted(stat_name: String):
+	match stat_name:
+		"health":
+			print("Player died!")
+		"oxygen":
+			print("Player is drowning!")
+			
+			# Take damage from drowning
+			player_stats.modify_health(-20.0)
+		"stamina":
+			print("Player is exhausted!")
+			# Could reduce movement speed or prevent sprinting
