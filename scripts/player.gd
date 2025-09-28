@@ -22,10 +22,7 @@ var last_move_dir: int = 1  # 1 for right, -1 for left
 var was_running_when_jumped: bool = false
 var jump_speed: float = 0.0
 var inventory_is_open: bool = false
-var water_depth: int = 0
-var sea_level_y: float = 0.0 # Y=0 represents Sea Level
 var is_in_water: bool = false
-var previous_water_depth: int = 0
 var tile_size: float = 32.0
 
 # Player stats system
@@ -52,8 +49,6 @@ func _ready():
 		anim = AnimatedSprite2D.new()
 		anim.name = "AnimatedSprite2D"
 		add_child(anim)
-
-	# Scale is now set in the scene file
 	
 	# Set initial animation
 	anim.play("idle")
@@ -66,23 +61,16 @@ func _ready():
 	create_highlight_texture()
 	# Enable input processing so _input can capture key presses
 	set_process_input(true)
-	
-	# Ensure player receives input
-	# (No pause handling needed)
-	
-	# We'll check for aadddddatiles manually during attacks instead of using signals
-	
+
 	# Connect to inventory state changes
 	inventory_state_changed.connect(_on_inventory_state_changed)
 	
 	# Add player to group so other scripts can find it easily
 	add_to_group("player")
 
-	# Initialize player stats
+	# Setup player stats
 	player_stats = PlayerStats.new()
 	add_child(player_stats)
-	
-	# Connect to stat depletion events
 	player_stats.stat_depleted.connect(_on_stat_depleted)
 
 
@@ -101,8 +89,8 @@ func _physics_process(delta):
 		# Don't update sword position, mouse UI detection, or highlights when inventory is open
 		return
 
-	# Calculate current water depth (Y=0 is sea level)
-	calculate_water_depth()
+	# Determine if player is in water
+	is_underwater = is_on_water_tile()
 
 	if not is_on_floor():
 		if is_underwater:
@@ -167,7 +155,7 @@ func _physics_process(delta):
 			var current_swim_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
 			
 			# Prevent swimming above water surface
-			if vertical_dir < 0 and global_position.y <= sea_level_y + 5: # 16px buffer from surface
+			if vertical_dir < 0 and not is_on_water_tile():
 				vel.y = 0 # Stop upward movement at surface
 			else:
 				vel.y = vertical_dir * current_swim_speed
@@ -489,51 +477,12 @@ func get_selected_hotbar_item():
 		return null
 	return hotbar.get_selected_item()
 
-func calculate_water_depth():
-	# Y=0 is sea level, positive Y values are underwater
-	if global_position.y > sea_level_y:
-		# Player is underwater - calculate depth in tiles
-		var depth_pixels = global_position.y - sea_level_y
-		var new_depth = int(depth_pixels / tile_size) + 1
-		
-		# Store previous depth for comparison
-		previous_water_depth = water_depth
-		water_depth = max(0, new_depth) # Ensure depth is never negative
-		is_in_water = true
-		
-		# Shallow water walking - use collision detection + depth
-		var player_height_in_tiles = 2.0 # Approximate player height in tiles
-		var shallow_water_threshold = player_height_in_tiles * 0.6 # 60% submerged = still walking
-				
-		# Check if underwater with ground-based shallow water walking
-		if not is_underwater:
-			# Only enter swimming if water is deeper than walking threshold
-			is_underwater = water_depth > shallow_water_threshold + 0.5 # Hysteresis buffer
-		else:
-			# Exit swimming mode only if in shallow water AND on walkable ground
-			var is_shallow_water = water_depth < 1.5
-			var has_walkable_ground = is_on_floor()
-			is_underwater = not (is_shallow_water and has_walkable_ground)
-			
-		# Emit signal if depth changed significantly
-		if abs(water_depth - previous_water_depth) >= 1:
-			_on_depth_changed()
-	else:
-		# Player is above sea level (on land or air)
-		previous_water_depth = water_depth
-		water_depth = 0
-		is_in_water = false
-		
-		# Update stats system
-		player_stats.set_underwater_status(false)
-		
-		if previous_water_depth > 0:
-			_on_depth_changed()
-	
-	return water_depth
-	
-func _on_depth_changed():
-	print("Depth changed from ", previous_water_depth, " to ", water_depth, " tiles below sea level")
+func is_on_water_tile() -> bool:
+	var tile_pos = tilemap.local_to_map(global_position)
+	var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
+	if tile_data and tile_data.has_custom_data("is_water"):
+		return tile_data.get_custom_data("is_water")
+	return false
 
 func can_use_item_in_current_environment(item) -> bool:
 	if not item:
@@ -546,21 +495,6 @@ func can_use_item_in_current_environment(item) -> bool:
 	else:
 		return item.land_compatible if item.has_method("action") else true
 		
-
-#func update_collision_orientation():
-	#var collision_shape = $CollisionShape2D
-	#
-	#if is_underwater:
-		## When swimming, always use sprite swimming angle for collision shape
-		#var target_rotation = deg_to_rad(45.0)
-		## Flip collision shape to match sprite direction
-		#if $AnimatedSprite2D.flip_h:
-			#target_rotation = -target_rotation
-		#
-		#collision_shape.rotation = lerp(collision_shape.rotation, target_rotation, 0.1)
-	#else:
-		## On land or in air - always vertical collision
-		#collision_shape.rotation = lerp(collision_shape.rotation, 0.0, 0.2)
 
 func update_collision_orientation():
 	var collision_shape = $CollisionShape2D

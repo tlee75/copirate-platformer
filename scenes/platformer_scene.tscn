@@ -24,17 +24,20 @@ size = Vector2(13, 3.5)
 texture = ExtResource("4_f15g2")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
+0:0/0/custom_data_0 = true
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_btm0u"]
 texture = ExtResource("5_atnpy")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
+0:0/0/custom_data_0 = true
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nrqbv"]
 texture = ExtResource("6_cy82x")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, 7, 16, 7, 16, 16, -16, 16)
+0:0/0/custom_data_0 = true
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xoih0"]
 texture = ExtResource("4_8w8yu")
@@ -53,8 +56,8 @@ texture_region_size = Vector2i(32, 32)
 [sub_resource type="TileSet" id="TileSet_gwrsa"]
 tile_size = Vector2i(32, 32)
 physics_layer_0/collision_layer = 1
-custom_data_layer_0/name = "water_type"
-custom_data_layer_0/type = 4
+custom_data_layer_0/name = "is_water"
+custom_data_layer_0/type = 1
 sources/3 = SubResource("TileSetAtlasSource_xoih0")
 sources/11 = SubResource("TileSetAtlasSource_q5qfs")
 sources/12 = SubResource("TileSetAtlasSource_btm0u")
@@ -131,6 +134,10 @@ text = "Depth: 0 Tiles"
 script = ExtResource("14_atnpy")
 
 [node name="StatsDisplay" parent="UI" instance=ExtResource("15_cy82x")]
+offset_left = 8.0
+offset_top = 544.0
+offset_right = 8.0
+offset_bottom = 544.0
 
 [node name="Barrels" type="Node" parent="."]
 
