@@ -32,6 +32,8 @@ var player_stats: PlayerStats
 var water_slow_factor: float = 0.7
 var swim_speed: float = 150.0
 var is_underwater: bool = false
+var water_surface_y: int = -1
+var water_depth: int = -1
 
 # Remove old procedural Visual node if present
 func _ready():
@@ -91,6 +93,16 @@ func _physics_process(delta):
 
 	# Determine if player is in water
 	is_underwater = is_on_water_tile()
+
+	var tile_pos = tilemap.local_to_map(global_position)
+	
+	if is_underwater:
+		if water_surface_y == -1:
+			water_surface_y = find_water_surface_y()
+		water_depth = tile_pos.y - water_surface_y
+		print("Water depth: %", water_depth)
+	else:
+		water_surface_y = -1
 
 	if not is_on_floor():
 		if is_underwater:
@@ -172,7 +184,7 @@ func _physics_process(delta):
 				print("Trying to climb ", "up" if vertical_dir < 0 else "down", " - no climable serface found")
 
 	# Jump input - detect just pressed for the jump action
-	if Input.is_action_just_pressed("jump") and is_on_floor() and not is_underwater:
+	if Input.is_action_just_pressed("jump") and (is_on_floor() and not is_underwater or (is_underwater and water_depth == 0)):
 		vel.y = JUMP_VELOCITY
 		was_running_when_jumped = Input.is_key_pressed(KEY_SHIFT)
 		jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
@@ -483,6 +495,19 @@ func is_on_water_tile() -> bool:
 	if tile_data and tile_data.has_custom_data("is_water"):
 		return tile_data.get_custom_data("is_water")
 	return false
+
+func find_water_surface_y() -> int:
+	var tile_pos = tilemap.local_to_map(global_position)
+	var check_pos = tile_pos
+	while true:
+		check_pos.y -= 1
+		var tile_data = tilemap.get_cell_tile_data(0, check_pos)
+		if not tile_data or not tile_data.has_custom_data("is_water") or not tile_data.get_custom_data("is_water"):
+			return check_pos.y + 1 # The tile just below the first non-water tile
+	return tile_pos.y
+
+func get_water_depth() -> int:
+	return water_depth
 
 func can_use_item_in_current_environment(item) -> bool:
 	if not item:

@@ -11,20 +11,14 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	if player:
-		var current_y = player.global_position.y
-		var tile_size = 32.0  # Define tile size here
+		var water_depth = player.get_water_depth()
 
-		if current_y > 0:
-			# Underwater - calculate depth
-			var depth_tiles = int(current_y / tile_size) + 1
-			text = "Depth: %d tiles below sea level" % depth_tiles
+		if water_depth == 0:
+			text = "Depth: Shallow water"
 			visible = true
-		elif current_y < -tile_size:  # Only show altitude if significantly above sea level
-			# Above sea level
-			var altitude_tiles = int(abs(current_y) / tile_size)
-			text = "Altitude: %d tiles above sea level" % altitude_tiles
+		elif water_depth > 0:
+			text = "Depth: %d tiles below surface" % water_depth
 			visible = true
 		else:
-			# Near sea level
-			text = "At sea level"
+			text = "At or above water level"
 			visible = true
