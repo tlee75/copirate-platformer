@@ -32,12 +32,7 @@ func _ready():
 	
 	pause_menu.resume_requested.connect(_on_resume)
 	pause_menu.restart_requested.connect(_on_restart)
-	
-	# Add stats display
-	var stats_display = preload("res://ui/stats_display.tscn").instantiate()
-	stats_display.position = Vector2(10,100) # Position below other UI elements
-	$UI.add_child(stats_display)
-	
+
 	# Get reference to player stats
 	player_stats = player.player_stats
 

@@ -14,7 +14,7 @@ func _process(_delta):
 		var water_depth = player.get_water_depth()
 
 		if water_depth == 0:
-			text = "Depth: Shallow water"
+			text = "Depth: Surface water"
 			visible = true
 		elif water_depth > 0:
 			text = "Depth: %d tiles below surface" % water_depth

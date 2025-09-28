@@ -96,20 +96,22 @@ func _physics_process(delta):
 		if water_surface_y == -1:
 			water_surface_y = find_water_surface_y()
 		water_depth = tile_pos.y - water_surface_y
-		print("Water depth: %", water_depth)
 		if water_depth == 0:
+			player_stats.set_underwater_status(false)
 			var tile_below = tile_pos + Vector2i(0, 1)
 			var tile_data_below = tilemap.get_cell_tile_data(0, tile_below)
 			var is_water_below = tile_data_below and tile_data_below.has_custom_data("is_water") and tile_data_below.get_custom_data("is_water")
-			if is_water_below: # Determine if we're underwater or standing in shallow water
+			if is_water_below: # Determine if we're underwater or standing in surface water
 				is_underwater = true
 			else:
-				is_underwater = false # Shallow water
+				is_underwater = false # Surface water
 		else:
 			is_underwater = true
+			player_stats.set_underwater_status(is_underwater)
 	else:
 		water_surface_y = -1
 		is_underwater = false
+		player_stats.set_underwater_status(is_underwater)
 
 	if not is_on_floor():
 		if is_underwater:

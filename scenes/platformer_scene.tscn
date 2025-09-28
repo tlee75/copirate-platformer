@@ -14,7 +14,7 @@
 [ext_resource type="PackedScene" uid="uid://dgdkbk47a63st" path="res://scenes/barrel.tscn" id="10_nrqbv"]
 [ext_resource type="PackedScene" uid="uid://k0kkh12kws3d" path="res://ui/crafting_menu.tscn" id="10_xoih0"]
 [ext_resource type="Script" uid="uid://covte3n64vx2f" path="res://ui/crafting_menu.gd" id="11_mx3pc"]
-[ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://scripts/depth_counter.gd" id="14_atnpy"]
+[ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://ui/depth_counter.gd" id="14_atnpy"]
 [ext_resource type="PackedScene" uid="uid://noyk5n0awjav" path="res://ui/stats_display.tscn" id="15_cy82x"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
@@ -134,10 +134,13 @@ text = "Depth: 0 Tiles"
 script = ExtResource("14_atnpy")
 
 [node name="StatsDisplay" parent="UI" instance=ExtResource("15_cy82x")]
-offset_left = 8.0
-offset_top = 544.0
-offset_right = 8.0
-offset_bottom = 544.0
+anchors_preset = 15
+offset_left = 38.0
+offset_top = 431.0
+offset_right = -853.0
+offset_bottom = -26.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Barrels" type="Node" parent="."]
 
