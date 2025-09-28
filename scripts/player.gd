@@ -95,7 +95,7 @@ func _physics_process(delta):
 	is_underwater = is_on_water_tile()
 
 	var tile_pos = tilemap.local_to_map(global_position)
-	
+
 	if is_underwater:
 		if water_surface_y == -1:
 			water_surface_y = find_water_surface_y()
@@ -162,12 +162,16 @@ func _physics_process(delta):
 	
 	if vertical_dir != 0:
 		if is_underwater:
+			var tile_pixel_y = tile_pos.y * tile_size
+			var offset_in_tile = global_position.y - tile_pixel_y # 0 = top of tile, tile_size = bottom
+			var near_top = offset_in_tile < 5.0 # Threshold to adjust in pixels
+			
 			# Swimming up/down when underwater
 			var is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
 			var current_swim_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
 			
 			# Prevent swimming above water surface
-			if vertical_dir < 0 and not is_on_water_tile():
+			if vertical_dir < 0 and water_depth == 0 and near_top and not Input.is_action_just_pressed("jump"):
 				vel.y = 0 # Stop upward movement at surface
 			else:
 				vel.y = vertical_dir * current_swim_speed
