@@ -119,7 +119,8 @@ func _physics_process(delta):
 		
 		if is_underwater:
 			# Always use swim speed when underwater, regardless of floor contact
-			current_speed = swim_speed
+			var is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
+			current_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
 		elif not is_on_floor():
 			# Use locked jump speed when airborne
 			current_speed = jump_speed
