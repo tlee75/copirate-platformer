@@ -135,7 +135,10 @@ text = "Depth: 0 Tiles"
 script = ExtResource("14_atnpy")
 metadata/_edit_use_anchors_ = true
 
-[node name="StatsDisplay" parent="UI" instance=ExtResource("15_cy82x")]
+[node name="StatsUpdateTimer" type="Timer" parent="UI"]
+autostart = true
+
+[node name="StatsDisplay" parent="UI/StatsUpdateTimer" instance=ExtResource("15_cy82x")]
 anchor_left = 0.021000002
 anchor_top = 0.57100004
 anchor_right = 0.264812

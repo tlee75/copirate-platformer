@@ -28,3 +28,7 @@ text = "Resume"
 [node name="RestartButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Restart"
+
+[node name="RespawnButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Respawn"

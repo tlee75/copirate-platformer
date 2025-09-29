@@ -2,11 +2,13 @@ extends Control
 
 signal resume_requested
 signal restart_requested
+signal respawn_requested
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	$VBoxContainer/ResumeButton.pressed.connect(_on_resume_pressed)
 	$VBoxContainer/RestartButton.pressed.connect(_on_restart_pressed)
+	$VBoxContainer/RespawnButton.pressed.connect(_on_respawn_pressed)
 
 
 func _on_resume_pressed():
@@ -14,6 +16,9 @@ func _on_resume_pressed():
 
 func _on_restart_pressed():
 	emit_signal("restart_requested")
+
+func _on_respawn_pressed():
+	emit_signal("respawn_requested")
 
 func _input(event):
 	if event is InputEventKey and event.pressed:

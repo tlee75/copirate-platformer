@@ -13,15 +13,9 @@ extends Node2D
 @onready var player_stats: PlayerStats
 
 var inventory_is_open: bool = false
+var respawn_position: Vector2
 
 func _ready():
-
-	print("PauseMenu found: ", pause_menu != null)
-	print("PauseMenu visible: ", pause_menu.visible)
-	print("PauseMenu size: ", pause_menu.size)
-	print("PauseMenu position: ", pause_menu.position)
-
-
 	# Set up inventory system references
 	inventory_system.setup_ui_references(hotbar, main_inventory)
 	
@@ -32,9 +26,12 @@ func _ready():
 	
 	pause_menu.resume_requested.connect(_on_resume)
 	pause_menu.restart_requested.connect(_on_restart)
+	pause_menu.respawn_requested.connect(_on_respawn)
 
 	# Get reference to player stats
 	player_stats = player.player_stats
+
+	respawn_position = player.global_position # Initial position
 
 func _on_inventory_toggled(is_open: bool):
 	inventory_is_open = is_open
@@ -52,13 +49,7 @@ func _input(event):
 			if key_event.keycode == KEY_TAB:
 				# TAB toggles the combined menu open/closed
 				crafting_menu.visible = not crafting_menu.visible
-				#main_inventory.toggle_inventory()
-				#inventory_is_open = main_inventory.is_visible_flag
-				#
-				## Notify player script about inventory state change
-				#if player.has_signal("inventory_state_changed"):
-					#player.inventory_state_changed.emit(inventory_is_open)
-				#
+
 				get_viewport().set_input_as_handled()
 			
 			elif key_event.keycode == KEY_ESCAPE:
@@ -67,20 +58,7 @@ func _input(event):
 				else:
 					pause_menu.show()
 					get_tree().paused = true
-					
-				#if inventory_is_open:
-					## ESC only closes inventory when it's open
-					#main_inventory.hide_inventory()
-					#inventory_is_open = false
-				#
-					## Notify player script about inventory state change
-					#if player.has_signal("inventory_state_changed"):
-						#player.inventory_state_changed.emit(inventory_is_open)
-				#else:
-					## Escape opens pause menu
-					#pause_menu.show()
-					#get_tree().paused = true
-				#
+
 				get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
@@ -111,3 +89,11 @@ func _on_resume():
 func _on_restart():
 	get_tree().paused = false
 	get_tree().reload_current_scene()
+
+func _on_respawn():
+	player.player_stats.reset_stats()
+	player.is_dead = false
+	player.get_node("AnimatedSprite2D").play("idle")
+	player.global_position = respawn_position
+	pause_menu.hide()
+	get_tree().paused = false

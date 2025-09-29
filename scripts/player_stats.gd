@@ -205,3 +205,18 @@ func get_hunger_percentage() -> float:
 
 func get_thirst_percentage() -> float:
 	return current_thirst / max_thirst
+
+func reset_stats():
+	current_health = max_health
+	current_oxygen = max_oxygen
+	current_stamina = max_stamina
+	current_hunger = max_hunger
+	current_thirst = max_thirst
+	
+	# Emit signals to update the UI
+	health_changed.emit(current_health, max_health)
+	oxygen_changed.emit(current_oxygen, max_oxygen)
+	stamina_changed.emit(current_stamina, max_stamina)
+	hunger_changed.emit(current_hunger, max_hunger)
+	thirst_changed.emit(current_thirst, max_thirst)
+	

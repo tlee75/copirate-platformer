@@ -24,6 +24,7 @@ var jump_speed: float = 0.0
 var inventory_is_open: bool = false
 var is_in_water: bool = false
 var tile_size: float = 32.0
+var is_dead: bool = false
 
 # Player stats system
 var player_stats: PlayerStats
@@ -76,7 +77,7 @@ func _ready():
 	player_stats.stat_depleted.connect(_on_stat_depleted)
 
 
-func _physics_process(delta):
+func _physics_process(delta):	
 	var vel: Vector2 = velocity
 	var tile_pos = tilemap.local_to_map(global_position)
 	
@@ -557,14 +558,29 @@ func update_collision_orientation():
 		collision_shape.rotation = lerp(collision_shape.rotation, 0.0, 0.2)
 
 func _on_stat_depleted(stat_name: String):
+	if is_dead:
+		return
 	match stat_name:
 		"health":
-			print("Player died!")
+			print("Player has died!")
+			is_dead = true
+			$AnimatedSprite2D.play("land_death")
+			var ui_layer = get_parent().get_node_or_null("UI")
+			if ui_layer:
+				var pause_menu = ui_layer.get_node_or_null("PauseMenu")
+				if pause_menu:
+					pause_menu.show()
+					get_tree().paused = true
 		"oxygen":
-			print("Player is drowning!")
-			
+			print("Player is suffocating!")
 			# Take damage from drowning
-			player_stats.modify_health(-20.0)
+			player_stats.modify_health(-0.2)
 		"stamina":
 			print("Player is exhausted!")
 			# Could reduce movement speed or prevent sprinting
+		"hunger":
+			print("Player is starving!")
+			player_stats.modify_health(-5.0)
+		"thirst":
+			print("Player is dehydrated!")
+			player_stats.modify_health(-5.0)
