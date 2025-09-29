@@ -224,8 +224,13 @@ func _physics_process(delta):
 			else:
 				# Fallback to punch attack, e.g. melee
 				is_trigger_action = true
-				print("Hook used by %s" % self.name)
-				$AnimatedSprite2D.play("punch")
+				
+				if is_underwater:
+					print("Gather used by %s" % self.name)
+					$AnimatedSprite2D.play("swim_gather")
+				else:
+					print("Melee used by %s" % self.name)
+					$AnimatedSprite2D.play("punch")
 				
 				# Destroy tiles in sword area
 				#destroy_tiles_in_sword_area()

@@ -4,29 +4,37 @@
 
 [node name="StatsDisplay" type="Control"]
 layout_mode = 3
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 100.0
-offset_right = -1142.0
-offset_bottom = -548.0
+anchor_left = 0.074
+anchor_top = 0.90300006
+anchor_right = 0.074
+anchor_bottom = 0.90300006
+offset_left = -66.248
+offset_top = -290.14404
+offset_right = 360.752
+offset_bottom = 48.855957
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_agt1n")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 0
-offset_left = 17.0
-offset_top = -8.0
-offset_right = 228.0
-offset_bottom = 89.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.439
+anchor_top = 0.809
+anchor_right = 0.439
+anchor_bottom = 0.809
+offset_left = -122.453
+offset_top = -107.25101
+offset_right = 133.547
+offset_bottom = 70.74899
+pivot_offset = Vector2(100, 100)
 
 [node name="HealthContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 
 [node name="HealthLabel" type="Label" parent="VBoxContainer/HealthContainer"]
 layout_mode = 2
-text = "Health"
+text = "Health   "
 
 [node name="HealthBar" type="ProgressBar" parent="VBoxContainer/HealthContainer"]
 layout_mode = 2
@@ -38,7 +46,7 @@ layout_mode = 2
 
 [node name="OxygenLabel" type="Label" parent="VBoxContainer/OxygenContainer"]
 layout_mode = 2
-text = "Oxygen"
+text = "Oxygen "
 
 [node name="OxygenBar" type="ProgressBar" parent="VBoxContainer/OxygenContainer"]
 layout_mode = 2
@@ -62,7 +70,7 @@ layout_mode = 2
 
 [node name="HungerLabel" type="Label" parent="VBoxContainer/HungerContainer"]
 layout_mode = 2
-text = "Hunger"
+text = "Hunger "
 
 [node name="HungerBar" type="ProgressBar" parent="VBoxContainer/HungerContainer"]
 layout_mode = 2
@@ -74,7 +82,7 @@ layout_mode = 2
 
 [node name="ThirstLabel" type="Label" parent="VBoxContainer/ThirstContainer"]
 layout_mode = 2
-text = "Thirst"
+text = "Thirst    "
 
 [node name="ThirstBar" type="ProgressBar" parent="VBoxContainer/ThirstContainer"]
 layout_mode = 2
