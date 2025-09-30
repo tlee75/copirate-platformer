@@ -78,6 +78,9 @@ func _ready():
 
 
 func _physics_process(delta):	
+	if is_dead:
+		return
+	
 	var vel: Vector2 = velocity
 	var tile_pos = tilemap.local_to_map(global_position)
 	
@@ -261,6 +264,10 @@ func handle_animations():
 	if is_trigger_action:
 		return
 	
+	# Don't change animations while dead
+	if is_dead:
+		return
+	
 	var on_floor = is_on_floor()
 	
 	if not on_floor:
@@ -340,8 +347,17 @@ func _on_attack_animation_finished():
 	# When attack animation finishes, end attack state
 	is_trigger_action = false
 
-	# Don't force animation change here - let handle_animations() handle it
-	# This prevents interference with jump/fall animations
+func _on_death_animation_finished():
+	# Prevent subsequent cycles from re-pausing the game
+	if not is_dead:
+		return
+	var ui_layer = get_parent().get_node_or_null("UI")
+	if ui_layer:
+		var pause_menu = ui_layer.get_node_or_null("PauseMenu")
+		if pause_menu:
+			pause_menu.show()
+			pause_menu.set_resume_enabled(false)
+			get_tree().paused = true
 
 func update_sword_position():
 	# Get mouse position in world coordinates
@@ -562,15 +578,20 @@ func _on_stat_depleted(stat_name: String):
 		return
 	match stat_name:
 		"health":
-			print("Player has died!")
+			print("Player has died!!")
 			is_dead = true
-			$AnimatedSprite2D.play("land_death")
-			var ui_layer = get_parent().get_node_or_null("UI")
-			if ui_layer:
-				var pause_menu = ui_layer.get_node_or_null("PauseMenu")
-				if pause_menu:
-					pause_menu.show()
-					get_tree().paused = true
+			if $AnimatedSprite2D.animation != "land_death":
+				print("play land death")
+				$AnimatedSprite2D.play("land_death")
+				# Disconnect previous handlers
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
+					$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
+					$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_death_animation_finished):
+					$AnimatedSprite2D.animation_finished.disconnect(_on_death_animation_finished)
+				# Connect death animation finished h andler
+				$AnimatedSprite2D.animation_finished.connect(_on_death_animation_finished)
 		"oxygen":
 			print("Player is suffocating!")
 			# Take damage from drowning

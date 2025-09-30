@@ -42,6 +42,8 @@ func _on_inventory_toggled(is_open: bool):
 		player.inventory_state_changed.emit(is_open)
 
 func _input(event):
+	if player.is_dead:
+		return
 	# Handle TAB and ESC keys for inventory
 	if event is InputEventKey:
 		var key_event = event as InputEventKey
@@ -97,3 +99,4 @@ func _on_respawn():
 	player.global_position = respawn_position
 	pause_menu.hide()
 	get_tree().paused = false
+	pause_menu.set_resume_enabled(true)
