@@ -37,43 +37,52 @@ func _process(delta):
 	# Reduce hit cooldown
 	if hit_cooldown > 0.0:
 		hit_cooldown -= delta
-		
-	# Check for player actions if barrel isn't destroyed
-	if state != BarrelState.DESTROYED:
-		check_for_player_actions()
 
-# Modular action detection system
-func check_for_player_actions():
-	# Don't process if on cooldown
-	if hit_cooldown > 0.0:
-		return
-		
-	# Get all areas currently overlapping with hit detection
-	var overlapping_areas = hit_detection.get_overlapping_areas()
-	
-	for area in overlapping_areas:
-		if area.name == "SwordArea":
-			var player = area.get_parent()
-			if player and player.is_trigger_action:
-				handle_attack_action(player)
-				return
+	## Check for player actions if barrel isn't destroyed
+	#if state != BarrelState.DESTROYED:
+		#check_for_player_actions()
+
+## Modular action detection system
+#func check_for_player_actions():
+	## Don't process if on cooldown
+	#if hit_cooldown > 0.0:
+		#return
+		#
+	## Get all areas currently overlapping with hit detection
+	#var overlapping_areas = hit_detection.get_overlapping_areas()
+	#
+	#for area in overlapping_areas:
+		#if area.name == "SwordArea":
+			#var player = area.get_parent()
+			#if player and player.is_trigger_action:
+				#handle_attack_action(player)
+				#return
 
 func _on_area_exited(_area: Area2D):
 	# Could be used for effects in the future
 	pass
 
+func is_attackable() -> bool:
+	var result = state != BarrelState.DESTROYED and hit_cooldown <= 0.0
+	print("is_attackable check: state=", state, " cooldown=", hit_cooldown, " result=", result)
+	return result
 
-# Attack action handler
-func handle_attack_action(_player):
-	# Prevent multiple hits in quick succession
-	if state == BarrelState.DESTROYED or hit_cooldown > 0.0:
-		return
-		
-	# Set cooldown
+func set_attack_cooldown():
+	print("Setting cooldown. Current cooldown: ", hit_cooldown)
 	hit_cooldown = hit_cooldown_time
-	
-	# Apply attack damage
-	take_damage(1)
+	print("Cooldown set to: ", hit_cooldown)
+
+## Attack action handler
+#func handle_attack_action(_player):
+	## Prevent multiple hits in quick succession
+	#if state == BarrelState.DESTROYED or hit_cooldown > 0.0:
+		#return
+		#
+	## Set cooldown
+	#hit_cooldown = hit_cooldown_time
+	#
+	## Apply attack damage
+	#take_damage(1)
 
 # Interact action handler (for future use)
 func handle_interact_action(_player):
@@ -91,9 +100,9 @@ func handle_use_item_action(_player):
 
 # Damage system (separated from action handling)
 func take_damage(amount: int):
+	var old_health = health
 	health -= amount
-	print("Barrel damaged! Health: ", health, "/", max_health, " - State: ", state)
-	
+	print("Barrel take_damage called! Old health: ", old_health, " -> New health: ", health, "/", max_health, " - Amount: ", amount, " - State: ", state)	
 	# Check if barrel should be destroyed
 	if health <= 0:
 		break_barrel()

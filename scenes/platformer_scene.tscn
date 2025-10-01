@@ -72,7 +72,6 @@ position = Vector2(126, 2139)
 
 [node name="SwordArea" type="Area2D" parent="Player"]
 position = Vector2(20, 0)
-monitoring = false
 
 [node name="SwordCollision" type="CollisionShape2D" parent="Player/SwordArea"]
 position = Vector2(4.5, 3.25)
