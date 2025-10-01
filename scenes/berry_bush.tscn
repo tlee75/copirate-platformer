@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://bqjbr0fr548wk"]
+
+[ext_resource type="Script" uid="uid://cuywkiresdse3" path="res://scripts/berry_bush.gd" id="1_xykto"]
+[ext_resource type="Texture2D" uid="uid://c62oi65ltp333" path="res://assets/tropical/berry_bush_01_64x50.png" id="2_johh4"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dy85o"]
+radius = 22.022715
+
+[node name="BerryBush" type="Node2D"]
+script = ExtResource("1_xykto")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_johh4")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_dy85o")
