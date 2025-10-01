@@ -38,26 +38,6 @@ func _process(delta):
 	if hit_cooldown > 0.0:
 		hit_cooldown -= delta
 
-	## Check for player actions if barrel isn't destroyed
-	#if state != BarrelState.DESTROYED:
-		#check_for_player_actions()
-
-## Modular action detection system
-#func check_for_player_actions():
-	## Don't process if on cooldown
-	#if hit_cooldown > 0.0:
-		#return
-		#
-	## Get all areas currently overlapping with hit detection
-	#var overlapping_areas = hit_detection.get_overlapping_areas()
-	#
-	#for area in overlapping_areas:
-		#if area.name == "SwordArea":
-			#var player = area.get_parent()
-			#if player and player.is_trigger_action:
-				#handle_attack_action(player)
-				#return
-
 func _on_area_exited(_area: Area2D):
 	# Could be used for effects in the future
 	pass
@@ -67,25 +47,18 @@ func is_attackable() -> bool:
 	print("is_attackable check: state=", state, " cooldown=", hit_cooldown, " result=", result)
 	return result
 
-func set_attack_cooldown():
+func is_interactable() -> bool:
+	var result = state != BarrelState.DESTROYED and hit_cooldown <= 0.0
+	print("is_interactable check: state=", state, " cooldown=", hit_cooldown, " result=", result)
+	return result
+
+func set_cooldown():
 	print("Setting cooldown. Current cooldown: ", hit_cooldown)
 	hit_cooldown = hit_cooldown_time
 	print("Cooldown set to: ", hit_cooldown)
 
-## Attack action handler
-#func handle_attack_action(_player):
-	## Prevent multiple hits in quick succession
-	#if state == BarrelState.DESTROYED or hit_cooldown > 0.0:
-		#return
-		#
-	## Set cooldown
-	#hit_cooldown = hit_cooldown_time
-	#
-	## Apply attack damage
-	#take_damage(1)
-
 # Interact action handler (for future use)
-func handle_interact_action(_player):
+func interact():
 	if state == BarrelState.DESTROYED:
 		return
 	print("Player interacted with barrel")
@@ -98,7 +71,7 @@ func handle_use_item_action(_player):
 	print("Player used item on barrel")
 	# Could be used for tools, keys, etc.
 
-# Damage system (separated from action handling)
+# Damage system
 func take_damage(amount: int):
 	var old_health = health
 	health -= amount

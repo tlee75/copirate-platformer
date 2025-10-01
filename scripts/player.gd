@@ -12,6 +12,7 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") a
 
 var was_airborne: bool = false
 var is_trigger_action: bool = false
+var is_interacting: bool = false
 var sword_area: Area2D
 var tilemap: TileMap
 var highlighted_tiles: Array[Vector2i] = []
@@ -26,6 +27,7 @@ var is_in_water: bool = false
 var tile_size: float = 32.0
 var is_dead: bool = false
 var attack_target = null 
+var interact_target = null
 
 # Player stats system
 var player_stats: PlayerStats
@@ -215,46 +217,58 @@ func _physics_process(delta):
 	
 	# Interact Input
 	if Input.is_action_just_pressed("interact") and not inventory_is_open:
-		handle_interact_input()
+		if not is_interacting:
+			if is_interactable_objects():
+				is_interacting = true
+				if is_underwater:
+					print("Gather used by %s" % self.name)
+					$AnimatedSprite2D.play("swim_gather")
+				else:
+					print("Interact used by %s" % self.name)
+					$AnimatedSprite2D.play("interact")
+				# Disconnect any existing connections first, then connect
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
+					$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
+					$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
+
+				$AnimatedSprite2D.animation_finished.connect(_on_interact_animation_finished)
 	
 	# Attack input - left mouse button (but not when clicking on hotbar)
 	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu():
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
-			if handle_attack_input():
-				print("handle attack input")
-				var selected_item = get_selected_hotbar_item()
-				if selected_item and selected_item.has_method("action"):
-					# Check if this item can be used in current environment
-					if not can_use_item_in_current_environment(selected_item):
-						var item_name = selected_item.name if selected_item.has_method("get_name") else str(selected_item)
-						var environment_msg = "underwater" if is_underwater else "on land"
-						print("Cannot use ", item_name, " ", environment_msg, "!")
-						return
-					selected_item.action(self)
-				else:
-					# Fallback to punch attack, e.g. melee
-					is_trigger_action = true
-					
-					if is_underwater:
-						print("Gather used by %s" % self.name)
-						$AnimatedSprite2D.play("swim_gather")
-					else:
-						print("Melee used by %s" % self.name)
-						$AnimatedSprite2D.play("punch")
-					
-					# Destroy tiles in sword area
-					#destroy_tiles_in_sword_area()
-					
-					# Disconnect any existing connections first, then connect
-					if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
-						$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
-					if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
-						$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
-
-					$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
+			is_attackable_objects() # Allow attack even when there is no attackble object
+			var selected_item = get_selected_hotbar_item()
+			if selected_item and selected_item.has_method("action"):
+				# Check if this item can be used in current environment
+				if not can_use_item_in_current_environment(selected_item):
+					var item_name = selected_item.name if selected_item.has_method("get_name") else str(selected_item)
+					var environment_msg = "underwater" if is_underwater else "on land"
+					print("Cannot use ", item_name, " ", environment_msg, "!")
+					return
+				selected_item.action(self)
 			else:
-				print("Nothing to attack")
+				# Fallback to punch attack, e.g. melee
+				is_trigger_action = true
+				
+				if is_underwater:
+					print("Gather used by %s" % self.name)
+					$AnimatedSprite2D.play("swim_gather")
+				else:
+					print("Melee used by %s" % self.name)
+					$AnimatedSprite2D.play("punch")
+				
+				# Destroy tiles in sword area
+				#destroy_tiles_in_sword_area()
+				
+				# Disconnect any existing connections first, then connect
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
+					$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
+					$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
+
+				$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
 
 	# Update physics first
 	velocity = vel
@@ -268,7 +282,7 @@ func _physics_process(delta):
 
 func handle_animations():
 	# Don't change animations while in the middle of an action
-	if is_trigger_action:
+	if is_trigger_action or is_interacting:
 		return
 	
 	# Don't change animations while dead
@@ -358,6 +372,17 @@ func _on_attack_animation_finished():
 
 	# When attack animation finishes, end attack state
 	is_trigger_action = false
+
+func _on_interact_animation_finished():
+	print("interact animation finished")
+	# Disconnect the signal immediately to prevent interference
+	if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
+		$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
+
+	interact_target.interact()
+
+	# When attack animation finishes, end attack state
+	is_interacting = false
 
 func _on_death_animation_finished():
 	# Prevent subsequent cycles from re-pausing the game
@@ -618,49 +643,42 @@ func _on_stat_depleted(stat_name: String):
 			print("Player is dehydrated!")
 			player_stats.modify_health(-5.0)
 
-func handle_interact_input():
+func is_interactable_objects():
 	# Get all areas and bodies overlapping with the sword area
 	var overlapping_areas = sword_area.get_overlapping_areas()
 	var overlapping_bodies = sword_area.get_overlapping_bodies()
-	
-	# Check areas first
+
+	# Create combined list of potential targets
+	var all_targets = overlapping_bodies.duplicate()  # Start with bodies
 	for area in overlapping_areas:
 		var parent = area.get_parent()
-		if parent != self and parent.has_method("handle_interact_action") and parent.has_method("can_interact"):
-			if parent.can_interact():
-				parent.handle_interact_action(self)
-				return # Only interact with first valid object
+		if parent != self:
+			all_targets.append(parent)
 	
-	# Check bodies
-	for body in overlapping_bodies:
-		if body != self and body.has_method("handle_interact_action") and body.has_method("can_interact"):
-			if body.can_interact():
-				body.handle_interact_action(self)
-				return # Only interact with first valid object
+	# Find first interactable target
+	for target in all_targets:
+		if target != self and target.has_method("is_interactable") and target.is_interactable():
+			interact_target = target
+			target.set_cooldown()
+			return true
 		
 	print("No interactable objects in range")
 
-func handle_attack_input():
-	# Get all areas and bodies currently overlapping with sword area
+func is_attackable_objects():
+	# Get all overlapping objects and their parents
 	var overlapping_areas = sword_area.get_overlapping_areas()
 	var overlapping_bodies = sword_area.get_overlapping_bodies()
-	
-	# Check areas first (like barrel's HitDetection)
+
+	# Create combined list of potential targets
+	var all_targets = overlapping_bodies.duplicate()  # Start with bodies
 	for area in overlapping_areas:
 		var parent = area.get_parent()
-		if parent != self and parent.has_method("is_attackable"):
-			# Check if object can be attacked
-			if parent.is_attackable():
-				attack_target = parent # Store target, don't damage yet
-				parent.set_attack_cooldown()
-				return true
+		if parent != self:
+			all_targets.append(parent)
 	
-	# Check bodies (StaticBody2D, RigidBody2D, CharacterBody2D)
-	for body in overlapping_bodies:
-		if body != self and body.has_method("is_attackable"):
-			# Check if object can be attacked (if method exists)
-			if body.is_attackable():
-				attack_target = body # Store target, don't damage yet
-				body.set_attack_cooldown()
-				return true
-	return false
+	# Find first attackable target
+	for target in all_targets:
+		if target != self and target.has_method("is_attackable") and target.is_attackable():
+			attack_target = target
+			target.set_cooldown()
+			return true
