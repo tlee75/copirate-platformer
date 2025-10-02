@@ -374,7 +374,6 @@ func _on_attack_animation_finished():
 	is_trigger_action = false
 
 func _on_interact_animation_finished():
-	print("interact animation finished")
 	# Disconnect the signal immediately to prevent interference
 	if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
 		$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
@@ -644,20 +643,7 @@ func _on_stat_depleted(stat_name: String):
 			player_stats.modify_health(-5.0)
 
 func is_interactable_objects():
-	# Get all areas and bodies overlapping with the cursor area
-	var overlapping_areas = cursor_area.get_overlapping_areas()
-	var overlapping_bodies = cursor_area.get_overlapping_bodies()
-
-	# Create combined list of potential targets
-	var all_targets: Array = []
-	
-	for body in overlapping_bodies:
-		all_targets.append(body)
-
-	for area in overlapping_areas:
-		var parent = area.get_parent()
-		if parent != self:
-			all_targets.append(parent)
+	var all_targets = get_potential_targets()
 	
 	# Find first interactable target
 	for target in all_targets:
@@ -669,23 +655,23 @@ func is_interactable_objects():
 	print("No interactable objects in range")
 
 func is_attackable_objects():
-	# Get all overlapping objects and their parents
-	var overlapping_areas = cursor_area.get_overlapping_areas()
-	var overlapping_bodies = cursor_area.get_overlapping_bodies()
-
-	# Create combined list of potential targets
-	var all_targets: Array = []
-	
-	for body in overlapping_bodies:
-		all_targets.append(body)
-	for area in overlapping_areas:
-		var parent = area.get_parent()
-		if parent != self:
-			all_targets.append(parent)
-	
+	var all_targets = get_potential_targets()
+		
 	# Find first attackable target
 	for target in all_targets:
 		if target != self and target.has_method("is_attackable") and target.is_attackable():
 			attack_target = target
 			target.set_cooldown()
 			return true
+
+func get_potential_targets() -> Array:
+	var overlapping_areas = cursor_area.get_overlapping_areas()
+	var overlapping_bodies = cursor_area.get_overlapping_bodies()
+	var all_targets: Array = []
+	for body in overlapping_bodies:
+		all_targets.append(body)
+	for area in overlapping_areas:
+		var parent = area.get_parent()
+		if parent != self:
+			all_targets.append(parent)
+	return all_targets

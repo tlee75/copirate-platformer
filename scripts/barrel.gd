@@ -57,7 +57,7 @@ func set_cooldown():
 func interact():
 	if state == BarrelState.DESTROYED:
 		return
-	print("Player interacted with barrel")
+	print("The barrel doesn't seem to do anything.")
 	# Could be used for examining, picking up, etc.
 
 # Use item action handler (for future use)  
