@@ -7,10 +7,9 @@ func _ready():
 	body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body):
-	# If player touches coin, add to inventory
-	if body is Player:
-		var sword_item = InventoryManager.item_database["sword"]
-		if InventoryManager.add_item(sword_item, 1):
+	# If player touches item, add to inventory
+	if body.is_in_group("player"):
+		if body.add_loot("sword", 1):
 			print("Sword added to inventory!")
 			queue_free()
 		else:

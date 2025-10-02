@@ -5,13 +5,12 @@ func _ready():
 
 	# Connect area entered signal for collection
 	body_entered.connect(_on_body_entered)
-
+	
 func _on_body_entered(body):
-	# If player touches coin, add to inventory
-	if body is Player:
-		var pickaxe_item = InventoryManager.item_database["pickaxe"]
-		if InventoryManager.add_item(pickaxe_item, 1):
-			print("Pick Axe added to inventory!")
+	# If player touches item, add to inventory
+	if body.is_in_group("player"):
+		if body.add_loot("pickaxe", 1):
+			print("item added to inventory!")
 			queue_free()
 		else:
-			print("Inventory full! Cannot pick up pickaxe.")
+			print("Inventory full! Cannot pick up item.")

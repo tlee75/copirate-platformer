@@ -8,10 +8,9 @@ func _ready():
 
 func _on_body_entered(body):
 	# If player touches item, add to inventory
-	if body is Player:
-		var shovel_item = InventoryManager.item_database["shovel"]
-		if InventoryManager.add_item(shovel_item, 1):
-			print("Shovel added to inventory!")
+	if body.is_in_group("player"):
+		if body.add_loot("shovel", 1):
+			print("item added to inventory!")
 			queue_free()
 		else:
-			print("Inventory full! Cannot pick up shovel.")
+			print("Inventory full! Cannot pick up item.")

@@ -680,6 +680,6 @@ func add_loot(item_name: String, amount: int):
 	# Implement inventory logic
 	var game_item = InventoryManager.item_database[item_name]
 	if InventoryManager.add_item(game_item, amount):
-		print("Item added to inventory!")
+		return true
 	else:
-		print("Inventory full, cannot pick up item")
+		return false
