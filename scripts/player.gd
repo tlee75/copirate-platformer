@@ -675,3 +675,11 @@ func get_potential_targets() -> Array:
 		if parent != self:
 			all_targets.append(parent)
 	return all_targets
+
+func add_loot(item_name: String, amount: int):
+	# Implement inventory logic
+	var game_item = InventoryManager.item_database[item_name]
+	if InventoryManager.add_item(game_item, amount):
+		print("Item added to inventory!")
+	else:
+		print("Inventory full, cannot pick up item")

@@ -1,0 +1,2 @@
+extends GameItem
+class_name RaspberryItem

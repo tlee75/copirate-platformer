@@ -1,10 +1,11 @@
-[gd_scene load_steps=23 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=24 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_yte5o"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_8w8yu"]
 [ext_resource type="Texture2D" uid="uid://xbvs700g2epd" path="res://resources/crosshair.tres" id="3_xoih0"]
 [ext_resource type="Texture2D" uid="uid://dki1spd0slwxj" path="res://assets/tropical/tropical_tilemap_slice_32x32.png" id="4_8w8yu"]
 [ext_resource type="Texture2D" uid="uid://djumqlm6wttkh" path="res://assets/tropical/surface_water_32x32.png" id="4_f15g2"]
+[ext_resource type="PackedScene" uid="uid://bqjbr0fr548wk" path="res://scenes/berry_bush.tscn" id="4_q5qfs"]
 [ext_resource type="Texture2D" uid="uid://b4u6hsbyh7vou" path="res://assets/tropical/underwater_02_32x32.png" id="5_atnpy"]
 [ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://scripts/fps_counter.gd" id="5_f15g2"]
 [ext_resource type="PackedScene" uid="uid://bl5dg3fjv4w6g" path="res://ui/hotbar.tscn" id="6_atnpy"]
@@ -167,3 +168,6 @@ position = Vector2(2, 2164)
 
 [node name="Barrel" parent="." instance=ExtResource("10_nrqbv")]
 position = Vector2(530, 2257)
+
+[node name="BerryBush" parent="." instance=ExtResource("4_q5qfs")]
+position = Vector2(222, 2154)
