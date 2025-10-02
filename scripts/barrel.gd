@@ -44,18 +44,14 @@ func _on_area_exited(_area: Area2D):
 
 func is_attackable() -> bool:
 	var result = state != BarrelState.DESTROYED and hit_cooldown <= 0.0
-	print("is_attackable check: state=", state, " cooldown=", hit_cooldown, " result=", result)
 	return result
 
 func is_interactable() -> bool:
 	var result = state != BarrelState.DESTROYED and hit_cooldown <= 0.0
-	print("is_interactable check: state=", state, " cooldown=", hit_cooldown, " result=", result)
 	return result
 
 func set_cooldown():
-	print("Setting cooldown. Current cooldown: ", hit_cooldown)
 	hit_cooldown = hit_cooldown_time
-	print("Cooldown set to: ", hit_cooldown)
 
 # Interact action handler (for future use)
 func interact():
@@ -73,9 +69,8 @@ func handle_use_item_action(_player):
 
 # Damage system
 func take_damage(amount: int):
-	var old_health = health
 	health -= amount
-	print("Barrel take_damage called! Old health: ", old_health, " -> New health: ", health, "/", max_health, " - Amount: ", amount, " - State: ", state)	
+
 	# Check if barrel should be destroyed
 	if health <= 0:
 		break_barrel()
@@ -90,8 +85,6 @@ func take_damage(amount: int):
 		if animated_sprite.sprite_frames.has_animation("damaged"):
 			animated_sprite.play("damaged")
 
-# REMOVED: Old monolithic hit function - replaced by modular action system
-# func on_barrel_hit(): ...
 		elif animated_sprite.sprite_frames.has_animation("hit"):
 			animated_sprite.play("hit")
 		else:
@@ -153,8 +146,7 @@ func spawn_loot_item(item_scene: PackedScene, offset_index: int):
 	
 	# Add to the scene
 	get_parent().add_child(item_instance)
-	
-	print("Spawned loot item at position: ", item_instance.global_position)
+
 
 func find_valid_spawn_position(offset_index: int) -> Vector2:
 	var max_attempts = 20

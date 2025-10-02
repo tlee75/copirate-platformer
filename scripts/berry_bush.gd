@@ -10,7 +10,7 @@ func _ready():
 		$Sprite2D.texture = full_texture
 
 
-func handle_interact_action(player):
+func interact(player):
 	if has_berries:
 		has_berries = false
 		

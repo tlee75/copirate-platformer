@@ -86,7 +86,6 @@ func _ready():
 	sword_item.land_compatible = true
 	item_database["sword"] = sword_item
 	sword_item.craft_requirements = {"Gold Coin": 2}
-	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 	
 	# Initialize item database with pick Axe
 	var pickaxe_item = PickAxeItem.new()
@@ -99,7 +98,6 @@ func _ready():
 	pickaxe_item.land_compatible = true
 	item_database["pickaxe"] = pickaxe_item
 	pickaxe_item.craft_requirements = {"Gold Coin": 3}
-	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
 	# Initialize item database with Wood Axe
 	var woodaxe_item = WoodAxeItem.new()
@@ -112,7 +110,6 @@ func _ready():
 	woodaxe_item.land_compatible = true
 	item_database["woodaxe"] = woodaxe_item
 	woodaxe_item.craft_requirements = {"Gold Coin": 3}
-	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
 	# Initialize item database with Wood Axe
 	var shovel_item = ShovelItem.new()
@@ -125,6 +122,7 @@ func _ready():
 	shovel_item.land_compatible = true
 	item_database["shovel"] = shovel_item
 	shovel_item.craft_requirements = {"Gold Coin": 2}
+
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
 
@@ -157,7 +155,6 @@ func _ready():
 # Add item to inventory (tries hotbar first, then main inventory)
 func add_item(item: GameItem, amount: int = 1) -> bool:	
 	var remaining = amount
-	var original_remaining = remaining
 	
 	# Try to add to existing stacks in hotbar first
 	for slot in hotbar_slots:
@@ -270,7 +267,6 @@ func add_item_to_total(item_name: String, quantity: int):
 		item_totals[item_name] += quantity
 	else:
 		item_totals[item_name] = quantity
-	print("Total for ", item_name, " is now: ", item_totals[item_name])
 
 func remove_item_from_total(item_name: String, quantity: int):
 	if item_name in item_totals:

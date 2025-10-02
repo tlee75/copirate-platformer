@@ -70,14 +70,14 @@ script = ExtResource("1_yte5o")
 z_index = 1
 position = Vector2(126, 2139)
 
-[node name="SwordArea" type="Area2D" parent="Player"]
+[node name="CursorArea" type="Area2D" parent="Player"]
 position = Vector2(20, 0)
 
-[node name="SwordCollision" type="CollisionShape2D" parent="Player/SwordArea"]
+[node name="CursorCollision" type="CollisionShape2D" parent="Player/CursorArea"]
 position = Vector2(4.5, 3.25)
 shape = SubResource("RectangleShape2D_ru564")
 
-[node name="Crosshair" type="Sprite2D" parent="Player/SwordArea"]
+[node name="Crosshair" type="Sprite2D" parent="Player/CursorArea"]
 modulate = Color(1, 1, 1, 0.7)
 position = Vector2(8, 3)
 scale = Vector2(0.8, 0.8)
@@ -164,3 +164,6 @@ position = Vector2(-45, 2164)
 
 [node name="Barrel5" parent="Barrels" instance=ExtResource("10_nrqbv")]
 position = Vector2(2, 2164)
+
+[node name="Barrel" parent="." instance=ExtResource("10_nrqbv")]
+position = Vector2(530, 2257)

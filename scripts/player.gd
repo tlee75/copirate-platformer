@@ -13,7 +13,7 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") a
 var was_airborne: bool = false
 var is_trigger_action: bool = false
 var is_interacting: bool = false
-var sword_area: Area2D
+var cursor_area: Area2D
 var tilemap: TileMap
 var highlighted_tiles: Array[Vector2i] = []
 var tile_highlights: Array[Node2D] = []
@@ -59,8 +59,8 @@ func _ready():
 	# Set initial animation
 	anim.play("idle")
 	
-	# Get references to sword area and tilemap
-	sword_area = $SwordArea
+	# Get references to cursor area and tilemap
+	cursor_area = $CursorArea
 	tilemap = get_parent().get_node("TileMap")
 	
 	# Create reusable highlight texture
@@ -96,7 +96,7 @@ func _physics_process(delta):
 		vel.x = move_toward(vel.x, 0, WALK_SPEED * 2)  # Stop faster when inventory opens
 		velocity = vel
 		move_and_slide()
-		# Don't update sword position, mouse UI detection, or highlights when inventory is open
+		# Don't update cursor position, mouse UI detection, or highlights when inventory is open
 		return
 
 	if is_on_water_tile():
@@ -209,8 +209,8 @@ func _physics_process(delta):
 		was_running_when_jumped = Input.is_key_pressed(KEY_SHIFT)
 		jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
 
-	# Update sword area position based on mouse position
-	update_sword_position()
+	# Update cursor area position based on mouse position
+	update_cursor_position()
 	
 	# Update tile highlights
 	update_tile_highlights()
@@ -259,8 +259,8 @@ func _physics_process(delta):
 					print("Melee used by %s" % self.name)
 					$AnimatedSprite2D.play("punch")
 				
-				# Destroy tiles in sword area
-				#destroy_tiles_in_sword_area()
+				# Destroy tiles in cursor area
+				#destroy_tiles_in_cursor_area()
 				
 				# Disconnect any existing connections first, then connect
 				if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
@@ -396,7 +396,7 @@ func _on_death_animation_finished():
 			pause_menu.set_resume_enabled(false)
 			get_tree().paused = true
 
-func update_sword_position():
+func update_cursor_position():
 	# Get mouse position in world coordinates
 	var mouse_pos = get_global_mouse_position()
 	var player_pos = global_position
@@ -404,9 +404,9 @@ func update_sword_position():
 	# Calculate direction from player to mouse
 	var direction = (mouse_pos - player_pos).normalized()
 	
-	# Set sword area position at fixed distance from player
-	var sword_distance = 30.0  # Fixed distance to prevent infinite range
-	sword_area.position = direction * sword_distance
+	# Set cursor area position at fixed distance from player
+	var cursor_distance = 30.0  # Fixed distance to prevent infinite range
+	cursor_area.position = direction * cursor_distance
 	
 	# Face the direction of movement when moving; otherwise, face the mouse direction when idle
 	if abs(velocity.x) > 1.0:
@@ -416,23 +416,23 @@ func update_sword_position():
 	
 	# Ensure crosshair position is not affected by sprite flipping
 	# Reset any transform that might be affected by parent flipping
-	if sword_area.has_node("Crosshair"):
-		var crosshair = sword_area.get_node("Crosshair")
-		crosshair.position = Vector2.ZERO  # Keep crosshair centered on sword area
+	if cursor_area.has_node("Crosshair"):
+		var crosshair = cursor_area.get_node("Crosshair")
+		crosshair.position = Vector2.ZERO  # Keep crosshair centered on cursor area
 
 func create_highlight_texture():
 	# Create the highlight texture once and reuse it
-	var tile_size = tilemap.tile_set.tile_size
-	var image = Image.create(tile_size.x, tile_size.y, false, Image.FORMAT_RGBA8)
+	var map_tile_size = tilemap.tile_set.tile_size
+	var image = Image.create(map_tile_size.x, map_tile_size.y, false, Image.FORMAT_RGBA8)
 	image.fill(Color(1, 0, 0, 0.3))  # Red with transparency
 	
 	# Draw white outline
-	for x in range(tile_size.x):
+	for x in range(map_tile_size.x):
 		image.set_pixel(x, 0, Color.WHITE)  # Top edge
-		image.set_pixel(x, tile_size.y - 1, Color.WHITE)  # Bottom edge
-	for y in range(tile_size.y):
+		image.set_pixel(x, map_tile_size.y - 1, Color.WHITE)  # Bottom edge
+	for y in range(map_tile_size.y):
 		image.set_pixel(0, y, Color.WHITE)  # Left edge
-		image.set_pixel(tile_size.x - 1, y, Color.WHITE)  # Right edge
+		image.set_pixel(map_tile_size.x - 1, y, Color.WHITE)  # Right edge
 	
 	highlight_texture = ImageTexture.new()
 	highlight_texture.set_image(image)
@@ -443,8 +443,8 @@ func update_tile_highlights():
 		clear_tile_highlights()
 		return
 		
-	# Get tiles that would be affected by sword
-	var affected_tiles = get_tiles_in_sword_area()
+	# Get tiles that would be affected by cursor
+	var affected_tiles = get_tiles_in_cursor_area()
 	
 	# Check if we need to update (only if target tile changed)
 	var new_target = affected_tiles[0] if affected_tiles.size() > 0 else Vector2i(-999, -999)
@@ -470,12 +470,12 @@ func clear_tile_highlights():
 	tile_highlights.clear()
 	highlighted_tiles.clear()
 
-func get_tiles_in_sword_area() -> Array[Vector2i]:
+func get_tiles_in_cursor_area() -> Array[Vector2i]:
 	var affected_tiles: Array[Vector2i] = []
 	
-	# Get crosshair position (same as sword collision center)
-	var sword_collision = sword_area.get_node("SwordCollision")
-	var crosshair_pos = sword_collision.global_position
+	# Get crosshair position (same as cursor collision center)
+	var cursor_collision = cursor_area.get_node("CursorCollision")
+	var crosshair_pos = cursor_collision.global_position
 	
 	# Use Godot's built-in coordinate conversion to handle negative coordinates correctly
 	var target_tile = tilemap.local_to_map(tilemap.to_local(crosshair_pos))
@@ -490,10 +490,10 @@ func get_tiles_in_sword_area() -> Array[Vector2i]:
 func create_tile_highlight_optimized(tile_pos: Vector2i):
 	# Create a highlight sprite using the pre-created texture
 	var highlight = Sprite2D.new()
-	var tile_size = tilemap.tile_set.tile_size
+	var map_tile_size = tilemap.tile_set.tile_size
 	
 	# Position the highlight at the tile's world position
-	var world_pos = Vector2(tile_pos.x * tile_size.x + tile_size.x/2, tile_pos.y * tile_size.y + tile_size.y/2)
+	var world_pos = Vector2(tile_pos.x * map_tile_size.x + map_tile_size.x/2, tile_pos.y * map_tile_size.y + map_tile_size.y/2)
 	highlight.global_position = world_pos
 	
 	# Use the pre-created texture (much faster!)
@@ -504,9 +504,9 @@ func create_tile_highlight_optimized(tile_pos: Vector2i):
 	tile_highlights.append(highlight)
 	highlighted_tiles.append(tile_pos)
 
-func destroy_tiles_in_sword_area():
+func destroy_tiles_in_cursor_area():
 	# Get the single tile that would be affected (same logic as highlighting)
-	var affected_tiles = get_tiles_in_sword_area()
+	var affected_tiles = get_tiles_in_cursor_area()
 	
 	# Destroy only the single targeted tile
 	for tile_pos in affected_tiles:
@@ -644,12 +644,16 @@ func _on_stat_depleted(stat_name: String):
 			player_stats.modify_health(-5.0)
 
 func is_interactable_objects():
-	# Get all areas and bodies overlapping with the sword area
-	var overlapping_areas = sword_area.get_overlapping_areas()
-	var overlapping_bodies = sword_area.get_overlapping_bodies()
+	# Get all areas and bodies overlapping with the cursor area
+	var overlapping_areas = cursor_area.get_overlapping_areas()
+	var overlapping_bodies = cursor_area.get_overlapping_bodies()
 
 	# Create combined list of potential targets
-	var all_targets = overlapping_bodies.duplicate()  # Start with bodies
+	var all_targets: Array = []
+	
+	for body in overlapping_bodies:
+		all_targets.append(body)
+
 	for area in overlapping_areas:
 		var parent = area.get_parent()
 		if parent != self:
@@ -666,11 +670,14 @@ func is_interactable_objects():
 
 func is_attackable_objects():
 	# Get all overlapping objects and their parents
-	var overlapping_areas = sword_area.get_overlapping_areas()
-	var overlapping_bodies = sword_area.get_overlapping_bodies()
+	var overlapping_areas = cursor_area.get_overlapping_areas()
+	var overlapping_bodies = cursor_area.get_overlapping_bodies()
 
 	# Create combined list of potential targets
-	var all_targets = overlapping_bodies.duplicate()  # Start with bodies
+	var all_targets: Array = []
+	
+	for body in overlapping_bodies:
+		all_targets.append(body)
 	for area in overlapping_areas:
 		var parent = area.get_parent()
 		if parent != self:
