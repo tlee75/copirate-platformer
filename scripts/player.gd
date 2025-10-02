@@ -233,6 +233,8 @@ func _physics_process(delta):
 					$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
 
 				$AnimatedSprite2D.animation_finished.connect(_on_interact_animation_finished)
+			else:
+				print("Using item")
 	
 	# Attack input - left mouse button (but not when clicking on hotbar)
 	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu():
