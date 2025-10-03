@@ -5,6 +5,7 @@ extends Node2D
 
 @onready var ui_layer: CanvasLayer = $UI
 @onready var hotbar = $UI/Hotbar
+@onready var weaponbar = $UI/WeaponBar
 @onready var crafting_menu: Control = $UI/CraftingMenu
 @onready var main_inventory: Control = $UI/CraftingMenu/TabBar/InventoryTab/MainInventory
 @onready var inventory_system: Node = $UI/InventorySystem
@@ -17,7 +18,7 @@ var respawn_position: Vector2
 
 func _ready():
 	# Set up inventory system references
-	inventory_system.setup_ui_references(hotbar, main_inventory)
+	inventory_system.setup_ui_references(hotbar, main_inventory, weaponbar)
 	
 	# Connect inventory system signals
 	inventory_system.inventory_toggled.connect(_on_inventory_toggled)

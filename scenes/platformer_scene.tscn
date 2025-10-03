@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=26 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_yte5o"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_8w8yu"]
@@ -12,9 +12,11 @@
 [ext_resource type="Texture2D" uid="uid://dp42rf78somje" path="res://assets/tropical/seafloor_32x32.png" id="6_cy82x"]
 [ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://ui/inventory_system.gd" id="8_q5qfs"]
 [ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://ui/pause_menu.tscn" id="9_btm0u"]
+[ext_resource type="PackedScene" uid="uid://o5dk1uupyfxt" path="res://ui/weaponbar.tscn" id="10_mwf8c"]
 [ext_resource type="PackedScene" uid="uid://dgdkbk47a63st" path="res://scenes/barrel.tscn" id="10_nrqbv"]
 [ext_resource type="PackedScene" uid="uid://k0kkh12kws3d" path="res://ui/crafting_menu.tscn" id="10_xoih0"]
 [ext_resource type="Script" uid="uid://covte3n64vx2f" path="res://ui/crafting_menu.gd" id="11_mx3pc"]
+[ext_resource type="Script" uid="uid://dbkq1bkntxiv1" path="res://ui/weaponbar.gd" id="11_rgya6"]
 [ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://ui/depth_counter.gd" id="14_atnpy"]
 [ext_resource type="PackedScene" uid="uid://noyk5n0awjav" path="res://ui/stats_display.tscn" id="15_cy82x"]
 
@@ -109,6 +111,22 @@ offset_left = -251.0
 offset_top = -93.0
 offset_right = 261.0
 offset_bottom = -29.0
+
+[node name="WeaponBar" parent="UI" instance=ExtResource("10_mwf8c")]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -152.0
+offset_top = -90.0
+offset_right = -88.0
+offset_bottom = -25.0
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("11_rgya6")
 
 [node name="InventorySystem" type="Node" parent="UI"]
 script = ExtResource("8_q5qfs")

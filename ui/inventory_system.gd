@@ -7,10 +7,12 @@ signal inventory_toggled(is_open: bool)
 
 var hotbar_ui: Control
 var main_inventory_ui: Control
+var weaponbar_ui: Control
 
 # Public drag state variables for slots to check
 var drag_source_slot: int = -1
 var drag_source_is_hotbar: bool = false
+var drag_source_is_weaponbar: bool = false
 var is_dragging: bool = false
 var drag_preview: Control
 
@@ -28,14 +30,30 @@ func _input(event):
 				# Mouse released - check what's under the mouse cursor
 				var drop_target = find_slot_under_mouse()
 				if drop_target:
-					print("Drop target found: slot ", drop_target.slot_index, " (", "hotbar" if drop_target.is_hotbar_slot else "inventory", ")")
-					end_drag(drop_target.slot_index, drop_target.is_hotbar_slot)
+					print("Drop target found: slot ", drop_target.slot_index, " (", "hotbar" if drop_target.is_hotbar_slot else ("weapon" if drop_target.is_weapon_slot else "inventory"), ")")
+					end_drag(drop_target.slot_index, drop_target.is_hotbar_slot, drop_target.is_weapon_slot)
 				else:
 					print("Drag cancelled - mouse released outside any slot")
 					cancel_drag()
 				get_viewport().set_input_as_handled()
 			elif mouse_event.pressed and is_dragging:
 				print("Mouse button pressed while already dragging - ignoring")
+
+func find_source_slot_node():
+	var containers = []
+	if hotbar_ui:
+		containers.append(hotbar_ui)
+	if main_inventory_ui:
+		containers.append(main_inventory_ui)
+	if weaponbar_ui:
+		containers.append(weaponbar_ui)
+
+	for container in containers:
+		var slots = get_all_slots_from_container(container)
+		for slot in slots:
+			if slot.has_method("get") and slot.get("slot_index") == drag_source_slot:
+				return slot
+	return null
 
 func find_slot_under_mouse():
 	var mouse_pos = get_viewport().get_mouse_position()
@@ -54,6 +72,13 @@ func find_slot_under_mouse():
 			if slot.get_global_rect().has_point(mouse_pos):
 				return slot
 	
+	# Check weapon bar slots
+	if weaponbar_ui:
+		var weaponbar_slots = get_all_slots_from_container(weaponbar_ui)
+		for slot in weaponbar_slots:
+			if slot.get_global_rect().has_point(mouse_pos):
+				return slot
+
 	return null
 
 func get_all_slots_from_container(container: Control) -> Array:
@@ -71,13 +96,15 @@ func get_all_slots_from_container(container: Control) -> Array:
 	
 	return slots
 
-func setup_ui_references(hotbar: Control, inventory: Control):
+func setup_ui_references(hotbar: Control, inventory: Control, weaponbar: Control):
 	hotbar_ui = hotbar
 	main_inventory_ui = inventory
+	weaponbar_ui = weaponbar
 	
 	# Connect all slot signals through the UI managers
 	_connect_hotbar_signals()
 	_connect_inventory_signals()
+	_connect_weaponbar_signals()
 
 func _connect_hotbar_signals():
 	if not hotbar_ui:
@@ -93,13 +120,19 @@ func _connect_inventory_signals():
 	# Inventory slots are already connected in main_inventory.gd script
 	# We'll override their drag functions
 
-func start_drag(slot_index: int, is_hotbar: bool):
+func _connect_weaponbar_signals():
+	if not weaponbar_ui:
+		return
+
+func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool):
 	if is_dragging:
 		return
 	
 	var slot_data
 	if is_hotbar:
 		slot_data = InventoryManager.get_hotbar_slot(slot_index)
+	elif is_weaponbar:
+		slot_data = InventoryManager.get_weaponbar_slot(slot_index)
 	else:
 		slot_data = InventoryManager.get_inventory_slot(slot_index)
 	
@@ -109,28 +142,37 @@ func start_drag(slot_index: int, is_hotbar: bool):
 	is_dragging = true
 	drag_source_slot = slot_index
 	drag_source_is_hotbar = is_hotbar
+	drag_source_is_weaponbar = is_weaponbar
 	
 	# Create drag preview (simplified for now)
 	create_drag_preview(slot_data)
-	print("Started dragging from ", "hotbar" if is_hotbar else "inventory", " slot ", slot_index)
+	print("Started dragging from ", "hotbar" if is_hotbar else ("weapon" if is_weaponbar else "inventory"), " slot ", slot_index)
 
-func end_drag(target_slot: int, target_is_hotbar: bool):
+func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: bool = false):
 	if not is_dragging:
 		return
-	
-	# Perform the move
-	var success = InventoryManager.move_item(
-		drag_source_is_hotbar, drag_source_slot,
-		target_is_hotbar, target_slot
+
+	var source_slot_node = find_source_slot_node()
+	var target_slot_node = find_slot_under_mouse()
+
+	var source_type = InventoryManager.SlotType.HOTBAR if drag_source_is_hotbar else (InventoryManager.SlotType.WEAPON if drag_source_is_weaponbar else InventoryManager.SlotType.INVENTORY)
+	if source_slot_node and source_slot_node.is_weapon_slot:
+		source_type = InventoryManager.SlotType.WEAPON
+
+	var target_type = InventoryManager.SlotType.HOTBAR if target_is_hotbar else (InventoryManager.SlotType.WEAPON if target_is_weaponbar else InventoryManager.SlotType.INVENTORY)
+	if target_slot_node and target_slot_node.is_weapon_slot:
+		target_type = InventoryManager.SlotType.WEAPON
+
+	var success = InventoryManager.move_item_extended(
+		source_type, drag_source_slot,
+		target_type, target_slot
 	)
-	
+
 	if success:
-		print("Moved item from ", "hotbar" if drag_source_is_hotbar else "inventory", " slot ", drag_source_slot,
-			  " to ", "hotbar" if target_is_hotbar else "inventory", " slot ", target_slot)
+		print("Moved item")
 	else:
 		print("Failed to move item")
-	
-	# Clean up drag state
+
 	cleanup_drag()
 
 func cancel_drag():
@@ -141,6 +183,7 @@ func cleanup_drag():
 	is_dragging = false
 	drag_source_slot = -1
 	drag_source_is_hotbar = false
+	drag_source_is_weaponbar = false
 	
 	if drag_preview:
 		drag_preview.queue_free()
@@ -182,8 +225,9 @@ func _process(_delta):
 			print("Mouse button no longer pressed - ending drag via process check")
 			var drop_target = find_slot_under_mouse()
 			if drop_target:
-				print("Drop target found via process: slot ", drop_target.slot_index, " (", "hotbar" if drop_target.is_hotbar_slot else "inventory", ")")
-				end_drag(drop_target.slot_index, drop_target.is_hotbar_slot)
+				var target_type = "hotbar" if drop_target.is_hotbar_slot else ("weapon" if drop_target.is_weapon_slot else "inventory")
+				print("Drop target found: slot ", drop_target.slot_index, " (", target_type, ")")
+				end_drag(drop_target.slot_index, drop_target.is_hotbar_slot, drop_target.is_weapon_slot)
 			else:
 				print("Drag cancelled via process - mouse outside any slot")
 				cancel_drag()
