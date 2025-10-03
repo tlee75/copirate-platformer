@@ -234,41 +234,41 @@ func add_item(item: GameItem, amount: int = 1) -> bool:
 	print("Inventory full! Couldn't add ", item.name)
 	return false
 
-# Move item between slots (for drag and drop)
-func move_item(from_hotbar: bool, from_index: int, to_hotbar: bool, to_index: int) -> bool:
-	var from_slots = hotbar_slots if from_hotbar else inventory_slots
-	var to_slots = hotbar_slots if to_hotbar else inventory_slots
-	
-	if from_index < 0 or from_index >= from_slots.size():
-		return false
-	if to_index < 0 or to_index >= to_slots.size():
-		return false
-	
-	var from_slot = from_slots[from_index]
-	var to_slot = to_slots[to_index]
-	
-	# Simple swap for now - can be enhanced for partial moves later
-	var temp_item = from_slot.item
-	var temp_quantity = from_slot.quantity
-	
-	from_slot.item = to_slot.item
-	from_slot.quantity = to_slot.quantity
-	
-	to_slot.item = temp_item
-	to_slot.quantity = temp_quantity
-	
-	# Emit appropriate signals
-	if from_hotbar:
-		hotbar_changed.emit()
-	else:
-		inventory_changed.emit()
-	
-	if to_hotbar and to_hotbar != from_hotbar:
-		hotbar_changed.emit()
-	elif not to_hotbar and to_hotbar != from_hotbar:
-		inventory_changed.emit()
-	
-	return true
+## Move item between slots (for drag and drop)
+#func move_item(from_hotbar: bool, from_index: int, to_hotbar: bool, to_index: int) -> bool:
+	#var from_slots = hotbar_slots if from_hotbar else inventory_slots
+	#var to_slots = hotbar_slots if to_hotbar else inventory_slots
+	#
+	#if from_index < 0 or from_index >= from_slots.size():
+		#return false
+	#if to_index < 0 or to_index >= to_slots.size():
+		#return false
+	#
+	#var from_slot = from_slots[from_index]
+	#var to_slot = to_slots[to_index]
+	#
+	## Simple swap for now - can be enhanced for partial moves later
+	#var temp_item = from_slot.item
+	#var temp_quantity = from_slot.quantity
+	#
+	#from_slot.item = to_slot.item
+	#from_slot.quantity = to_slot.quantity
+	#
+	#to_slot.item = temp_item
+	#to_slot.quantity = temp_quantity
+	#
+	## Emit appropriate signals
+	#if from_hotbar:
+		#hotbar_changed.emit()
+	#else:
+		#inventory_changed.emit()
+	#
+	#if to_hotbar and to_hotbar != from_hotbar:
+		#hotbar_changed.emit()
+	#elif not to_hotbar and to_hotbar != from_hotbar:
+		#inventory_changed.emit()
+	#
+	#return true
 
 func move_item_extended(from_type: SlotType, from_index: int, to_type: SlotType, to_index: int) -> bool:
 	var from_slot = get_slot_by_type(from_type, from_index)

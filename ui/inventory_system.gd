@@ -163,6 +163,17 @@ func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: boo
 	if target_slot_node and target_slot_node.is_weapon_slot:
 		target_type = InventoryManager.SlotType.WEAPON
 
+	var source_slot_data = InventoryManager.get_slot_by_type(source_type, drag_source_slot)
+	if target_type == InventoryManager.SlotType.WEAPON:
+		if not source_slot_node or not source_slot_data.item:
+			print("No item to move to weaponbar")
+			cleanup_drag()
+			return
+		if source_slot_data.item.category != "weapon" and source_slot_data.item.category != "tool":
+			print("Only weapons or tools can be placed in the weapon bar")
+			cleanup_drag()
+			return
+			
 	var success = InventoryManager.move_item_extended(
 		source_type, drag_source_slot,
 		target_type, target_slot
