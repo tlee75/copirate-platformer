@@ -235,25 +235,36 @@ func _physics_process(delta):
 				$AnimatedSprite2D.animation_finished.connect(_on_interact_animation_finished)
 			else:
 				print("Using item")
+				var selected_item = get_selected_hotbar_item()
+				if selected_item and selected_item.has_method("action"):
+					# Check if this item can be used in current environment
+					if not can_use_item_in_current_environment(selected_item):
+						var item_name = selected_item.name if selected_item.has_method("get_name") else str(selected_item)
+						var environment_msg = "underwater" if is_underwater else "on land"
+						print("Cannot use ", item_name, " ", environment_msg, "!")
+						return
+					selected_item.action(self)
+				else:
+					print("Cannot interact or use an item")
 	
 	# Attack input - left mouse button (but not when clicking on hotbar)
 	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu():
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
 			is_attackable_objects() # Allow attack even when there is no attackble object
-			var selected_item = get_selected_hotbar_item()
-			if selected_item and selected_item.has_method("action"):
-				# Check if this item can be used in current environment
-				if not can_use_item_in_current_environment(selected_item):
-					var item_name = selected_item.name if selected_item.has_method("get_name") else str(selected_item)
+			var weapon_slot = InventoryManager.get_weaponbar_slot(0)
+			if weapon_slot and not weapon_slot.is_empty() and weapon_slot.item and weapon_slot.item.has_method("action"):
+				# Check if this item can be used in the current environment
+				if not can_use_item_in_current_environment(weapon_slot.item):
+					var item_name = weapon_slot.item.name if weapon_slot.item.has_method("get_name") else str(weapon_slot.item)
 					var environment_msg = "underwater" if is_underwater else "on land"
 					print("Cannot use ", item_name, " ", environment_msg, "!")
 					return
-				selected_item.action(self)
+				weapon_slot.item.action(self)
 			else:
-				# Fallback to punch attack, e.g. melee
+				# Fallback to unarmed attack/gather
 				is_trigger_action = true
-				
+								
 				if is_underwater:
 					print("Gather used by %s" % self.name)
 					$AnimatedSprite2D.play("swim_gather")

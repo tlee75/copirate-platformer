@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=29 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_yte5o"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_8w8yu"]
@@ -19,6 +19,9 @@
 [ext_resource type="Script" uid="uid://dbkq1bkntxiv1" path="res://ui/weaponbar.gd" id="11_rgya6"]
 [ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://ui/depth_counter.gd" id="14_atnpy"]
 [ext_resource type="PackedScene" uid="uid://noyk5n0awjav" path="res://ui/stats_display.tscn" id="15_cy82x"]
+[ext_resource type="PackedScene" uid="uid://buc368tv0cjic" path="res://scenes/pickaxe.tscn" id="20_lj68f"]
+[ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/shovel.tscn" id="21_ilrow"]
+[ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/sword.tscn" id="22_oo6ai"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(13, 3.5)
@@ -189,3 +192,12 @@ position = Vector2(530, 2257)
 
 [node name="BerryBush" parent="." instance=ExtResource("4_q5qfs")]
 position = Vector2(222, 2154)
+
+[node name="PickAxe" parent="." instance=ExtResource("20_lj68f")]
+position = Vector2(167, 2101)
+
+[node name="Shovel" parent="." instance=ExtResource("21_ilrow")]
+position = Vector2(81, 2095)
+
+[node name="Sword" parent="." instance=ExtResource("22_oo6ai")]
+position = Vector2(125, 2075)
