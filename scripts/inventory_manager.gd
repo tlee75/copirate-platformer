@@ -18,8 +18,6 @@ var item_totals: Dictionary = {}
 var weapon_slots: Array[InventorySlotData] = []
 var equipment_slots: Array[InventorySlotData] = []
 
-@onready var slot_container: HBoxContainer = $HBoxContainer
-
 # GameItem database - you can add more items here
 var item_database: Dictionary = {}
 
