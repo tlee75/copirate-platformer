@@ -7,21 +7,26 @@ extends Node2D
 @onready var hotbar = $UI/Hotbar
 @onready var weaponbar = $UI/WeaponBar
 @onready var crafting_menu: Control = $UI/CraftingMenu
-@onready var main_inventory: Control = $UI/CraftingMenu/TabBar/InventoryTab/MainInventory
+@onready var main_inventory: Control =  $UI/CraftingMenu/TabBar/InventoryTab/MainInventory
 @onready var inventory_system: Node = $UI/InventorySystem
 @onready var player: CharacterBody2D = $Player
 @onready var pause_menu = $UI/PauseMenu
 @onready var player_stats: PlayerStats
+@onready var equipment_panel: Control = $UI/CraftingMenu/TabBar/EquipmentTab/HBoxContainer/EquipmentPanel
+@onready var equipment_inventory: Control = $UI/CraftingMenu/TabBar/EquipmentTab/HBoxContainer/InventoryPanel/EquipmentInventory
 
 var inventory_is_open: bool = false
 var respawn_position: Vector2
 
 func _ready():
 	# Set up inventory system references
-	inventory_system.setup_ui_references(hotbar, main_inventory, weaponbar)
+	inventory_system.setup_ui_references(hotbar, main_inventory, weaponbar, equipment_panel, equipment_inventory)
 	
 	# Connect inventory system signals
 	inventory_system.inventory_toggled.connect(_on_inventory_toggled)
+	
+	# Ensure crafting menu is properly initialized
+	await get_tree().process_frame
 	
 	print("Game scene initialized with inventory system")
 	

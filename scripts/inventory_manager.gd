@@ -6,6 +6,7 @@ extends Node
 signal inventory_changed
 signal hotbar_changed
 signal weapon_changed
+signal equipment_changed
 
 # GameItem data structure
 
@@ -49,13 +50,14 @@ class InventorySlotData:
 		item = null
 		quantity = 0
 
-enum SlotType { INVENTORY, HOTBAR, WEAPON }
+enum SlotType { INVENTORY, HOTBAR, WEAPON, EQUIPMENT }
 
 # Inventory data
 var hotbar_slots: Array[InventorySlotData] = []
 var inventory_slots: Array[InventorySlotData] = []
 var item_totals: Dictionary = {}
 var weapon_slots: Array[InventorySlotData] = []
+var equipment_slots: Array[InventorySlotData] = []
 
 # GameItem database - you can add more items here
 var item_database: Dictionary = {}
@@ -70,6 +72,9 @@ func _ready():
 	
 	for i in 1: # For now just a single weapon slot
 		weapon_slots.append(InventorySlotData.new())
+	
+	for i in 10:
+		equipment_slots.append(InventorySlotData.new())
 	
 	# Initialize item database with gold coin	
 	var gold_coin_item = GoldCoinItem.new()
@@ -275,6 +280,7 @@ func move_item_extended(from_type: SlotType, from_index: int, to_type: SlotType,
 	var to_slot = get_slot_by_type(to_type, to_index)
 	if not from_slot or not to_slot:
 		return false
+	
 	# Swap items
 	var temp_item = from_slot.item
 	var temp_quantity = from_slot.quantity
@@ -289,6 +295,8 @@ func move_item_extended(from_type: SlotType, from_index: int, to_type: SlotType,
 		inventory_changed.emit()
 	if from_type == SlotType.WEAPON or to_type == SlotType.WEAPON:
 		weapon_changed.emit()
+	if from_type == SlotType.EQUIPMENT or to_type == SlotType.EQUIPMENT:
+		equipment_changed.emit()
 	return true
 
 func get_slot_by_type(slot_type: SlotType, index: int) -> InventorySlotData:
@@ -299,6 +307,8 @@ func get_slot_by_type(slot_type: SlotType, index: int) -> InventorySlotData:
 			return get_inventory_slot(index)
 		SlotType.WEAPON:
 			return get_weaponbar_slot(index)
+		SlotType.EQUIPMENT:
+			return get_equipment_slot(index)
 	return null
 
 # Get slot data for UI
@@ -315,6 +325,11 @@ func get_inventory_slot(index: int) -> InventorySlotData:
 func get_weaponbar_slot(index: int) -> InventorySlotData:
 	if index >= 0 and index < weapon_slots.size():
 		return weapon_slots[index]
+	return null
+
+func get_equipment_slot(index: int) -> InventorySlotData:
+	if index >= 0 and index < equipment_slots.size():
+		return equipment_slots[index]
 	return null
 
 func add_item_to_total(item_name: String, quantity: int):

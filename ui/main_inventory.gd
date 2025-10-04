@@ -36,7 +36,7 @@ func _ready():
 	# Setup slot properties and connections
 	for i in slot_nodes.size():
 		if slot_nodes[i]:
-			slot_nodes[i].slot_index = 1
+			slot_nodes[i].slot_index = i
 			slot_nodes[i].is_hotbar_slot = false
 			
 			# Connect signals

@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://k0kkh12kws3d"]
+[gd_scene load_steps=5 format=3 uid="uid://k0kkh12kws3d"]
 
 [ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://ui/main_inventory.tscn" id="1_srlpo"]
+[ext_resource type="Script" uid="uid://vcvkw3xxws36" path="res://ui/equipment_panel.gd" id="2_cuqmt"]
+[ext_resource type="PackedScene" uid="uid://x72kyodvepj7" path="res://ui/inventory_slot.tscn" id="2_cywfm"]
+[ext_resource type="PackedScene" uid="uid://c8tdbg3kjuavn" path="res://ui/equipment_inventory.tscn" id="3_rjctp"]
 
 [node name="CraftingMenu" type="Control"]
 layout_mode = 3
@@ -29,23 +32,15 @@ offset_right = 0.0759277
 offset_bottom = 134.94
 grow_horizontal = 2
 grow_vertical = 2
-current_tab = 0
+current_tab = 2
 
 [node name="InventoryTab" type="Control" parent="TabBar"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
 [node name="MainInventory" parent="TabBar/InventoryTab" instance=ExtResource("1_srlpo")]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.466
-anchor_right = 0.466
-anchor_bottom = 0.0
-offset_left = 9.01399
-offset_top = 260.0
-offset_right = 9.01399
-offset_bottom = 279.0
-grow_horizontal = 0
 
 [node name="CraftTab" type="Control" parent="TabBar"]
 visible = false
@@ -112,3 +107,116 @@ layout_mode = 2
 [node name="CraftButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
 layout_mode = 2
 text = "Craft"
+
+[node name="EquipmentTab" type="Control" parent="TabBar"]
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabBar/EquipmentTab"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.998
+offset_top = 7.5699997
+offset_right = -6.69989
+offset_bottom = -0.1217041
+
+[node name="EquipmentPanel" type="Control" parent="TabBar/EquipmentTab/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_cuqmt")
+
+[node name="NinePatchRect" type="NinePatchRect" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel"]
+layout_mode = 0
+offset_left = 81.850006
+offset_top = 15.999992
+offset_right = 290.85
+offset_bottom = 377.0
+
+[node name="HeadSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+layout_mode = 0
+offset_left = 9.850006
+offset_top = 28.57
+offset_right = 73.850006
+offset_bottom = 92.57
+
+[node name="ChestSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+layout_mode = 0
+offset_left = 9.850006
+offset_top = 122.57
+offset_right = 73.850006
+offset_bottom = 186.57
+
+[node name="LegsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+layout_mode = 0
+offset_left = 9.850006
+offset_top = 217.57
+offset_right = 73.850006
+offset_bottom = 281.57
+
+[node name="HandsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+layout_mode = 0
+offset_left = 9.850006
+offset_top = 308.57
+offset_right = 73.850006
+offset_bottom = 372.57
+
+[node name="MainHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+layout_mode = 0
+offset_left = 104.850006
+offset_top = 393.57
+offset_right = 168.85
+offset_bottom = 457.57
+
+[node name="OffHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+layout_mode = 0
+offset_left = 203.85004
+offset_top = 393.57
+offset_right = 267.85004
+offset_bottom = 457.57
+
+[node name="ArmsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+layout_mode = 0
+offset_left = 296.85
+offset_top = 28.570007
+offset_right = 360.85
+offset_bottom = 92.57001
+
+[node name="FeetSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+layout_mode = 0
+offset_left = 296.85
+offset_top = 122.57001
+offset_right = 360.85
+offset_bottom = 186.57
+
+[node name="AccessorySlot1" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+layout_mode = 0
+offset_left = 296.85
+offset_top = 217.57
+offset_right = 360.85
+offset_bottom = 281.57
+
+[node name="AccessorySlot2" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+layout_mode = 0
+offset_left = 296.85
+offset_top = 308.57
+offset_right = 360.85
+offset_bottom = 372.57
+
+[node name="InventoryPanel" type="Control" parent="TabBar/EquipmentTab/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EquipmentInventory" parent="TabBar/EquipmentTab/HBoxContainer/InventoryPanel" instance=ExtResource("3_rjctp")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.078
+anchor_top = 0.061000004
+anchor_right = 0.97
+anchor_bottom = 0.9760001
+offset_left = -0.16999245
+offset_top = -0.036001205
+offset_right = 0.14996338
+offset_bottom = 0.21697998
+grow_horizontal = 2
+grow_vertical = 2

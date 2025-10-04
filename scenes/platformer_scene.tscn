@@ -160,6 +160,7 @@ metadata/_edit_use_anchors_ = true
 autostart = true
 
 [node name="StatsDisplay" parent="UI/StatsUpdateTimer" instance=ExtResource("15_cy82x")]
+visible = false
 anchor_left = 0.021000002
 anchor_top = 0.57100004
 anchor_right = 0.264812

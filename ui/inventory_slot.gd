@@ -8,6 +8,8 @@ signal slot_clicked(slot_index: int, is_hotbar: bool)
 @export var slot_index: int = 0
 @export var is_hotbar_slot: bool = false
 @export var is_weapon_slot: bool = false
+@export var is_equipment_slot: bool = false
+@export var equipment_type: int = -1 # Maps to EquipmentPanel.EquipmentType enum
 
 @onready var background: Control = get_node_or_null("Background")
 @onready var item_icon: TextureRect = get_node_or_null("ItemIcon")
@@ -47,7 +49,7 @@ func _on_gui_input(event: InputEvent):
 					# Start drag through inventory system
 					var inventory_system = get_inventory_system()
 					if inventory_system:
-						inventory_system.start_drag(slot_index, is_hotbar_slot, is_weapon_slot)
+						inventory_system.start_drag(slot_index, is_hotbar_slot, is_weapon_slot, is_equipment_slot)
 			# Mouse release is now handled by the inventory system globally
 
 func _on_mouse_entered():

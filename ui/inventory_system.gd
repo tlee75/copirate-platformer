@@ -1,18 +1,21 @@
 extends Node
 
 # Inventory System Controller - handles drag and drop between UI components
-# This will be added to the main scene to coordinate between hotbar and inventory UI
+# This will be added to the main scene to coordinate between hotbar, weaponbar and inventory UI
 
 signal inventory_toggled(is_open: bool)
 
 var hotbar_ui: Control
 var main_inventory_ui: Control
+var equipment_inventory_ui: Control
 var weaponbar_ui: Control
+var equipment_ui: Control
 
 # Public drag state variables for slots to check
 var drag_source_slot: int = -1
 var drag_source_is_hotbar: bool = false
 var drag_source_is_weaponbar: bool = false
+var drag_source_is_equipment: bool = false
 var is_dragging: bool = false
 var drag_preview: Control
 
@@ -30,8 +33,15 @@ func _input(event):
 				# Mouse released - check what's under the mouse cursor
 				var drop_target = find_slot_under_mouse()
 				if drop_target:
-					print("Drop target found: slot ", drop_target.slot_index, " (", "hotbar" if drop_target.is_hotbar_slot else ("weapon" if drop_target.is_weapon_slot else "inventory"), ")")
-					end_drag(drop_target.slot_index, drop_target.is_hotbar_slot, drop_target.is_weapon_slot)
+					var slot_type_name = "inventory"
+					if drop_target.is_hotbar_slot:
+						slot_type_name = "hotbar"
+					elif drop_target.is_weapon_slot:
+						slot_type_name = "weapon"
+					elif drop_target.has_method("get") and drop_target.get("is_equipment_slot"):
+						slot_type_name = "equipment"
+					print("Drop target found: slot ", drop_target.slot_index, " (", slot_type_name, ")")
+					end_drag(drop_target.slot_index, drop_target.is_hotbar_slot, drop_target.is_weapon_slot, drop_target.is_equipment_slot if drop_target.has_method("get") and drop_target.get("is_equipment_slot") else false)
 				else:
 					print("Drag cancelled - mouse released outside any slot")
 					cancel_drag()
@@ -47,6 +57,10 @@ func find_source_slot_node():
 		containers.append(main_inventory_ui)
 	if weaponbar_ui:
 		containers.append(weaponbar_ui)
+	if equipment_ui:
+		containers.append(equipment_ui)
+	if equipment_inventory_ui:
+		containers.append(equipment_inventory_ui)
 
 	for container in containers:
 		var slots = get_all_slots_from_container(container)
@@ -64,20 +78,47 @@ func find_slot_under_mouse():
 		for slot in hotbar_slots:
 			if slot.get_global_rect().has_point(mouse_pos):
 				return slot
-	
-	# Check inventory slots (only if inventory is open)
-	if main_inventory_ui and main_inventory_ui.visible:
-		var inventory_slots = get_all_slots_from_container(main_inventory_ui)
-		for slot in inventory_slots:
+
+	# Check for equpiment slots before (higher priority)
+	if equipment_ui and equipment_ui.visible:
+		print("DEBUG: Checking equipment slots. equipment_ui exists and visible")
+		var equipment_slots = get_all_slots_from_container(equipment_ui)
+		print("DEBUG: Found ", equipment_slots.size(), " equipment slots")
+		for slot in equipment_slots:
+			print("DEBUG: Equipment slot ", slot.slot_index, " rect: ", slot.get_global_rect(), " mouse: ", mouse_pos)
 			if slot.get_global_rect().has_point(mouse_pos):
-				return slot
-	
+				print("DEBUG: MATCH! Found equipment slot: ", slot.slot_index, " is_equipment: ", slot.is_equipment_slot)
+				return slot	
+	else:
+		print("DEBUG: Equipment UI not available or not visible. equipment_ui: ", equipment_ui, " visible: ", equipment_ui.visible if equipment_ui else "null")
+		
 	# Check weapon bar slots
 	if weaponbar_ui:
 		var weaponbar_slots = get_all_slots_from_container(weaponbar_ui)
 		for slot in weaponbar_slots:
 			if slot.get_global_rect().has_point(mouse_pos):
 				return slot
+
+	# Check for filtered equipment inventory slots
+	if equipment_inventory_ui and equipment_inventory_ui.visible:
+		var filtered_inventory_slots = get_all_slots_from_container(equipment_inventory_ui)
+		for slot in filtered_inventory_slots:
+			if slot.get_global_rect().has_point(mouse_pos):
+				return slot
+
+	# Check inventory slots Last, lowerest priority (only if inventory is open)
+	if main_inventory_ui and main_inventory_ui.visible:
+		print("Checking inventory slots, found ", get_all_slots_from_container(main_inventory_ui).size(), " slots")
+		var inventory_slots = get_all_slots_from_container(main_inventory_ui)
+		for slot in inventory_slots:
+			if slot.get_global_rect().has_point(mouse_pos):
+				print("Found matching inventory slot: ", slot.slot_index)
+				return slot
+	else:
+		if main_inventory_ui:
+			print("Main inventory UI not visible or null: visible=", main_inventory_ui.visible)
+		else:
+			print("Main inventory UI not visible or null: visible=null")
 
 	return null
 
@@ -96,10 +137,12 @@ func get_all_slots_from_container(container: Control) -> Array:
 	
 	return slots
 
-func setup_ui_references(hotbar: Control, inventory: Control, weaponbar: Control):
+func setup_ui_references(hotbar: Control, inventory: Control, weaponbar: Control, equipment: Control = null, equipment_inventory: Control = null):
 	hotbar_ui = hotbar
 	main_inventory_ui = inventory
 	weaponbar_ui = weaponbar
+	equipment_ui = equipment
+	equipment_inventory_ui = equipment_inventory
 	
 	# Connect all slot signals through the UI managers
 	_connect_hotbar_signals()
@@ -124,7 +167,7 @@ func _connect_weaponbar_signals():
 	if not weaponbar_ui:
 		return
 
-func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool):
+func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool, is_equipment: bool = false):
 	if is_dragging:
 		return
 	
@@ -133,6 +176,8 @@ func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool):
 		slot_data = InventoryManager.get_hotbar_slot(slot_index)
 	elif is_weaponbar:
 		slot_data = InventoryManager.get_weaponbar_slot(slot_index)
+	elif is_equipment:
+		slot_data = InventoryManager.get_equipment_slot(slot_index)
 	else:
 		slot_data = InventoryManager.get_inventory_slot(slot_index)
 	
@@ -143,25 +188,30 @@ func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool):
 	drag_source_slot = slot_index
 	drag_source_is_hotbar = is_hotbar
 	drag_source_is_weaponbar = is_weaponbar
+	drag_source_is_equipment = is_equipment
 	
 	# Create drag preview (simplified for now)
 	create_drag_preview(slot_data)
 	print("Started dragging from ", "hotbar" if is_hotbar else ("weapon" if is_weaponbar else "inventory"), " slot ", slot_index)
 
-func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: bool = false):
+func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: bool = false, target_is_equipment: bool = false):
 	if not is_dragging:
 		return
 
 	var source_slot_node = find_source_slot_node()
 	var target_slot_node = find_slot_under_mouse()
 
-	var source_type = InventoryManager.SlotType.HOTBAR if drag_source_is_hotbar else (InventoryManager.SlotType.WEAPON if drag_source_is_weaponbar else InventoryManager.SlotType.INVENTORY)
+	var source_type = InventoryManager.SlotType.HOTBAR if drag_source_is_hotbar else (InventoryManager.SlotType.WEAPON if drag_source_is_weaponbar else (InventoryManager.SlotType.EQUIPMENT if drag_source_is_equipment else InventoryManager.SlotType.INVENTORY))
 	if source_slot_node and source_slot_node.is_weapon_slot:
 		source_type = InventoryManager.SlotType.WEAPON
-
-	var target_type = InventoryManager.SlotType.HOTBAR if target_is_hotbar else (InventoryManager.SlotType.WEAPON if target_is_weaponbar else InventoryManager.SlotType.INVENTORY)
+	elif source_slot_node and source_slot_node.has_method("get") and source_slot_node.get("is_equipment_slot"):
+		source_type = InventoryManager.SlotType.EQUIPMENT
+		
+	var target_type = InventoryManager.SlotType.HOTBAR if target_is_hotbar else (InventoryManager.SlotType.WEAPON if target_is_weaponbar else (InventoryManager.SlotType.EQUIPMENT if target_is_equipment else InventoryManager.SlotType.INVENTORY))
 	if target_slot_node and target_slot_node.is_weapon_slot:
 		target_type = InventoryManager.SlotType.WEAPON
+	elif target_slot_node and target_slot_node.has_method("get") and target_slot_node.get("is_equipment_slot"):
+		target_type = InventoryManager.SlotType.EQUIPMENT
 
 	var source_slot_data = InventoryManager.get_slot_by_type(source_type, drag_source_slot)
 	if target_type == InventoryManager.SlotType.WEAPON:
@@ -171,6 +221,24 @@ func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: boo
 			return
 		if source_slot_data.item.category != "weapon" and source_slot_data.item.category != "tool":
 			print("Only weapons or tools can be placed in the weapon bar")
+			cleanup_drag()
+			return
+			
+	if target_type == InventoryManager.SlotType.EQUIPMENT:
+		if not source_slot_node or not source_slot_data.item:
+			print("No item to move to equipment slot")
+			cleanup_drag()
+			return
+		
+		# Validate item category matches equipment slot type
+		if equipment_ui and equipment_ui.has_method("can_equip_item"):
+			var equipment_slot_type = target_slot_node.equipment_type if target_slot_node.has_method("get") and target_slot_node.get("equipment_type") != null else target_slot
+			if not equipment_ui.can_equip_item(source_slot_data.item, equipment_slot_type):
+				print("Item category '", source_slot_data.item.category, "' cannot be equipped in this slot")
+				cleanup_drag()
+				return
+		else:
+			print("Equipment UI validation not available")
 			cleanup_drag()
 			return
 			
@@ -195,6 +263,7 @@ func cleanup_drag():
 	drag_source_slot = -1
 	drag_source_is_hotbar = false
 	drag_source_is_weaponbar = false
+	drag_source_is_equipment = false
 	
 	if drag_preview:
 		drag_preview.queue_free()
@@ -236,9 +305,15 @@ func _process(_delta):
 			print("Mouse button no longer pressed - ending drag via process check")
 			var drop_target = find_slot_under_mouse()
 			if drop_target:
-				var target_type = "hotbar" if drop_target.is_hotbar_slot else ("weapon" if drop_target.is_weapon_slot else "inventory")
+				var target_type = "inventory"
+				if drop_target.is_hotbar_slot:
+					target_type = "hotbar"
+				elif drop_target.is_weapon_slot:
+					target_type = "weapon"
+				elif drop_target.has_method("get") and drop_target.get("is_equipment_slot"):
+					target_type = "equipment"
 				print("Drop target found: slot ", drop_target.slot_index, " (", target_type, ")")
-				end_drag(drop_target.slot_index, drop_target.is_hotbar_slot, drop_target.is_weapon_slot)
+				end_drag(drop_target.slot_index, drop_target.is_hotbar_slot, drop_target.is_weapon_slot, drop_target.is_equipment_slot if drop_target.has_method("get") and drop_target.get("is_equipment_slot") else false)
 			else:
 				print("Drag cancelled via process - mouse outside any slot")
 				cancel_drag()
