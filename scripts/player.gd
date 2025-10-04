@@ -252,15 +252,15 @@ func _physics_process(delta):
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
 			is_attackable_objects() # Allow attack even when there is no attackble object
-			var weapon_slot = InventoryManager.get_weaponbar_slot(0)
-			if weapon_slot and not weapon_slot.is_empty() and weapon_slot.item and weapon_slot.item.has_method("action"):
+			var main_hand_slot = InventoryManager.get_equipment_slot(4)
+			if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item and main_hand_slot.item.has_method("action"):
 				# Check if this item can be used in the current environment
-				if not can_use_item_in_current_environment(weapon_slot.item):
-					var item_name = weapon_slot.item.name if weapon_slot.item.has_method("get_name") else str(weapon_slot.item)
+				if not can_use_item_in_current_environment(main_hand_slot.item):
+					var item_name = main_hand_slot.item.name if main_hand_slot.item.has_method("get_name") else str(main_hand_slot.item)
 					var environment_msg = "underwater" if is_underwater else "on land"
 					print("Cannot use ", item_name, " ", environment_msg, "!")
 					return
-				weapon_slot.item.action(self)
+				main_hand_slot.item.action(self)
 			else:
 				# Fallback to unarmed attack/gather
 				is_trigger_action = true
