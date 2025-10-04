@@ -48,11 +48,7 @@ func _ready():
 			equipment_slots[i].equipment_type = i
 			
 			print("DEBUG: Configured equipment slot ", i, " (", EquipmentType.keys()[i], ") - is_equipment_slot: ", equipment_slots[i].is_equipment_slot)
-			
-			# Connect signals
-			if equipment_slots[i].has_signal("slot_clicked"):
-				equipment_slots[i].slot_clicked.connect(_on_equipment_slot_clicked)
-	
+
 		else:
 			print("DEBUG: Equipment slot ", i, " is null!")
 	
@@ -69,9 +65,6 @@ func _update_display():
 			if slot_data:
 				equipment_slots[i].update_display(slot_data)
 
-func _on_equipment_slot_clicked(slot_index: int, _is_hotbar: bool):
-	print("Equipment slot ", slot_index, " (", EquipmentType.keys()[slot_index], ") clicked")
-	
 func can_equip_item(item_data, equipment_type: EquipmentType) -> bool:
 	if not item_data:
 		return false

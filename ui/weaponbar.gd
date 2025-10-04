@@ -11,7 +11,7 @@ func _ready():
 		slot.slot_index = i
 		slot.is_hotbar_slot = false
 		slot.is_weapon_slot = true
-		slot.slot_clicked.connect(_on_slot_clicked)
+
 	# Connect to inventory manager signals if needed
 	if InventoryManager.has_signal("weapon_changed"):
 		InventoryManager.weapon_changed.connect(_update_display)
@@ -22,6 +22,3 @@ func _update_display():
 		var slot_data = InventoryManager.get_weaponbar_slot(i)
 		if slot_data:
 			weapon_slots[i].update_display(slot_data)
-
-func _on_slot_clicked(slot_index: int, _is_hotbar: bool):
-	print("Weapon bar slot ", slot_index, " clicked")

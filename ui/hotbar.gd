@@ -17,9 +17,6 @@ func _ready():
 		# Configure each slot
 		slot_node.slot_index = i
 		slot_node.is_hotbar_slot = true
-		
-		# Connect slot signals
-		slot_node.slot_clicked.connect(_on_slot_clicked)
 	
 	# Start the game with slot 0 selectedF
 	select_slot(0)
@@ -35,9 +32,6 @@ func _update_display():
 		var slot_data = InventoryManager.get_hotbar_slot(i)
 		if slot_data:
 			slot_nodes[i].update_display(slot_data)
-
-func _on_slot_clicked(slot_index: int, _is_hotbar: bool):
-	print("Hotbar slot ", slot_index, " clicked")
 
 func _on_drag_started(slot_index: int, _is_hotbar: bool):
 	print("Drag started from hotbar slot ", slot_index)

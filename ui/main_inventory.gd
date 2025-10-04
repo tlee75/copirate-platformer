@@ -38,10 +38,6 @@ func _ready():
 		if slot_nodes[i]:
 			slot_nodes[i].slot_index = i
 			slot_nodes[i].is_hotbar_slot = false
-			
-			# Connect signals
-			if slot_nodes[i].has_signal("slot_clicked"):
-				slot_nodes[i].slot_clicked.connect(_on_slot_clicked)
 	
 	# Connect to inventory manager
 	InventoryManager.inventory_changed.connect(_update_display)
@@ -71,9 +67,6 @@ func _update_display():
 			var slot_data = InventoryManager.get_inventory_slot(i)
 			if slot_data:
 				slot_nodes[i].update_display(slot_data)
-
-func _on_slot_clicked(slot_index: int, _is_hotbar: bool):
-	print("Inventory slot ", slot_index, " clicked")
 
 func _on_drag_started(slot_index: int, _is_hotbar: bool):
 	print("Drag started from inventory slot ", slot_index)
