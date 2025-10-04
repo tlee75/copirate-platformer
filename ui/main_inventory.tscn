@@ -53,3 +53,48 @@ columns = 4
 
 [node name="Slot0" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
 layout_mode = 2
+
+[node name="Slot1" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot2" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot3" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot4" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot5" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot6" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot7" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot8" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot9" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot10" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot11" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot12" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot13" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot14" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2
+
+[node name="Slot15" parent="InventoryPanel/GridContainer" instance=ExtResource("2_6dtvc")]
+layout_mode = 2

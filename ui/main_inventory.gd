@@ -7,37 +7,41 @@ extends Control
 @onready var inventory_panel: NinePatchRect = $InventoryPanel
 @onready var grid_container: GridContainer = $InventoryPanel/GridContainer
 
-var slot_nodes: Array[Control] = []
+# Get all slot references from the scene tree
+@onready var slot_nodes: Array[Control] = [
+	$InventoryPanel/GridContainer/Slot0,
+	$InventoryPanel/GridContainer/Slot1,
+	$InventoryPanel/GridContainer/Slot2, 
+	$InventoryPanel/GridContainer/Slot3, 
+	$InventoryPanel/GridContainer/Slot4, 
+	$InventoryPanel/GridContainer/Slot5, 
+	$InventoryPanel/GridContainer/Slot6, 
+	$InventoryPanel/GridContainer/Slot7, 
+	$InventoryPanel/GridContainer/Slot8, 
+	$InventoryPanel/GridContainer/Slot9, 
+	$InventoryPanel/GridContainer/Slot10, 
+	$InventoryPanel/GridContainer/Slot11, 
+	$InventoryPanel/GridContainer/Slot12, 
+	$InventoryPanel/GridContainer/Slot13, 
+	$InventoryPanel/GridContainer/Slot14, 
+	$InventoryPanel/GridContainer/Slot15
+]
 var is_visible_flag: bool = false
 
 func _ready():
-	## Initially hidden
-	#visible = false
-	#is_visible_flag = false
-	
-	# Always visible since we're in a tab	
+	# Always visible because we're in a tab
 	visible = true
 	is_visible_flag = true
 	
-	## Create 16 inventory slots
-	var inventory_slot_scene = preload("res://ui/inventory_slot.tscn")
-	
-	# Clear any existing slots first
-	for child in grid_container.get_children():
-		child.queue_free()
-	
-	# Create all 16 slots
-	for i in 16:
-		var slot_instance = inventory_slot_scene.instantiate()
-		slot_instance.name = "Slot" + str(i)
-		slot_instance.slot_index = i
-		slot_instance.is_hotbar_slot = false
-		
-		# Connect signals
-		slot_instance.slot_clicked.connect(_on_slot_clicked)
-		
-		grid_container.add_child(slot_instance)
-		slot_nodes.append(slot_instance)
+	# Setup slot properties and connections
+	for i in slot_nodes.size():
+		if slot_nodes[i]:
+			slot_nodes[i].slot_index = 1
+			slot_nodes[i].is_hotbar_slot = false
+			
+			# Connect signals
+			if slot_nodes[i].has_signal("slot_clicked"):
+				slot_nodes[i].slot_clicked.connect(_on_slot_clicked)
 	
 	# Connect to inventory manager
 	InventoryManager.inventory_changed.connect(_update_display)
