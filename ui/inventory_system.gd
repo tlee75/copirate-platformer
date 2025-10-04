@@ -57,9 +57,9 @@ func find_source_slot_node():
 		containers.append(main_inventory_ui)
 	if weaponbar_ui:
 		containers.append(weaponbar_ui)
-	if equipment_ui:
+	if equipment_ui: # The equipment slots
 		containers.append(equipment_ui)
-	if equipment_inventory_ui:
+	if equipment_inventory_ui: # The filtered equipment next to the equipment slots
 		containers.append(equipment_inventory_ui)
 
 	for container in containers:
@@ -79,7 +79,7 @@ func find_slot_under_mouse():
 			if slot.get_global_rect().has_point(mouse_pos):
 				return slot
 
-	# Check for equpiment slots before (higher priority)
+	# Check for equpiment slotsefore (higher priority)
 	if equipment_ui and equipment_ui.visible:
 		print("DEBUG: Checking equipment slots. equipment_ui exists and visible")
 		var equipment_slots = get_all_slots_from_container(equipment_ui)
@@ -89,8 +89,6 @@ func find_slot_under_mouse():
 			if slot.get_global_rect().has_point(mouse_pos):
 				print("DEBUG: MATCH! Found equipment slot: ", slot.slot_index, " is_equipment: ", slot.is_equipment_slot)
 				return slot	
-	else:
-		print("DEBUG: Equipment UI not available or not visible. equipment_ui: ", equipment_ui, " visible: ", equipment_ui.visible if equipment_ui else "null")
 		
 	# Check weapon bar slots
 	if weaponbar_ui:
@@ -106,7 +104,7 @@ func find_slot_under_mouse():
 			if slot.get_global_rect().has_point(mouse_pos):
 				return slot
 
-	# Check inventory slots Last, lowerest priority (only if inventory is open)
+	# Check inventory slots
 	if main_inventory_ui and main_inventory_ui.visible:
 		print("Checking inventory slots, found ", get_all_slots_from_container(main_inventory_ui).size(), " slots")
 		var inventory_slots = get_all_slots_from_container(main_inventory_ui)
@@ -148,6 +146,7 @@ func setup_ui_references(hotbar: Control, inventory: Control, weaponbar: Control
 	_connect_hotbar_signals()
 	_connect_inventory_signals()
 	_connect_weaponbar_signals()
+	# Equipment signals are not required because it's handled separately
 
 func _connect_hotbar_signals():
 	if not hotbar_ui:
@@ -214,33 +213,11 @@ func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: boo
 		target_type = InventoryManager.SlotType.EQUIPMENT
 
 	var source_slot_data = InventoryManager.get_slot_by_type(source_type, drag_source_slot)
-	if target_type == InventoryManager.SlotType.WEAPON:
-		if not source_slot_node or not source_slot_data.item:
-			print("No item to move to weaponbar")
-			cleanup_drag()
-			return
-		if source_slot_data.item.category != "weapon" and source_slot_data.item.category != "tool":
-			print("Only weapons or tools can be placed in the weapon bar")
-			cleanup_drag()
-			return
-			
-	if target_type == InventoryManager.SlotType.EQUIPMENT:
-		if not source_slot_node or not source_slot_data.item:
-			print("No item to move to equipment slot")
-			cleanup_drag()
-			return
-		
-		# Validate item category matches equipment slot type
-		if equipment_ui and equipment_ui.has_method("can_equip_item"):
-			var equipment_slot_type = target_slot_node.equipment_type if target_slot_node.has_method("get") and target_slot_node.get("equipment_type") != null else target_slot
-			if not equipment_ui.can_equip_item(source_slot_data.item, equipment_slot_type):
-				print("Item category '", source_slot_data.item.category, "' cannot be equipped in this slot")
-				cleanup_drag()
-				return
-		else:
-			print("Equipment UI validation not available")
-			cleanup_drag()
-			return
+	
+	# Centralized validation for all slot types
+	if not _can_place_item_in_slot(source_slot_data.item, target_type, target_slot_node):
+		cleanup_drag()
+		return
 			
 	var success = InventoryManager.move_item_extended(
 		source_type, drag_source_slot,
@@ -317,6 +294,33 @@ func _process(_delta):
 			else:
 				print("Drag cancelled via process - mouse outside any slot")
 				cancel_drag()
+
+# Centralized slot validation dispatcher
+func _can_place_item_in_slot(item: GameItem, target_type: int, target_slot_node: Control) -> bool:
+	match target_type:
+		InventoryManager.SlotType.WEAPON:
+			return _can_place_in_weapon_bar(item)
+		InventoryManager.SlotType.EQUIPMENT:
+			return _can_place_in_equipment_slot(item, target_slot_node)
+		InventoryManager.SlotType.HOTBAR, InventoryManager.SlotType.INVENTORY:
+			return true # No restrictions on these
+	return false
+
+func _can_place_in_weapon_bar(item: GameItem) -> bool:
+	if item.category != "weapon" and item.category != "tool":
+		print("Only weapons or tools can be placed in teh weapon bar")
+		return false
+	return true
+
+func _can_place_in_equipment_slot(item: GameItem, target_slot_node: Control) -> bool:
+	if not equipment_ui or not equipment_ui.has_method("can_equip_item"):
+		print("Equipment UI validation not available")
+		return false
+	var equipment_slot_type = target_slot_node.equipment_type if target_slot_node.has_method("get") and target_slot_node.get("equipment_type") != null else 0
+	if not equipment_ui.can_equip_item(item, equipment_slot_type):
+		print("Item category '", item.category, "' cannot be equipped in this slot")
+		return false
+	return true
 
 func toggle_inventory():
 	print("InventorySystem: toggle_inventory called")
