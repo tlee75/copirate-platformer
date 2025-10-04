@@ -39,8 +39,14 @@ var is_underwater: bool = false
 var water_surface_y: int = -1
 var water_depth: int = -1
 
+# UI
+var equipment_panel: Node = null
+
 # Remove old procedural Visual node if present
 func _ready():
+	var ui_layer = get_parent().get_node_or_null("UI")
+	if ui_layer:
+		equipment_panel = ui_layer.get_node_or_null("CraftingMenu/TabBar/EquipmentTab/HBoxContainer/EquipmentPanel")
 	var frames = load("res://resources/player_sprites.tres")
 	$AnimatedSprite2D.sprite_frames = frames
 	# Remove procedural Visual if it exists
@@ -252,36 +258,39 @@ func _physics_process(delta):
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
 			is_attackable_objects() # Allow attack even when there is no attackble object
-			var main_hand_slot = InventoryManager.get_equipment_slot(4)
-			if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item and main_hand_slot.item.has_method("action"):
-				# Check if this item can be used in the current environment
-				if not can_use_item_in_current_environment(main_hand_slot.item):
-					var item_name = main_hand_slot.item.name if main_hand_slot.item.has_method("get_name") else str(main_hand_slot.item)
-					var environment_msg = "underwater" if is_underwater else "on land"
-					print("Cannot use ", item_name, " ", environment_msg, "!")
-					return
-				main_hand_slot.item.action(self)
-			else:
-				# Fallback to unarmed attack/gather
-				is_trigger_action = true
-								
-				if is_underwater:
-					print("Gather used by %s" % self.name)
-					$AnimatedSprite2D.play("swim_gather")
-				else:
-					print("Melee used by %s" % self.name)
-					$AnimatedSprite2D.play("punch")
-				
-				# Destroy tiles in cursor area
-				#destroy_tiles_in_cursor_area()
-				
-				# Disconnect any existing connections first, then connect
-				if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
-					$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
-				if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
-					$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
+			if equipment_panel:
+				var main_hand_slot_index = equipment_panel.get_equipment_slot_index_by_node_name("MainHand")
+				if main_hand_slot_index != -1:
+					var main_hand_slot = InventoryManager.get_equipment_slot(main_hand_slot_index)
+					if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item and main_hand_slot.item.has_method("action"):
+						# Check if this item can be used in the current environment
+						if not can_use_item_in_current_environment(main_hand_slot.item):
+							var item_name = main_hand_slot.item.name if main_hand_slot.item.has_method("get_name") else str(main_hand_slot.item)
+							var environment_msg = "underwater" if is_underwater else "on land"
+							print("Cannot use ", item_name, " ", environment_msg, "!")
+							return
+						main_hand_slot.item.action(self)
+					else:
+						# Fallback to unarmed attack/gather
+						is_trigger_action = true
+										
+						if is_underwater:
+							print("Gather used by %s" % self.name)
+							$AnimatedSprite2D.play("swim_gather")
+						else:
+							print("Melee used by %s" % self.name)
+							$AnimatedSprite2D.play("punch")
+						
+						# Destroy tiles in cursor area
+						#destroy_tiles_in_cursor_area()
+						
+						# Disconnect any existing connections first, then connect
+						if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
+							$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
+						if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
+							$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
 
-				$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
+						$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
 
 	# Update physics first
 	velocity = vel

@@ -91,4 +91,10 @@ func can_equip_item(item_data, equipment_type: EquipmentType) -> bool:
 		EquipmentType.ACCESSORY1, EquipmentType.ACCESSORY2:
 			return item_data.category == "accessory"
 	return false
-			
+
+
+func get_equipment_slot_index_by_node_name(node_name: String) -> int:
+	for i in equipment_slots.size():
+		if equipment_slots[i].name == node_name:
+			return i
+	return -1
