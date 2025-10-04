@@ -4,8 +4,12 @@ extends Control
 var weapon_slots: Array[Control] = []
 
 func _ready():
+	
+	var slot_count = slot_container.get_child_count()
+	InventoryManager.initialize_weaponbar_slots(slot_count)
+	
 	# Gather all slot nodes (for now, just one, but scalable)
-	for i in slot_container.get_child_count():
+	for i in slot_count:
 		var slot = slot_container.get_child(i)
 		weapon_slots.append(slot)
 		slot.slot_index = i

@@ -38,8 +38,11 @@ func _ready():
 	
 	print("DEBUG: EquipmentPanel _ready() called with ", equipment_slots.size(), " slots")
 	
+	var slot_count = equipment_slots.size()
+	InventoryManager.initialize_equipment_slots(slot_count)
+	
 	# Configure each slot
-	for i in equipment_slots.size():
+	for i in slot_count:
 		if equipment_slots[i]:
 			equipment_slots[i].slot_index = i
 			equipment_slots[i].is_hotbar_slot = false

@@ -33,8 +33,11 @@ func _ready():
 	visible = true
 	is_visible_flag = true
 	
+	var slot_count = slot_nodes.size()
+	InventoryManager.initialize_inventory_slots(slot_count)
+	
 	# Setup slot properties and connections
-	for i in slot_nodes.size():
+	for i in slot_count:
 		if slot_nodes[i]:
 			slot_nodes[i].slot_index = i
 			slot_nodes[i].is_hotbar_slot = false

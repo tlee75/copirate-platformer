@@ -141,26 +141,6 @@ func setup_ui_references(hotbar: Control, inventory: Control, weaponbar: Control
 	weaponbar_ui = weaponbar
 	equipment_ui = equipment
 	equipment_inventory_ui = equipment_inventory
-	
-	# Connect all slot signals through the UI managers
-	_connect_hotbar_signals()
-	_connect_inventory_signals()
-	_connect_weaponbar_signals()
-	# Equipment signals are not required because it's handled separately
-
-func _connect_hotbar_signals():
-	if not hotbar_ui:
-		return
-	
-	# Hotbar slots are already connected in hotbar.gd script
-	# We'll override their drag functions
-
-func _connect_inventory_signals():
-	if not main_inventory_ui:
-		return
-	
-	# Inventory slots are already connected in main_inventory.gd script
-	# We'll override their drag functions
 
 func _connect_weaponbar_signals():
 	if not weaponbar_ui:

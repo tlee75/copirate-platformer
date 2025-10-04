@@ -8,6 +8,26 @@ signal hotbar_changed
 signal weapon_changed
 signal equipment_changed
 
+
+enum SlotType { INVENTORY, HOTBAR, WEAPON, EQUIPMENT }
+
+# Inventory data
+var hotbar_slots: Array[InventorySlotData] = []
+var inventory_slots: Array[InventorySlotData] = []
+var item_totals: Dictionary = {}
+var weapon_slots: Array[InventorySlotData] = []
+var equipment_slots: Array[InventorySlotData] = []
+
+@onready var slot_container: HBoxContainer = $HBoxContainer
+
+# GameItem database - you can add more items here
+var item_database: Dictionary = {}
+
+@export var hotbar_container_path: NodePath
+@export var inventory_container_path: NodePath
+@export var weaponbar_container_path: NodePath
+@export var equipment_container_path: NodePath
+
 # GameItem data structure
 
 class InventorySlotData:
@@ -50,32 +70,7 @@ class InventorySlotData:
 		item = null
 		quantity = 0
 
-enum SlotType { INVENTORY, HOTBAR, WEAPON, EQUIPMENT }
-
-# Inventory data
-var hotbar_slots: Array[InventorySlotData] = []
-var inventory_slots: Array[InventorySlotData] = []
-var item_totals: Dictionary = {}
-var weapon_slots: Array[InventorySlotData] = []
-var equipment_slots: Array[InventorySlotData] = []
-
-# GameItem database - you can add more items here
-var item_database: Dictionary = {}
-
-func _ready():
-	# Initialize slots
-	for i in 8:  # 8 hotbar slots
-		hotbar_slots.append(InventorySlotData.new())
-	
-	for i in 16:  # 16 inventory slots
-		inventory_slots.append(InventorySlotData.new())
-	
-	for i in 1: # For now just a single weapon slot
-		weapon_slots.append(InventorySlotData.new())
-	
-	for i in 10:
-		equipment_slots.append(InventorySlotData.new())
-	
+func _ready():	
 	# Initialize item database with gold coin	
 	var gold_coin_item = GoldCoinItem.new()
 	gold_coin_item.name = "Gold Coin"
@@ -149,6 +144,25 @@ func _ready():
 
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
+func initialize_hotbar_slots(count: int):
+	hotbar_slots.clear()
+	for i in count:
+		hotbar_slots.append(InventorySlotData.new())
+
+func initialize_inventory_slots(count: int):
+	inventory_slots.clear()
+	for i in count:
+		inventory_slots.append(InventorySlotData.new())
+
+func initialize_weaponbar_slots(count: int):
+	weapon_slots.clear()
+	for i in count:
+		weapon_slots.append(InventorySlotData.new())
+
+func initialize_equipment_slots(count: int):
+	equipment_slots.clear()
+	for i in count:
+		equipment_slots.append(InventorySlotData.new())
 
 #func add_test_items():
 	## Add some gold coins to test drag and drop
@@ -238,42 +252,6 @@ func add_item(item: GameItem, amount: int = 1) -> bool:
 	
 	print("Inventory full! Couldn't add ", item.name)
 	return false
-
-## Move item between slots (for drag and drop)
-#func move_item(from_hotbar: bool, from_index: int, to_hotbar: bool, to_index: int) -> bool:
-	#var from_slots = hotbar_slots if from_hotbar else inventory_slots
-	#var to_slots = hotbar_slots if to_hotbar else inventory_slots
-	#
-	#if from_index < 0 or from_index >= from_slots.size():
-		#return false
-	#if to_index < 0 or to_index >= to_slots.size():
-		#return false
-	#
-	#var from_slot = from_slots[from_index]
-	#var to_slot = to_slots[to_index]
-	#
-	## Simple swap for now - can be enhanced for partial moves later
-	#var temp_item = from_slot.item
-	#var temp_quantity = from_slot.quantity
-	#
-	#from_slot.item = to_slot.item
-	#from_slot.quantity = to_slot.quantity
-	#
-	#to_slot.item = temp_item
-	#to_slot.quantity = temp_quantity
-	#
-	## Emit appropriate signals
-	#if from_hotbar:
-		#hotbar_changed.emit()
-	#else:
-		#inventory_changed.emit()
-	#
-	#if to_hotbar and to_hotbar != from_hotbar:
-		#hotbar_changed.emit()
-	#elif not to_hotbar and to_hotbar != from_hotbar:
-		#inventory_changed.emit()
-	#
-	#return true
 
 func move_item_extended(from_type: SlotType, from_index: int, to_type: SlotType, to_index: int) -> bool:
 	var from_slot = get_slot_by_type(from_type, from_index)

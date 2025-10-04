@@ -9,8 +9,11 @@ var selected_slot: int = 0
 var slot_nodes: Array[Control] = []
 
 func _ready():
+	var slot_count = slot_container.get_child_count()
+	InventoryManager.initialize_hotbar_slots(slot_count)
+	
 	# Get references to all slot nodes
-	for i in 8:
+	for i in slot_count:
 		var slot_node = slot_container.get_child(i)
 		slot_nodes.append(slot_node)
 		
