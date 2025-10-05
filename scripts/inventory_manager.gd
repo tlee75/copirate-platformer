@@ -136,7 +136,7 @@ func _ready():
 	raspberry_item.craftable = true
 	raspberry_item.category = "consumable"
 	raspberry_item.underwater_compatible = false
-	raspberry_item.land_compatible = false
+	raspberry_item.land_compatible = true
 	raspberry_item.craft_requirements = {"Gold Coin": 1}
 	item_database["raspberry"] = raspberry_item
 
@@ -351,6 +351,8 @@ func remove_items_by_name(item_name: String, quantity: int) -> bool:
 		inventory_changed.emit()
 	
 	return remaining == 0 # Return true if all items were removed
+
+
 
 # Debug functions
 func print_inventory():

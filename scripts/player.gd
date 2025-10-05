@@ -248,7 +248,9 @@ func _physics_process(delta):
 				$AnimatedSprite2D.animation_finished.connect(_on_interact_animation_finished)
 			else:
 				print("Using item")
-				var selected_item = get_selected_hotbar_item()
+				var selected_result = get_selected_hotbar_slot_and_item()
+				var slot_data = selected_result[0]
+				var selected_item = selected_result[1]
 				if selected_item and selected_item.has_method("action"):
 					# Check if this item can be used in current environment
 					if not can_use_item_in_current_environment(selected_item):
@@ -257,6 +259,10 @@ func _physics_process(delta):
 						print("Cannot use ", item_name, " ", environment_msg, "!")
 						return
 					selected_item.action(self)
+					# Remove item if it's consumable
+					if selected_item.is_consumable():
+						slot_data.remove_item(1)
+						InventoryManager.hotbar_changed.emit()
 				else:
 					print("Cannot interact or use an item")
 	
@@ -293,7 +299,9 @@ func _physics_process(delta):
 							$AnimatedSprite2D.frame_changed.disconnect(_on_attack_frame_changed)
 						if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
 							$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
-
+						if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
+							$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
+						
 						$AnimatedSprite2D.frame_changed.connect(_on_attack_frame_changed)
 						$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
 
@@ -428,7 +436,8 @@ func _on_interact_animation_finished():
 	if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
 		$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
 
-	interact_target.interact()
+	if interact_target and is_instance_valid(interact_target):
+		interact_target.interact()
 
 	# When attack animation finishes, end attack state
 	is_interacting = false
@@ -601,14 +610,27 @@ func is_mouse_over_hotbar() -> bool:
 	var hotbar_rect = Rect2(hotbar.global_position, hotbar.size)
 	return hotbar_rect.has_point(mouse_pos)
 
-func get_selected_hotbar_item():
+#func get_selected_hotbar_item():
+	#var ui_layer = get_parent().get_node_or_null("UI")
+	#if not ui_layer:
+		#return null
+	#var hotbar = ui_layer.get_node_or_null("Hotbar")
+	#if not hotbar:
+		#return null
+	#return hotbar.get_selected_item()
+
+func get_selected_hotbar_slot_and_item():
 	var ui_layer = get_parent().get_node_or_null("UI")
 	if not ui_layer:
-		return null
+		return [null, null]
 	var hotbar = ui_layer.get_node_or_null("Hotbar")
 	if not hotbar:
-		return null
-	return hotbar.get_selected_item()
+		return [null, null]
+	var slot_index = hotbar.selected_slot
+	var slot_data = InventoryManager.get_hotbar_slot(slot_index)
+	if slot_data and not slot_data.is_empty():
+		return [slot_data, slot_data.item]
+	return [null, null]
 
 func is_on_water_tile() -> bool:
 	var tile_pos = tilemap.local_to_map(global_position)

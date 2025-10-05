@@ -160,15 +160,14 @@ metadata/_edit_use_anchors_ = true
 autostart = true
 
 [node name="StatsDisplay" parent="UI/StatsUpdateTimer" instance=ExtResource("15_cy82x")]
-visible = false
-anchor_left = 0.021000002
-anchor_top = 0.57100004
+anchor_left = 0.026
+anchor_top = 0.7068272
 anchor_right = 0.264812
-anchor_bottom = 0.95184
-offset_left = -0.19200134
-offset_top = -0.008026123
-offset_right = -3.6480103
-offset_bottom = 0.20794678
+anchor_bottom = 0.9672717
+offset_left = 0.048000336
+offset_top = 18.975952
+offset_right = 2.3519897
+offset_bottom = -14.792053
 metadata/_edit_use_anchors_ = true
 
 [node name="Barrels" type="Node" parent="."]
