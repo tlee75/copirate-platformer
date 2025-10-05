@@ -81,18 +81,29 @@ func _input(event):
 			get_viewport().set_input_as_handled()
 	
 	# Debug keys to test stats system
-	if event.is_action_pressed("ui_accept"):  # Enter key
+	if event.is_action_pressed("ui_up"):
 		# Test damage
 		if player_stats:
 			player_stats.modify_health(-10)
 			print("Debug: Took 10 damage")
 	
-	if event.is_action_pressed("ui_cancel"):  # Escape key  
+	if event.is_action_pressed("ui_down"):  # Escape key  
 		# Test oxygen depletion
 		if player_stats:
 			player_stats.modify_oxygen(-20)
 			print("Debug: Lost 20 oxygen")
 
+	if event.is_action_pressed("ui_left"):  # Escape key  
+		# Test thirst depletion
+		if player_stats:
+			player_stats.modify_thirst(-20)
+			print("Debug: Lost 20 thirst")
+
+	if event.is_action_pressed("ui_right"):  # Escape key  
+		# Test hunger depletion
+		if player_stats:
+			player_stats.modify_hunger(-20)
+			print("Debug: Lost 20 hunger")
 
 func _on_resume():
 	pause_menu.hide()

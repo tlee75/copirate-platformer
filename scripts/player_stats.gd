@@ -23,6 +23,11 @@ var current_stamina: float
 var current_hunger: float
 var current_thirst: float
 
+# Damage rates (per second)
+@export var oxygen_damage_rate: float = 5.0
+@export var hunger_damage_rate: float = 1.0
+@export var thirst_damage_rate: float = 1.0
+
 # Regeneration rates (per second)
 @export var oxygen_regen_rate: float = 20.0 # When on surface
 @export var stamina_regen_rate: float = 25.0 # When not sprinting
@@ -34,6 +39,9 @@ var current_thirst: float
 @export var stamina_usage_rate: float = 20.0
 @export var hunger_usage_rate: float = 0.05
 @export var thirst_usage_rate: float = 0.1
+
+# Interval
+@export var health_drain_interval: float = 1.0 # seconds between health loss
 
 # Modifiers (multipliers applied to rates)
 var oxygen_usage_modifier: float = 1.0
@@ -47,11 +55,15 @@ var thirst_usage_modifier: float = 1.0
 # Status tracking
 var is_underwater: bool = false
 var is_sprinting: bool = false
-var stamina_depleted: bool = false
+var is_stamina_depleted: bool = false
+var is_oxygen_depleted: bool = false
 var is_hunger_depleted: bool = false
 var is_thirst_depleted: bool = false
 var is_eating: bool = false
 var is_drinking: bool = false
+
+# Timer
+var health_drain_timer: float = 0.0
 
 func _ready():
 	# Initialize stats to full
@@ -66,13 +78,27 @@ func _process(delta):
 	update_stamina(delta)
 	update_hunger(delta)
 	update_thirst(delta)
-	
+
+	var should_drain = current_oxygen <= 0.0 or current_hunger <= 0.0 or current_thirst <= 0.0
+	if should_drain:
+		health_drain_timer += delta
+		if health_drain_timer >= health_drain_interval:
+			if current_oxygen <= 0.0:
+				modify_health(-oxygen_damage_rate)
+			if current_hunger <= 0.0:
+				modify_health(-hunger_damage_rate)
+			if current_thirst <= 0.0:
+				modify_health(-thirst_damage_rate)
+			health_drain_timer = 0.0
+	else:
+		health_drain_timer = 0.0
+
 func update_oxygen(delta: float):
 	if is_underwater:
 		# Deplete oxygen when underwater
 		var depletion = oxygen_usage_rate * oxygen_usage_modifier * delta
 		modify_oxygen(-depletion)
-	else:
+	elif current_oxygen < max_oxygen:
 		# Regenerate oxygen when on surface
 		var regen = oxygen_regen_rate * oxygen_regen_modifier * delta
 		modify_oxygen(regen)
@@ -82,7 +108,7 @@ func update_stamina(delta: float):
 		# Deplete stamina when sprinting
 		var usage = stamina_usage_rate * stamina_usage_modifier * delta
 		modify_stamina(-usage)
-	else:
+	elif current_stamina < max_stamina:
 		# Regenerate stamina when not sprinting
 		modify_stamina(stamina_regen_rate * delta)
 
@@ -90,7 +116,7 @@ func update_hunger(delta: float):
 	if is_eating:
 		# Regenerate hunger when eating
 		modify_hunger(hunger_regen_rate * hunger_regen_modifier * delta)
-	else:
+	elif current_hunger < max_hunger:
 		# Deplete hunger
 		var usage = hunger_usage_rate * hunger_usage_modifier * delta
 		modify_hunger(-usage)
@@ -99,7 +125,7 @@ func update_thirst(delta: float):
 	if is_drinking:
 		# Regenerate thirst when drinking
 		modify_thirst(thirst_regen_rate * hunger_regen_modifier * delta)
-	else:
+	elif current_thirst < max_thirst:
 		# Deplete hunger
 		var usage = thirst_usage_rate * hunger_usage_modifier * delta
 		modify_thirst(-usage)
@@ -122,8 +148,13 @@ func modify_oxygen(amount: float):
 	if current_oxygen != old_oxygen:
 		oxygen_changed.emit(current_oxygen, max_oxygen)
 
-	if current_oxygen <= 0.0:
+	# Only emit stat_depleted once when hunger hits zero
+	if current_oxygen <= 0.0 and not is_oxygen_depleted:
 		stat_depleted.emit("oxygen")
+		is_oxygen_depleted = true
+	elif current_oxygen > 0.0:
+		is_oxygen_depleted = false
+
 
 func modify_stamina(amount: float):
 	var old_stamina = current_stamina
@@ -133,11 +164,11 @@ func modify_stamina(amount: float):
 		stamina_changed.emit(current_stamina, max_stamina)
 	
 	# Only emit stat_depleted once when stamina hits zero
-	if current_stamina <= 0.0 and not stamina_depleted:
+	if current_stamina <= 0.0 and not is_stamina_depleted:
 		stat_depleted.emit("stamina")
-		stamina_depleted = true
+		is_stamina_depleted = true
 	elif current_stamina > 0.0:
-		stamina_depleted = false
+		is_stamina_depleted = false
 
 func modify_hunger(amount: float):
 	var old_hunger = current_hunger

@@ -322,12 +322,8 @@ func handle_attack_action():
 						$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
 
 func handle_animations():
-	# Don't change animations while in the middle of an action
-	if is_trigger_action or is_interacting:
-		return
-	
-	# Don't change animations while dead
-	if is_dead:
+	# Don't change animations while in the middle of an action or dead
+	if is_trigger_action or is_interacting or is_dead:
 		return
 	
 	var on_floor = is_on_floor()
@@ -709,16 +705,16 @@ func _on_stat_depleted(stat_name: String):
 		"oxygen":
 			print("Player is suffocating!")
 			# Take damage from drowning
-			player_stats.modify_health(-0.2)
+			#player_stats.modify_health(-0.2)
 		"stamina":
 			print("Player is exhausted!")
 			# Could reduce movement speed or prevent sprinting
 		"hunger":
 			print("Player is starving!")
-			player_stats.modify_health(-5.0)
+			#player_stats.modify_health(-5.0)
 		"thirst":
 			print("Player is dehydrated!")
-			player_stats.modify_health(-5.0)
+			#player_stats.modify_health(-5.0)
 
 func is_interactable_objects():
 	var all_targets = get_potential_targets()
