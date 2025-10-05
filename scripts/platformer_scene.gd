@@ -36,8 +36,12 @@ func _ready():
 
 	# Get reference to player stats
 	player_stats = player.player_stats
+	
+	if player_stats:
+		player_stats.stat_depleted.connect(_close_menus_on_death)
 
 	respawn_position = player.global_position # Initial position
+	
 
 func _on_inventory_toggled(is_open: bool):
 	inventory_is_open = is_open
@@ -106,3 +110,7 @@ func _on_respawn():
 	pause_menu.hide()
 	get_tree().paused = false
 	pause_menu.set_resume_enabled(true)
+
+func _close_menus_on_death(stat_name: String):
+	if stat_name == "health":
+		$UI/CraftingMenu.visible = false

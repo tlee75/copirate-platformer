@@ -489,9 +489,10 @@ offset_right = 0.0759277
 offset_bottom = 134.94
 grow_horizontal = 2
 grow_vertical = 2
-current_tab = 0
+current_tab = 2
 
 [node name="InventoryTab" type="Control" parent="TabBar"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -564,8 +565,14 @@ layout_mode = 2
 layout_mode = 2
 text = "Craft"
 
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="TabBar"]
+position = Vector2(182.59998, 246.52948)
+scale = Vector2(3.635137, 3.6351364)
+sprite_frames = SubResource("SpriteFrames_u6k0j")
+animation = &"equipment_idle"
+autoplay = "equipment_idle"
+
 [node name="EquipmentTab" type="Control" parent="TabBar"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
@@ -582,13 +589,6 @@ offset_bottom = -0.1217041
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_cuqmt")
-
-[node name="NinePatchRect" type="NinePatchRect" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel"]
-layout_mode = 0
-offset_left = 81.850006
-offset_top = 15.999992
-offset_right = 290.85
-offset_bottom = 377.0
 
 [node name="EquipmentSlotsContainer" type="Control" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel"]
 anchors_preset = 0
@@ -664,11 +664,6 @@ offset_left = 296.85
 offset_top = 308.57
 offset_right = 360.85
 offset_bottom = 372.57
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel"]
-sprite_frames = SubResource("SpriteFrames_u6k0j")
-animation = &"equipment_idle"
-autoplay = "equipment_idle"
 
 [node name="InventoryPanel" type="Control" parent="TabBar/EquipmentTab/HBoxContainer"]
 layout_mode = 2

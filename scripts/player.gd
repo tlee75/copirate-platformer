@@ -47,6 +47,7 @@ func _ready():
 	var ui_layer = get_parent().get_node_or_null("UI")
 	if ui_layer:
 		equipment_panel = ui_layer.get_node_or_null("CraftingMenu/TabBar/EquipmentTab/HBoxContainer/EquipmentPanel")
+		
 	var frames = load("res://resources/player_sprites.tres")
 	$AnimatedSprite2D.sprite_frames = frames
 	# Remove procedural Visual if it exists
