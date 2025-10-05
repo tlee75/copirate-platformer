@@ -228,7 +228,22 @@ func _physics_process(delta):
 	# Update tile highlights
 	update_tile_highlights()
 	
-	# Interact Input
+	handle_interact_or_use_action()
+	
+	handle_attack_action()
+
+	# Update physics first
+	velocity = vel
+	move_and_slide()
+
+	# Update collision shape orientation for swimming
+	update_collision_orientation()
+
+	# Handle animations after physics update
+	handle_animations()
+
+func handle_interact_or_use_action():
+	# Interact/Use Action
 	if Input.is_action_just_pressed("interact") and not inventory_is_open:
 		if not is_interacting:
 			if is_interactable_objects():
@@ -265,8 +280,9 @@ func _physics_process(delta):
 						InventoryManager.hotbar_changed.emit()
 				else:
 					print("Cannot interact or use an item")
-	
-	# Attack input - left mouse button (but not when clicking on hotbar)
+
+func handle_attack_action():
+	# Main Hand Action - left mouse button (but not when clicking on hotbar)
 	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu():
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
@@ -284,12 +300,12 @@ func _physics_process(delta):
 							return
 						main_hand_slot.item.action(self)
 					else:
-						# Fallback to unarmed attack/gather
+						# Fallback to unarmed attack
 						is_trigger_action = true
 										
 						if is_underwater:
 							print("Gather used by %s" % self.name)
-							$AnimatedSprite2D.play("swim_gather")
+							$AnimatedSprite2D.play("swim_gather") # Replace this with swim attack
 						else:
 							print("Melee used by %s" % self.name)
 							$AnimatedSprite2D.play("punch")
@@ -304,16 +320,6 @@ func _physics_process(delta):
 						
 						$AnimatedSprite2D.frame_changed.connect(_on_attack_frame_changed)
 						$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
-
-	# Update physics first
-	velocity = vel
-	move_and_slide()
-
-	# Update collision shape orientation for swimming
-	update_collision_orientation()
-
-	# Handle animations after physics update
-	handle_animations()
 
 func handle_animations():
 	# Don't change animations while in the middle of an action
