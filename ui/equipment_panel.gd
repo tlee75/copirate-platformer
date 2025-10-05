@@ -2,39 +2,17 @@ extends Control
 class_name EquipmentPanel
 
 # Equipment slot references
-@onready var head_slot: Control = $HeadSlot
-@onready var chest_slot: Control = $ChestSlot
-@onready var legs_slot: Control = $LegsSlot
-@onready var hands_slot: Control = $HandsSlot
-@onready var main_hand: Control = $MainHand
-@onready var off_hand: Control = $OffHand
-@onready var arms_slot: Control = $ArmsSlot
-@onready var feet_slot: Control = $FeetSlot
-@onready var accessory_slot_1: Control = $AccessorySlot1
-@onready var accessory_slot_2: Control = $AccessorySlot2
+@onready var equipment_slots_container: Control = $EquipmentSlotsContainer
 
 var equipment_slots: Array[Control] = []
 
-# Equipment slot types enum
-enum EquipmentType {
-	HEAD = 0,
-	CHEST = 1,
-	LEGS = 2,
-	HANDS = 3,
-	MAIN_HAND = 4,
-	OFF_HAND = 5,
-	ARMS = 6,
-	FEET = 7,
-	ACCESSORY1 = 8,
-	ACCESSORY2 = 9
-}
-
 func _ready():
 	# Initialize equipment slots array
-	equipment_slots = [
-		head_slot, chest_slot, legs_slot, hands_slot, main_hand, off_hand,
-		arms_slot, feet_slot, accessory_slot_1, accessory_slot_2
-	]
+	equipment_slots = []
+	for child in equipment_slots_container.get_children():
+		if child is Control:
+			equipment_slots.append(child)
+			
 	
 	print("DEBUG: EquipmentPanel _ready() called with ", equipment_slots.size(), " slots")
 	
@@ -50,7 +28,7 @@ func _ready():
 			equipment_slots[i].is_equipment_slot = true
 			equipment_slots[i].equipment_type = i
 			
-			print("DEBUG: Configured equipment slot ", i, " (", EquipmentType.keys()[i], ") - is_equipment_slot: ", equipment_slots[i].is_equipment_slot)
+			print("DEBUG: Configured equipment slot ", i, " (", equipment_slots[i].name, ") - is_equipment_slot: ", equipment_slots[i].is_equipment_slot)
 
 		else:
 			print("DEBUG: Equipment slot ", i, " is null!")
@@ -68,27 +46,27 @@ func _update_display():
 			if slot_data:
 				equipment_slots[i].update_display(slot_data)
 
-func can_equip_item(item_data, equipment_type: EquipmentType) -> bool:
+func can_equip_item(item_data, slot_node_name: String) -> bool:
 	if not item_data:
 		return false
 	
 	# Define what item categories can go in each equipment slot
-	match equipment_type:
-		EquipmentType.HEAD:
+	match slot_node_name:
+		"HeadSlot":
 			return item_data.category == "head"
-		EquipmentType.CHEST:
+		"ChestSlot":
 			return item_data.category == "chest"
-		EquipmentType.LEGS:
+		"LegsSlot":
 			return item_data.category == "legs"
-		EquipmentType.HANDS:
+		"HandsSlot":
 			return item_data.category == "hands"
-		EquipmentType.MAIN_HAND:
+		"MainHand":
 			return item_data.category == "weapon" or item_data.category == "tool"
-		EquipmentType.OFF_HAND:
+		"OffHand":
 			return item_data.category == "shield" or item_data.category == "sidearm"
-		EquipmentType.ARMS:
+		"ArmsSlot":
 			return item_data.category == "bracers"
-		EquipmentType.ACCESSORY1, EquipmentType.ACCESSORY2:
+		"AccessorySlot1", "AccessorySlot2":
 			return item_data.category == "accessory"
 	return false
 

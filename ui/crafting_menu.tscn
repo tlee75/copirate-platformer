@@ -133,70 +133,75 @@ offset_top = 15.999992
 offset_right = 290.85
 offset_bottom = 377.0
 
-[node name="HeadSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+[node name="EquipmentSlotsContainer" type="Control" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="HeadSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
 layout_mode = 0
 offset_left = 9.850006
 offset_top = 28.57
 offset_right = 73.850006
 offset_bottom = 92.57
 
-[node name="ChestSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+[node name="ChestSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
 layout_mode = 0
 offset_left = 9.850006
-offset_top = 122.57
+offset_top = 122.57001
 offset_right = 73.850006
 offset_bottom = 186.57
 
-[node name="LegsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+[node name="LegsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
 layout_mode = 0
 offset_left = 9.850006
 offset_top = 217.57
 offset_right = 73.850006
 offset_bottom = 281.57
 
-[node name="HandsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+[node name="HandsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
 layout_mode = 0
 offset_left = 9.850006
 offset_top = 308.57
 offset_right = 73.850006
 offset_bottom = 372.57
 
-[node name="MainHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+[node name="MainHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
 layout_mode = 0
 offset_left = 104.850006
 offset_top = 393.57
 offset_right = 168.85
 offset_bottom = 457.57
 
-[node name="OffHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+[node name="OffHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
 layout_mode = 0
 offset_left = 203.85004
 offset_top = 393.57
 offset_right = 267.85004
 offset_bottom = 457.57
 
-[node name="ArmsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+[node name="ArmsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
 layout_mode = 0
 offset_left = 296.85
 offset_top = 28.570007
 offset_right = 360.85
 offset_bottom = 92.57001
 
-[node name="FeetSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+[node name="FeetSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
 layout_mode = 0
 offset_left = 296.85
 offset_top = 122.57001
 offset_right = 360.85
 offset_bottom = 186.57
 
-[node name="AccessorySlot1" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+[node name="AccessorySlot1" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
 layout_mode = 0
 offset_left = 296.85
 offset_top = 217.57
 offset_right = 360.85
 offset_bottom = 281.57
 
-[node name="AccessorySlot2" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel" instance=ExtResource("2_cywfm")]
+[node name="AccessorySlot2" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
 layout_mode = 0
 offset_left = 296.85
 offset_top = 308.57

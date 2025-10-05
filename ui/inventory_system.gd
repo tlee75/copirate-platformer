@@ -296,8 +296,8 @@ func _can_place_in_equipment_slot(item: GameItem, target_slot_node: Control) -> 
 	if not equipment_ui or not equipment_ui.has_method("can_equip_item"):
 		print("Equipment UI validation not available")
 		return false
-	var equipment_slot_type = target_slot_node.equipment_type if target_slot_node.has_method("get") and target_slot_node.get("equipment_type") != null else 0
-	if not equipment_ui.can_equip_item(item, equipment_slot_type):
+	var slot_node_name = target_slot_node.name
+	if not equipment_ui.can_equip_item(item, slot_node_name):
 		print("Item category '", item.category, "' cannot be equipped in this slot")
 		return false
 	return true
