@@ -18,6 +18,7 @@ func _ready():
 
 	# Connect to inventory changes
 	InventoryManager.inventory_changed.connect(_update_filtered_display)
+	InventoryManager.hotbar_changed.connect(_update_filtered_display)
 
 	# Initial display update
 	_update_filtered_display()
@@ -33,7 +34,18 @@ func _update_filtered_display():
 		if not slot_data.is_empty() and _is_equipment_item(slot_data.item):
 			equipment_items.append({
 				"slot_data": slot_data,
-				"original_index": i
+				"original_index": i,
+				"source": "main_inventory"
+			})
+	
+	# Find equipment from the hotbar
+	for i in range(InventoryManager.hotbar_slots.size()):
+		var slot_data = InventoryManager.hotbar_slots[i]
+		if not slot_data.is_empty() and _is_equipment_item(slot_data.item):
+			equipment_items.append({
+				"slot_data": slot_data,
+				"original_index": i,
+				"source": "hotbar"
 			})
 
 	# Create slots for found equipment items
@@ -72,7 +84,10 @@ func _create_filtered_slots(equipment_items: Array):
 		# Add to grid and track
 		grid_container.add_child(slot_node)
 		slot_nodes.append(slot_node)
-		equipment_mapping.append(equipment_data.original_index)
+		equipment_mapping.append({
+			"original_index": equipment_data.original_index, 
+			"source": equipment_data.source
+		})
 
 		# Update display with the equipment data
 		slot_node.update_display(equipment_data.slot_data)
@@ -80,21 +95,23 @@ func _create_filtered_slots(equipment_items: Array):
 func _on_filtered_slot_clicked(display_slot_index: int, _is_hotbar: bool):
 	# Convert display index to original inventory index
 	if display_slot_index < equipment_mapping.size():
-		var original_index = equipment_mapping[display_slot_index]
-		print("Filtered equipment slot ", display_slot_index, " (original inventory slot ", original_index, ") clicked")
+		var mapping = equipment_mapping[display_slot_index]
+		var original_index = mapping.original_index
+		var source = mapping.source
+		var is_hotbar = source == "hotbar"
+		print("Filtered equipment slot ", display_slot_index, " (source: ", " (source: ", source, ", index: ", original_index, ") clicked")
 		
 		# Start drag using original inventory index
 		var inventory_system = _get_inventory_system()
 		if inventory_system:
-			var slot_data = InventoryManager.get_inventory_slot(original_index)
+			var slot_data = null
+			if source == "main_inventory":
+				slot_data = InventoryManager.get_inventory_slot(original_index)
+			elif source == "hotbar":
+				slot_data = InventoryManager.get_hotbar_slot(original_index)
 			if slot_data and not slot_data.is_empty():
-				inventory_system.start_drag(original_index, false, false, false)
-
-func get_original_slot_index(display_index: int) -> int:
-	# Convert filtered display index to original inventory slot index
-	if display_index < equipment_mapping.size():
-		return equipment_mapping[display_index]
-	return -1
+				# Set the correct flags for hotbar/equipment
+				inventory_system.start_drag(original_index, is_hotbar, false, false)
 
 func _get_inventory_system() -> Node:
 	# Navigate to find the inventory system
