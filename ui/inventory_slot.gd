@@ -9,7 +9,6 @@ signal slot_clicked(slot_index: int, is_hotbar: bool)
 @export var is_hotbar_slot: bool = false
 @export var is_weapon_slot: bool = false
 @export var is_equipment_slot: bool = false
-@export var equipment_type: int = -1 # Maps to EquipmentPanel.EquipmentType enum
 
 @onready var background: Control = get_node_or_null("Background")
 @onready var item_icon: TextureRect = get_node_or_null("ItemIcon")

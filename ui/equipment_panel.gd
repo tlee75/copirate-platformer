@@ -26,7 +26,6 @@ func _ready():
 			equipment_slots[i].is_hotbar_slot = false
 			equipment_slots[i].is_weapon_slot = false
 			equipment_slots[i].is_equipment_slot = true
-			equipment_slots[i].equipment_type = i
 			
 			print("DEBUG: Configured equipment slot ", i, " (", equipment_slots[i].name, ") - is_equipment_slot: ", equipment_slots[i].is_equipment_slot)
 
@@ -50,7 +49,7 @@ func can_equip_item(item_data, slot_node_name: String) -> bool:
 	if not item_data:
 		return false
 	
-	# Define what item categories can go in each equipment slot
+	# Define what item categories can go in each equipment slot, by scene node name
 	match slot_node_name:
 		"HeadSlot":
 			return item_data.category == "head"
