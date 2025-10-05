@@ -42,6 +42,12 @@ var water_depth: int = -1
 # UI
 var equipment_panel: Node = null
 
+# Animation hit frame definition for animations without an item script
+var default_hit_frames = {
+	"punch": [7]
+}
+
+
 # Remove old procedural Visual node if present
 func _ready():
 	var ui_layer = get_parent().get_node_or_null("UI")
@@ -281,16 +287,14 @@ func _physics_process(delta):
 						else:
 							print("Melee used by %s" % self.name)
 							$AnimatedSprite2D.play("punch")
-						
-						# Destroy tiles in cursor area
-						#destroy_tiles_in_cursor_area()
-						
+							
 						# Disconnect any existing connections first, then connect
-						if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
-							$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
+						if $AnimatedSprite2D.frame_changed.is_connected(_on_attack_frame_changed):
+							$AnimatedSprite2D.frame_changed.disconnect(_on_attack_frame_changed)
 						if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
 							$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
 
+						$AnimatedSprite2D.frame_changed.connect(_on_attack_frame_changed)
 						$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
 
 	# Update physics first
@@ -387,14 +391,37 @@ func _on_attack_animation_finished():
 	# Disconnect the signal immediately to prevent interference
 	if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
 		$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
-		
-	# Apply delayed damage to stored target
-	if attack_target and is_instance_valid(attack_target):
-		attack_target.take_damage(1)  # Damage happens here
-		attack_target = null
 
-	# When attack animation finishes, end attack state
+	# Do stuff here when animation is finished
+
+	# When animation finishes, end actiond state
 	is_trigger_action = false
+	
+	# Remove target which was needed for any multi hit frame animations
+	attack_target = null
+
+func _on_attack_frame_changed():
+	var anim_sprite = $AnimatedSprite2D
+	var anim = anim_sprite.animation
+	var frame = anim_sprite.frame
+	
+	# Get the equipped item from the main hand slot
+	var item = null
+	if equipment_panel:
+		var main_hand_slot_index = equipment_panel.get_equipment_slot_index_by_node_name("MainHand")
+		if main_hand_slot_index != -1:
+			var main_hand_slot = InventoryManager.get_equipment_slot(main_hand_slot_index)
+			if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item:
+				item = main_hand_slot.item
+	
+	# Use the item's hit_frames if available
+	var item_hit_frames = item.hit_frames if item and "hit_frames" in item else default_hit_frames
+	
+	if anim in item_hit_frames and frame in item_hit_frames[anim]:
+		# Apply hit frame synchronized damage to stored target
+		if attack_target and is_instance_valid(attack_target):
+			attack_target.take_damage(1)  # Damage happens here
+
 
 func _on_interact_animation_finished():
 	# Disconnect the signal immediately to prevent interference
