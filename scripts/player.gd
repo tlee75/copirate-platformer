@@ -273,11 +273,11 @@ func handle_interact_or_use_action():
 						var environment_msg = "underwater" if is_underwater else "on land"
 						print("Cannot use ", item_name, " ", environment_msg, "!")
 						return
-					selected_item.action(self)
-					# Remove item if it's consumable
-					if selected_item.is_consumable():
-						slot_data.remove_item(1)
-						InventoryManager.hotbar_changed.emit()
+					if selected_item.action(self):
+						# Remove item if it's consumable
+						if selected_item.is_consumable():
+							slot_data.remove_item(1)
+							InventoryManager.hotbar_changed.emit()
 				else:
 					print("Cannot interact or use an item")
 

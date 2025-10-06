@@ -128,17 +128,29 @@ func _ready():
 	item_database["shovel"] = shovel_item
 	shovel_item.craft_requirements = {"Gold Coin": 2}
 
-	# Initialize item database with Berry
+	# Initialize item database with RaspBerry
 	var raspberry_item = RaspberryItem.new()
 	raspberry_item.name = "Raspberry"
 	raspberry_item.icon = load("res://assets/tropical/raspberry_icon_01.png")
 	raspberry_item.stack_size = 99
-	raspberry_item.craftable = true
+	raspberry_item.craftable = false
 	raspberry_item.category = "consumable"
 	raspberry_item.underwater_compatible = false
 	raspberry_item.land_compatible = true
 	raspberry_item.craft_requirements = {"Gold Coin": 1}
 	item_database["raspberry"] = raspberry_item
+
+	# Initialize item database with Leaf Bandage
+	var leafbandage_item = LeafBandageItem.new()
+	leafbandage_item.name = "Leaf Bandage"
+	leafbandage_item.icon = load("res://assets/consumables/leaf_bandage_01_16x18.png")
+	leafbandage_item.stack_size = 99
+	leafbandage_item.craftable = true
+	leafbandage_item.category = "consumable"
+	leafbandage_item.underwater_compatible = false
+	leafbandage_item.land_compatible = true
+	leafbandage_item.craft_requirements = {"Gold Coin": 1}
+	item_database["leafbandage"] = leafbandage_item
 
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 

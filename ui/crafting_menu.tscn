@@ -489,10 +489,9 @@ offset_right = 0.0759277
 offset_bottom = 134.94
 grow_horizontal = 2
 grow_vertical = 2
-current_tab = 2
+current_tab = 0
 
 [node name="InventoryTab" type="Control" parent="TabBar"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -566,6 +565,7 @@ layout_mode = 2
 text = "Craft"
 
 [node name="EquipmentTab" type="Control" parent="TabBar"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 

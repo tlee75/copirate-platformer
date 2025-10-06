@@ -63,12 +63,14 @@ var is_hunger_depleted: bool = false
 var is_thirst_depleted: bool = false
 var is_eating: bool = false
 var is_drinking: bool = false
+var is_healing: bool = false
 
 # Timer
 var health_drain_timer: float = 0.0
 
 var eating_time_remaining: float = 0.0
 var drinking_time_remaining: float = 0.0
+var healing_time_remaining: float = 0.0
 var stats_timer: Timer
 
 func _ready():
@@ -203,8 +205,14 @@ func set_stamina_usage_modifier(modifier: float):
 func set_hunger_usage_modifier(modifier: float):
 	hunger_usage_modifier = modifier
 
+func set_hunger_regen_modifier(modifier: float):
+	hunger_regen_modifier = modifier
+
 func set_thirst_usage_modifier(modifier: float):
 	thirst_usage_modifier = modifier
+
+func set_health_regen_modifier(modifier: float):
+	health_regen_modifier = modifier
 
 # Status update functions (called by player)
 func set_underwater_status(underwater: bool):
@@ -269,7 +277,27 @@ func start_drinking(duration: float):
 	drinking_time_remaining += duration
 	print("Added ", duration, " seconds of drinking time. Total remaining: ", drinking_time_remaining)
 
+func start_healing(duration: float):
+	is_healing = true
+	healing_time_remaining += duration
+	print("Added ", duration, " seconds of healing time. Total remaining: ", healing_time_remaining)
+
 func handle_health_update():
+	# Handle bandage, medkit etc
+	if current_health < max_health:
+		if is_healing and healing_time_remaining > 0:
+			modify_health(health_regen_rate * health_regen_modifier)
+			healing_time_remaining -= stats_timer.wait_time
+			if healing_time_remaining <= 0:
+				is_healing = false
+				healing_time_remaining = 0
+				set_health_regen_modifier(1.0)
+				print("Healing finished")
+				
+		# Handle well fed healing
+		if current_hunger >= 80 and current_thirst >= 80:
+			modify_health(health_regen_rate * health_regen_modifier)
+		
 	# Drain health if resource is depleted
 	if current_oxygen <= 0.0:
 		modify_health(-oxygen_damage_rate)
@@ -278,9 +306,7 @@ func handle_health_update():
 	if current_thirst <= 0.0:
 		modify_health(-thirst_damage_rate)
 	
-	# Handle healing (bandage, well fed, etc
-	if current_hunger >= 80 and current_thirst >= 80:
-		modify_health(health_regen_rate * health_regen_modifier)
+	
 
 func handle_thirst_update():
 	# Handle thirst and duration
@@ -290,6 +316,7 @@ func handle_thirst_update():
 		if drinking_time_remaining <= 0:
 			is_eating = false
 			drinking_time_remaining = 0.0
+			set_health_regen_modifier(1.0)
 			print("Finished drinking")
 	else:
 		# Deplete thirst - fixed amount per timer tick
@@ -303,6 +330,7 @@ func handle_hunger_update():
 		if eating_time_remaining <= 0:
 			is_eating = false
 			eating_time_remaining = 0.0
+			set_hunger_regen_modifier(1.0)
 			print("Finished eating")
 	else:
 		# Deplete hunger - fixed amount per timer tick

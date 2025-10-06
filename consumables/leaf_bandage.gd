@@ -1,5 +1,5 @@
 extends GameItem
-class_name RaspberryItem
+class_name LeafBandageItem
 
 # Animation hit frame definition
 var hit_frames = {
@@ -10,15 +10,21 @@ var player_stats: PlayerStats
 func is_consumable() -> bool:
 	return true
 
-func action(player):
-	player.is_trigger_action = true
-	player.get_node("AnimatedSprite2D").play("consume")
-	
+func action(player):	
 	if player and player.player_stats:
 		player_stats = player.player_stats
-		player_stats.is_eating = true
-		player_stats.start_eating(5)
+		if player_stats.is_healing:
+			print("Already healing")
+			return false
+		player_stats.is_healing = true
+		player_stats.set_health_regen_modifier(5)
+		player_stats.start_healing(10)
+		player.is_trigger_action = true
+		player.get_node("AnimatedSprite2D").play("consume")
 	else:
 		print("no player stats")
+		return false
 	
 	cleanup_connections(player) # Defined in base class
+	
+	return true
