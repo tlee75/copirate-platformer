@@ -704,17 +704,13 @@ func _on_stat_depleted(stat_name: String):
 				$AnimatedSprite2D.animation_finished.connect(_on_death_animation_finished)
 		"oxygen":
 			print("Player is suffocating!")
-			# Take damage from drowning
-			#player_stats.modify_health(-0.2)
 		"stamina":
 			print("Player is exhausted!")
 			# Could reduce movement speed or prevent sprinting
 		"hunger":
 			print("Player is starving!")
-			#player_stats.modify_health(-5.0)
 		"thirst":
 			print("Player is dehydrated!")
-			#player_stats.modify_health(-5.0)
 
 func is_interactable_objects():
 	var all_targets = get_potential_targets()

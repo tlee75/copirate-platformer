@@ -38,6 +38,8 @@ func _ready():
 	player_stats = player.player_stats
 	
 	if player_stats:
+		var stats_timer = $UI/StatsUpdateTimer
+		player_stats.setup_timer(stats_timer)
 		player_stats.stat_depleted.connect(_close_menus_on_death)
 
 	respawn_position = player.global_position # Initial position

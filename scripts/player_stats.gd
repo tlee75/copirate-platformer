@@ -25,14 +25,15 @@ var current_thirst: float
 
 # Damage rates (per second)
 @export var oxygen_damage_rate: float = 5.0
-@export var hunger_damage_rate: float = 1.0
-@export var thirst_damage_rate: float = 1.0
+@export var hunger_damage_rate: float = 2.0
+@export var thirst_damage_rate: float = 2.0
 
 # Regeneration rates (per second)
+@export var health_regen_rate: float = 0.2 # Well fed healing
 @export var oxygen_regen_rate: float = 20.0 # When on surface
-@export var stamina_regen_rate: float = 25.0 # When not sprinting
-@export var hunger_regen_rate: float = 5.0 # When consuming standard food
-@export var thirst_regen_rate: float = 5.0 # When consuming standard drinks
+@export var stamina_regen_rate: float = 20.0 # When not sprinting
+@export var hunger_regen_rate: float = 2.0 # When consuming standard food
+@export var thirst_regen_rate: float = 2.0 # When consuming standard drinks
 
 # Usage rates (per second)
 @export var oxygen_usage_rate: float = 10.0 # When underwater
@@ -44,6 +45,7 @@ var current_thirst: float
 @export var health_drain_interval: float = 1.0 # seconds between health loss
 
 # Modifiers (multipliers applied to rates)
+var health_regen_modifier: float = 1.0
 var oxygen_usage_modifier: float = 1.0
 var oxygen_regen_modifier: float = 1.0
 var stamina_usage_modifier: float = 1.0
@@ -65,6 +67,10 @@ var is_drinking: bool = false
 # Timer
 var health_drain_timer: float = 0.0
 
+var eating_time_remaining: float = 0.0
+var drinking_time_remaining: float = 0.0
+var stats_timer: Timer
+
 func _ready():
 	# Initialize stats to full
 	current_health = max_health
@@ -72,26 +78,12 @@ func _ready():
 	current_stamina = max_stamina
 	current_hunger = max_hunger
 	current_thirst = max_thirst
+
 	
 func _process(delta):
 	update_oxygen(delta)
 	update_stamina(delta)
-	update_hunger(delta)
-	update_thirst(delta)
 
-	var should_drain = current_oxygen <= 0.0 or current_hunger <= 0.0 or current_thirst <= 0.0
-	if should_drain:
-		health_drain_timer += delta
-		if health_drain_timer >= health_drain_interval:
-			if current_oxygen <= 0.0:
-				modify_health(-oxygen_damage_rate)
-			if current_hunger <= 0.0:
-				modify_health(-hunger_damage_rate)
-			if current_thirst <= 0.0:
-				modify_health(-thirst_damage_rate)
-			health_drain_timer = 0.0
-	else:
-		health_drain_timer = 0.0
 
 func update_oxygen(delta: float):
 	if is_underwater:
@@ -116,7 +108,7 @@ func update_hunger(delta: float):
 	if is_eating:
 		# Regenerate hunger when eating
 		modify_hunger(hunger_regen_rate * hunger_regen_modifier * delta)
-	elif current_hunger < max_hunger:
+	elif current_hunger <= max_hunger:
 		# Deplete hunger
 		var usage = hunger_usage_rate * hunger_usage_modifier * delta
 		modify_hunger(-usage)
@@ -125,7 +117,7 @@ func update_thirst(delta: float):
 	if is_drinking:
 		# Regenerate thirst when drinking
 		modify_thirst(thirst_regen_rate * hunger_regen_modifier * delta)
-	elif current_thirst < max_thirst:
+	elif current_thirst <= max_thirst:
 		# Deplete hunger
 		var usage = thirst_usage_rate * hunger_usage_modifier * delta
 		modify_thirst(-usage)
@@ -250,4 +242,68 @@ func reset_stats():
 	stamina_changed.emit(current_stamina, max_stamina)
 	hunger_changed.emit(current_hunger, max_hunger)
 	thirst_changed.emit(current_thirst, max_thirst)
+
+func setup_timer(timer: Timer):
+	stats_timer = timer
+	if stats_timer:
+		stats_timer.timeout.connect(_on_stats_timer_timeout)
+		print("Timer setup complete")
+
+func _on_stats_timer_timeout():
+	handle_hunger_update()
+	handle_thirst_update()
+	handle_health_update()
+
+
+# Eat food
+func start_eating(duration: float):
+	# Add to existing time
+	is_eating = true
+	eating_time_remaining += duration
+	print("Added ", duration, " seconds of eating time. Total remaining: ", eating_time_remaining)
+
+# Drink
+func start_drinking(duration: float):
+	# Add to existing time
+	is_drinking = true
+	drinking_time_remaining += duration
+	print("Added ", duration, " seconds of drinking time. Total remaining: ", drinking_time_remaining)
+
+func handle_health_update():
+	# Drain health if resource is depleted
+	if current_oxygen <= 0.0:
+		modify_health(-oxygen_damage_rate)
+	if current_hunger <= 0.0:
+		modify_health(-hunger_damage_rate)
+	if current_thirst <= 0.0:
+		modify_health(-thirst_damage_rate)
 	
+	# Handle healing (bandage, well fed, etc
+	if current_hunger >= 80 and current_thirst >= 80:
+		modify_health(health_regen_rate * health_regen_modifier)
+
+func handle_thirst_update():
+	# Handle thirst and duration
+	if is_drinking and drinking_time_remaining > 0:
+		modify_thirst(thirst_regen_rate * thirst_regen_modifier)
+		drinking_time_remaining -= stats_timer.wait_time
+		if drinking_time_remaining <= 0:
+			is_eating = false
+			drinking_time_remaining = 0.0
+			print("Finished drinking")
+	else:
+		# Deplete thirst - fixed amount per timer tick
+		modify_thirst(-thirst_usage_rate * thirst_usage_modifier)
+
+func handle_hunger_update():
+	# Handle eating and duration
+	if is_eating and eating_time_remaining > 0:
+		modify_hunger(hunger_regen_rate * hunger_regen_modifier)
+		eating_time_remaining -= stats_timer.wait_time
+		if eating_time_remaining <= 0:
+			is_eating = false
+			eating_time_remaining = 0.0
+			print("Finished eating")
+	else:
+		# Deplete hunger - fixed amount per timer tick
+		modify_hunger(-hunger_usage_rate * hunger_usage_modifier)

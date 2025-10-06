@@ -16,7 +16,8 @@ func action(player):
 	
 	if player and player.player_stats:
 		player_stats = player.player_stats
-		player_stats.modify_health(10)
+		player_stats.is_eating = true
+		player_stats.start_eating(5)
 	else:
 		print("no player stats")
 	
