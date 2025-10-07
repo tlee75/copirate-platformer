@@ -1,0 +1,97 @@
+[gd_scene load_steps=15 format=3 uid="uid://crl38kj8otjtc"]
+
+[ext_resource type="Texture2D" uid="uid://cufivuekexdn6" path="res://assets/structures/crate_hit_01-8.png" id="1_aqu1o"]
+[ext_resource type="Script" uid="uid://douoo83atpggs" path="res://scripts/wood_crate.gd" id="1_p4eel"]
+[ext_resource type="PackedScene" uid="uid://dhi7durjec88o" path="res://scenes/gold_coin.tscn" id="2_hfctv"]
+[ext_resource type="Texture2D" uid="uid://2a5h6hdlw8lx" path="res://assets/structures/crate_hit_02-8.png" id="2_p4eel"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hfctv"]
+atlas = ExtResource("1_aqu1o")
+region = Rect2(240, 0, 240, 280)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x7b78"]
+atlas = ExtResource("1_aqu1o")
+region = Rect2(480, 0, 240, 280)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ix8o7"]
+atlas = ExtResource("1_aqu1o")
+region = Rect2(720, 0, 240, 280)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s20nq"]
+atlas = ExtResource("1_aqu1o")
+region = Rect2(720, 280, 240, 280)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mhhac"]
+atlas = ExtResource("2_p4eel")
+region = Rect2(0, 0, 237, 250)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cpet5"]
+atlas = ExtResource("2_p4eel")
+region = Rect2(237, 0, 237, 250)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_easd3"]
+atlas = ExtResource("2_p4eel")
+region = Rect2(474, 0, 237, 250)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tcjsg"]
+atlas = ExtResource("2_p4eel")
+region = Rect2(711, 0, 237, 250)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_jxeky"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hfctv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x7b78")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ix8o7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s20nq")
+}],
+"loop": false,
+"name": &"break",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mhhac")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cpet5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_easd3")
+}],
+"loop": false,
+"name": &"hit",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tcjsg")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 1.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_77nhs"]
+size = Vector2(206, 246)
+
+[node name="WoodCrate" type="StaticBody2D"]
+scale = Vector2(0.15, 0.15)
+script = ExtResource("1_p4eel")
+hit_cooldown_time = 0.5
+gold_coin_scene = ExtResource("2_hfctv")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_jxeky")
+animation = &"break"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(4, -2)
+shape = SubResource("RectangleShape2D_77nhs")

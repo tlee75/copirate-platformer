@@ -1,21 +1,19 @@
 extends StaticBody2D
 
-# Breakable barrel that can be destroyed by player attacks
+# Breakable object that can be destroyed by player attacks
+var object_name = "Wood Crate"
 
-# Barrel states
-enum BarrelState { INTACT, DAMAGED, DESTROYED }
-var state: int = BarrelState.INTACT
+# Object states
+enum ObjectState { INTACT, DAMAGED, DESTROYED }
+var state: int = ObjectState.INTACT
 
 @export var max_health: int = 3
 var health: int = max_health
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
-@onready var hit_detection: Area2D = $HitDetection
-@onready var solid_collision: CollisionShape2D = $CollisionShape2D
-@onready var hit_collision: CollisionShape2D = $HitDetection/HitCollisionShape2D
 
 # Cooldown to prevent multiple hits from same attack
-@export var hit_cooldown_time: float = 0.6  # Longer than attack animation duration
+@export var hit_cooldown_time: float = 0.5  # Longer than attack animation duration
 var hit_cooldown: float = 0.0
 
 @export var gold_coin_scene: PackedScene
@@ -43,11 +41,11 @@ func _on_area_exited(_area: Area2D):
 	pass
 
 func is_attackable() -> bool:
-	var result = state != BarrelState.DESTROYED and hit_cooldown <= 0.0
+	var result = state != ObjectState.DESTROYED and hit_cooldown <= 0.0
 	return result
 
 func is_interactable() -> bool:
-	var result = state != BarrelState.DESTROYED and hit_cooldown <= 0.0
+	var result = state != ObjectState.DESTROYED and hit_cooldown <= 0.0
 	return result
 
 func set_cooldown():
@@ -55,30 +53,30 @@ func set_cooldown():
 
 # Interact action handler (for future use)
 func interact():
-	if state == BarrelState.DESTROYED:
+	if state == ObjectState.DESTROYED:
 		return
-	print("The barrel doesn't seem to do anything.")
+	print("The ", object_name, " doesn't seem to do anything.")
 	# Could be used for examining, picking up, etc.
 
 # Use item action handler (for future use)  
 func handle_use_item_action(_player):
-	if state == BarrelState.DESTROYED:
+	if state == ObjectState.DESTROYED:
 		return
-	print("Player used item on barrel")
+	print("Player used item on ", object_name)
 	# Could be used for tools, keys, etc.
 
 # Damage system
 func take_damage(amount: int):
 	health -= amount
 
-	# Check if barrel should be destroyed
+	# Check if object should be destroyed
 	if health <= 0:
-		break_barrel()
+		break_object()
 		return
 	
 	# Update state to damaged if not already
-	if state == BarrelState.INTACT:
-		state = BarrelState.DAMAGED
+	if state == ObjectState.INTACT:
+		state = ObjectState.DAMAGED
 		
 	# Play damaged animation or sprite
 	if animated_sprite.sprite_frames:
@@ -90,23 +88,23 @@ func take_damage(amount: int):
 		else:
 			animated_sprite.play("idle")
 
-func break_barrel():
-	if state == BarrelState.DESTROYED:
+func break_object():
+	if state == ObjectState.DESTROYED:
 		return
 		
-	state = BarrelState.DESTROYED
-	print("Barrel destroyed!")
+	state = ObjectState.DESTROYED
+	print(object_name, " destroyed!")
 	
 	# Drop loot before destruction
 	drop_loot()
 	
 	# Disable solid collision so player can walk through
-	solid_collision.disabled = true
+	#solid_collision.disabled = false
 	
 	# Play destruction animation if available
 	if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("break"):
 		animated_sprite.play("break")
-		# Wait for animation to finish, then remove barrel
+		# Wait for animation to finish, then remove object
 		await animated_sprite.animation_finished
 		queue_free()
 	else:
@@ -166,8 +164,8 @@ func find_valid_spawn_position(offset_index: int) -> Vector2:
 		
 		attempt += 1
 	
-	# If no valid position found, spawn at barrel position (it's disappearing anyway)
-	print("Warning: Could not find valid spawn position, using barrel location")
+	# If no valid position found, spawn at object position (it's disappearing anyway)
+	print("Warning: Could not find valid spawn position, using ", object_name, " location")
 	return global_position
 
 func is_position_valid(pos: Vector2) -> bool:
