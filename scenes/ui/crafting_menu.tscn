@@ -1,9 +1,9 @@
 [gd_scene load_steps=71 format=3 uid="uid://k0kkh12kws3d"]
 
-[ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://ui/main_inventory.tscn" id="1_srlpo"]
-[ext_resource type="Script" uid="uid://vcvkw3xxws36" path="res://ui/equipment_panel.gd" id="2_cuqmt"]
-[ext_resource type="PackedScene" uid="uid://x72kyodvepj7" path="res://ui/inventory_slot.tscn" id="2_cywfm"]
-[ext_resource type="PackedScene" uid="uid://c8tdbg3kjuavn" path="res://ui/equipment_inventory.tscn" id="3_rjctp"]
+[ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://scenes/ui/main_inventory.tscn" id="1_srlpo"]
+[ext_resource type="Script" uid="uid://vcvkw3xxws36" path="res://scripts/ui/equipment_panel.gd" id="2_cuqmt"]
+[ext_resource type="PackedScene" uid="uid://x72kyodvepj7" path="res://scenes/ui/inventory_slot.tscn" id="2_cywfm"]
+[ext_resource type="PackedScene" uid="uid://c8tdbg3kjuavn" path="res://scenes/ui/equipment_inventory.tscn" id="3_rjctp"]
 [ext_resource type="Texture2D" uid="uid://dl63amqod85d8" path="res://assets/sprite-man/idle_01_64.png" id="4_yadmt"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wjsuv"]

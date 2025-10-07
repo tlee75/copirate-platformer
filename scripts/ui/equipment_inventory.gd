@@ -68,7 +68,7 @@ func _create_filtered_slots(equipment_items: Array):
 		var equipment_data = equipment_items[i]
 
 		# Create new slot from scene
-		var slot_scene = preload("res://ui/inventory_slot.tscn")
+		var slot_scene = preload("res://scenes/ui/inventory_slot.tscn")
 		var slot_node = slot_scene.instantiate()
 
 		# Configure the slot

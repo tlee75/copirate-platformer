@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://noyk5n0awjav"]
 
-[ext_resource type="Script" uid="uid://d2w343e53bief" path="res://ui/stats_display.gd" id="1_agt1n"]
+[ext_resource type="Script" uid="uid://d2w343e53bief" path="res://scripts/ui/stats_display.gd" id="1_agt1n"]
 
 [node name="StatsDisplay" type="Control"]
 layout_mode = 3

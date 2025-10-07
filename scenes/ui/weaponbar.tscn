@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://o5dk1uupyfxt"]
 
-[ext_resource type="PackedScene" uid="uid://x72kyodvepj7" path="res://ui/inventory_slot.tscn" id="1_tieyi"]
+[ext_resource type="PackedScene" uid="uid://x72kyodvepj7" path="res://scenes/ui/inventory_slot.tscn" id="1_tieyi"]
 
 [node name="WeaponBar" type="Control"]
 layout_mode = 3

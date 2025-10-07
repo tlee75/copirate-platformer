@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://c8tdbg3kjuavn"]
 
-[ext_resource type="Script" uid="uid://dy6xo3rgv2tvx" path="res://ui/equipment_inventory.gd" id="1_tvxgi"]
+[ext_resource type="Script" uid="uid://dy6xo3rgv2tvx" path="res://scripts/ui/equipment_inventory.gd" id="1_tvxgi"]
 
 [node name="EquipmentInventory" type="Control"]
 layout_mode = 3
