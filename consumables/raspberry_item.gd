@@ -19,6 +19,7 @@ func action(player):
 		player_stats.is_eating = true
 		player_stats.set_hunger_regen_modifier(5)
 		player_stats.start_eating(5)
+		player_stats.start_drinking(5)
 		player.is_trigger_action = true
 		player.get_node("AnimatedSprite2D").play("consume")
 	else:

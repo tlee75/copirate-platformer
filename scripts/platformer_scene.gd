@@ -44,6 +44,13 @@ func _ready():
 
 	respawn_position = player.global_position # Initial position
 	
+	# Create and add Resource Manager
+	var resource_manager = preload("res://scripts/resource_manager.gd").new()
+	add_child(resource_manager)
+	
+	# Connect ResourceManager to the StatusUpdateTimer
+	var resource_timer = $Resources/FiveSecondTimer
+	resource_manager.setup_timer(resource_timer)
 
 func _on_inventory_toggled(is_open: bool):
 	inventory_is_open = is_open

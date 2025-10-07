@@ -201,3 +201,9 @@ position = Vector2(81, 2095)
 
 [node name="Sword" parent="." instance=ExtResource("22_oo6ai")]
 position = Vector2(125, 2075)
+
+[node name="Resources" type="Node" parent="."]
+
+[node name="FiveSecondTimer" type="Timer" parent="Resources"]
+wait_time = 2.0
+autostart = true
