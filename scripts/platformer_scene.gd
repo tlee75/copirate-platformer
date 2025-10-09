@@ -71,20 +71,31 @@ func _input(event):
 	if event is InputEventKey:
 		var key_event = event as InputEventKey
 		if key_event.pressed:
-			if key_event.keycode == KEY_TAB:
-				# TAB toggles the combined menu open/closed
-				crafting_menu.visible = not crafting_menu.visible
+			if key_event.keycode == KEY_TAB or key_event.keycode == KEY_ESCAPE:
+				# Check if object inventory is open first (priority over craft menu)
+				var object_inventories = get_tree().get_nodes_in_group("object_inventory")
+				var object_inventory_closed = false
+				
+				for obj_inv in object_inventories:
+					if obj_inv.visible:
+						obj_inv.close_inventory()
+						object_inventory_closed = true
+						break
+				
+				# If no object inventory was closed, handle normal Tab/Escape behavior
+				if not object_inventory_closed:
+					if key_event.keycode == KEY_TAB:
+						# TAB toggles the combined menu open/closed
+						crafting_menu.visible = not crafting_menu.visible
+					elif key_event.keycode == KEY_ESCAPE:
+						if crafting_menu.visible:
+							crafting_menu.visible = false
+						else:
+							pause_menu.show()
+							get_tree().paused = true
 
 				get_viewport().set_input_as_handled()
-			
-			elif key_event.keycode == KEY_ESCAPE:
-				if crafting_menu.visible:
-					crafting_menu.visible = false
-				else:
-					pause_menu.show()
-					get_tree().paused = true
-
-				get_viewport().set_input_as_handled()
+				
 	elif event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
 			hotbar.select_slot(hotbar.selected_slot - 1)

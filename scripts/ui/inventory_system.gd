@@ -200,6 +200,62 @@ func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: boo
 	if not is_dragging:
 		return
 
+	# Handle dragging FROM object inventory
+	if has_meta("dragging_from_object") and get_meta("dragging_from_object"):
+		var object_inventory = get_meta("object_inventory")
+		var source_slot_data = object_inventory.get_object_slot(drag_source_slot)
+		
+		var target_slot_data
+		if target_is_hotbar:
+			target_slot_data = InventoryManager.get_hotbar_slot(target_slot)
+		elif target_is_weaponbar:
+			target_slot_data = InventoryManager.get_weaponbar_slot(target_slot)
+		else:
+			target_slot_data = InventoryManager.get_inventory_slot(target_slot)
+		
+		if source_slot_data and target_slot_data:
+			# Check if target slot is occupied for swapping
+			if not target_slot_data.is_empty():
+				# Before swapping, validate that the target item can go into the object inventory
+				if not object_inventory.can_object_accept_item(target_slot_data.item):
+					print("Cannot swap: ", target_slot_data.item.name, " (", target_slot_data.item.category, ") is not accepted by ", object_inventory.current_object.name)
+					cleanup_drag()
+					return
+				
+				# Swap items between object slot and target slot
+				var temp_item = target_slot_data.item
+				var temp_quantity = target_slot_data.quantity
+				
+				target_slot_data.item = source_slot_data.item
+				target_slot_data.quantity = source_slot_data.quantity
+				
+				source_slot_data.item = temp_item
+				source_slot_data.quantity = temp_quantity
+				
+				print("Swapped items between object slot ", drag_source_slot, " and ", "hotbar" if target_is_hotbar else "inventory", " slot ", target_slot)
+			else:
+				# Move item from object to target
+				target_slot_data.item = source_slot_data.item
+				target_slot_data.quantity = source_slot_data.quantity
+				source_slot_data.clear()
+				
+				print("Moved item from object slot ", drag_source_slot, " to ", "hotbar" if target_is_hotbar else "inventory", " slot ", target_slot)
+			
+			# Update displays
+			object_inventory.update_object_slot_display(drag_source_slot)
+			if target_is_hotbar:
+				InventoryManager.hotbar_changed.emit()
+			elif target_is_weaponbar:
+				InventoryManager.weapon_changed.emit()
+			else:
+				InventoryManager.inventory_changed.emit()
+				
+		# Clean up object metadata
+		set_meta("dragging_from_object", false)
+		set_meta("object_inventory", null)
+		cleanup_drag()
+		return
+
 	var source_slot_node = find_source_slot_node()
 	var target_slot_node = find_slot_under_mouse()
 
@@ -244,6 +300,12 @@ func cleanup_drag():
 	drag_source_is_hotbar = false
 	drag_source_is_weaponbar = false
 	drag_source_is_equipment = false
+	
+	# Clean up any object inventory metadata
+	if has_meta("dragging_from_object"):
+		remove_meta("dragging_from_object")
+	if has_meta("object_inventory"):
+		remove_meta("object_inventory")
 	
 	if drag_preview:
 		drag_preview.queue_free()

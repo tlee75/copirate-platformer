@@ -89,8 +89,12 @@ func handle_object_drop(inventory_system, drop_target: Control):
 		inventory_system.remove_meta("dragging_from_object")
 		inventory_system.remove_meta("object_inventory")
 	else:
-		# Dragging FROM inventory TO object slot
-		var source_slot_data = InventoryManager.get_inventory_slot(inventory_system.drag_source_slot)
+		# Dragging FROM inventory/hotbar TO object slot
+		var source_slot_data
+		if inventory_system.drag_source_is_hotbar:
+			source_slot_data = InventoryManager.get_hotbar_slot(inventory_system.drag_source_slot)
+		else:
+			source_slot_data = InventoryManager.get_inventory_slot(inventory_system.drag_source_slot)
 		var target_slot_data = get_object_slot(object_slot_index)
 		
 		if source_slot_data and target_slot_data:
@@ -99,17 +103,51 @@ func handle_object_drop(inventory_system, drop_target: Control):
 				print("This object cannot accept ", source_slot_data.item.name, " (category: ", source_slot_data.item.category, ")")
 				inventory_system.cancel_drag()
 				return
+			
+			if not target_slot_data.is_empty():
+				# Target object slot has an item - need to swap
+				# Check if target item can go back to source location
+				if inventory_system.drag_source_is_hotbar:
+					# When swapping with hotbar, validate that the item from hotbar can go to object
+					if not can_object_accept_item(target_slot_data.item):
+						print("Cannot swap: ", target_slot_data.item.name, " cannot be placed in ", current_object.name)
+						inventory_system.cancel_drag()
+						return
+				else:
+					# When swapping with main inventory, validate that the item from inventory can go to object
+					if not can_object_accept_item(target_slot_data.item):
+						print("Cannot swap: ", target_slot_data.item.name, " cannot be placed in ", current_object.name)
+						inventory_system.cancel_drag()
+						return
 				
-			target_slot_data.item = source_slot_data.item
-			target_slot_data.quantity = source_slot_data.quantity
-			source_slot_data.clear()
+				# Perform the swap
+				var temp_item = target_slot_data.item
+				var temp_quantity = target_slot_data.quantity
+				
+				target_slot_data.item = source_slot_data.item
+				target_slot_data.quantity = source_slot_data.quantity
+				
+				source_slot_data.item = temp_item
+				source_slot_data.quantity = temp_quantity
+				
+				print("Swapped items between ", "hotbar" if inventory_system.drag_source_is_hotbar else "inventory", " slot ", inventory_system.drag_source_slot, " and object slot ", object_slot_index)
+			else:
+				# Target object slot is empty - simple move
+				target_slot_data.item = source_slot_data.item
+				target_slot_data.quantity = source_slot_data.quantity
+				source_slot_data.clear()
+				
+				print("Moved item to object slot ", object_slot_index)
 			
 			# Update displays
 			update_object_slot_display(object_slot_index)
-			InventoryManager.inventory_changed.emit()
 			
-			print("Moved item to object slot ", object_slot_index)
-	
+			# Emit appropriate signal based on source type
+			if inventory_system.drag_source_is_hotbar:
+				InventoryManager.hotbar_changed.emit()
+			else:
+				InventoryManager.inventory_changed.emit()
+					
 	inventory_system.cleanup_drag()
 
 func update_object_slot_display(slot_index: int):
