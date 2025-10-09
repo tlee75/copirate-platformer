@@ -267,10 +267,10 @@ func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: boo
 	elif target_slot_node and target_slot_node.has_method("get") and target_slot_node.get("is_equipment_slot"):
 		target_type = InventoryManager.SlotType.EQUIPMENT
 
-	var source_slot_data = InventoryManager.get_slot_by_type(source_type, drag_source_slot)
+	var regular_source_slot_data = InventoryManager.get_slot_by_type(source_type, drag_source_slot)
 	
 	# Centralized validation for all slot types
-	if not _can_place_item_in_slot(source_slot_data.item, target_type, target_slot_node):
+	if not _can_place_item_in_slot(regular_source_slot_data.item, target_type, target_slot_node):
 		cleanup_drag()
 		return
 			
