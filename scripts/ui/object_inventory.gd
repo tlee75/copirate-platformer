@@ -106,19 +106,6 @@ func handle_object_drop(inventory_system, drop_target: Control):
 			
 			if not target_slot_data.is_empty():
 				# Target object slot has an item - need to swap
-				# Check if target item can go back to source location
-				if inventory_system.drag_source_is_hotbar:
-					# When swapping with hotbar, validate that the item from hotbar can go to object
-					if not can_object_accept_item(target_slot_data.item):
-						print("Cannot swap: ", target_slot_data.item.name, " cannot be placed in ", current_object.name)
-						inventory_system.cancel_drag()
-						return
-				else:
-					# When swapping with main inventory, validate that the item from inventory can go to object
-					if not can_object_accept_item(target_slot_data.item):
-						print("Cannot swap: ", target_slot_data.item.name, " cannot be placed in ", current_object.name)
-						inventory_system.cancel_drag()
-						return
 				
 				# Perform the swap
 				var temp_item = target_slot_data.item

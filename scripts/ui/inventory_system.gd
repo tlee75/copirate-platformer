@@ -108,11 +108,7 @@ func find_slot_under_mouse():
 
 	# Check inventory slots
 	var inventory_slots = []
-	if main_inventory_ui and main_inventory_ui.has_method("get_all_main_inventory_slots"):
-		# ObjectInventory case
-		inventory_slots = main_inventory_ui.get_all_main_inventory_slots()
-		print("Checking object inventory main slots, found ", inventory_slots.size(), " slots")
-	elif main_inventory_ui and main_inventory_ui.visible:
+	if main_inventory_ui and main_inventory_ui.visible:
 		# Regular MainInventory case
 		inventory_slots = get_all_slots_from_container(main_inventory_ui)
 		print("Checking main inventory slots, found ", inventory_slots.size(), " slots")
