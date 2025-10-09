@@ -125,16 +125,37 @@ func handle_object_to_inventory_drop(inventory_system, drop_target: Control):
 	var target_slot_data = InventoryManager.get_inventory_slot(drop_target.slot_index)
 	
 	if source_slot_data and target_slot_data:
-		# Move item from object to inventory
-		target_slot_data.item = source_slot_data.item
-		target_slot_data.quantity = source_slot_data.quantity
-		source_slot_data.clear()
+		if not target_slot_data.is_empty():
+			# Target slot has an item - check if we can swap
+			if not can_object_accept_item(target_slot_data.item):
+				print("Cannot swap: ", target_slot_data.item.name, " cannot be placed in ", current_object.name)
+				inventory_system.cancel_drag()
+				return
+		
+			# Swap items
+			var temp_item = target_slot_data.item
+			var temp_quantity = target_slot_data.quantity
+			
+			# Move item from object to inventory
+			target_slot_data.item = source_slot_data.item
+			target_slot_data.quantity = source_slot_data.quantity
+			
+			source_slot_data.item = temp_item
+			source_slot_data.quantity = temp_quantity
+			
+			print("Swapped items between object slot ", source_index, " and inventory slot ", drop_target.slot_index)
+		else:
+			# Target slot is empty - simple move
+			target_slot_data.item = source_slot_data.item
+			target_slot_data.quantity = source_slot_data.quantity
+			source_slot_data.clear()
+			
+			print("Moved item from object slot ", source_index, " to inventory slot ", drop_target.slot_index)
 		
 		# Update displays
 		update_object_slot_display(source_index)
 		InventoryManager.inventory_changed.emit()
-		
-		print("Moved item from object slot ", source_index, " to inventory slot ", drop_target.slot_index)
+
 	
 	inventory_system.remove_meta("dragging_from_object")
 	inventory_system.remove_meta("object_inventory")
