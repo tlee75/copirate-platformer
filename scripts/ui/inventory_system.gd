@@ -23,6 +23,8 @@ func _ready():
 	# This will be connected when added to the main scene
 	# Set process input to handle global mouse releases
 	set_process_input(true)
+	
+	add_to_group("inventory_system")
 
 func _input(event):
 	if event is InputEventMouseButton:
@@ -104,19 +106,35 @@ func find_slot_under_mouse():
 			if slot.get_global_rect().has_point(mouse_pos):
 				return slot
 
+	## Check inventory slots
+	#if main_inventory_ui and main_inventory_ui.visible:
+		#print("Checking inventory slots, found ", get_all_slots_from_container(main_inventory_ui).size(), " slots")
+		#var inventory_slots = get_all_slots_from_container(main_inventory_ui)
+		#for slot in inventory_slots:
+			#if slot.get_global_rect().has_point(mouse_pos):
+				#print("Found matching inventory slot: ", slot.slot_index)
+				#return slot
+	#else:
+		#if main_inventory_ui:
+			#print("Main inventory UI not visible or null: visible=", main_inventory_ui.visible)
+		#else:
+			#print("Main inventory UI not visible or null: visible=null")
+
 	# Check inventory slots
-	if main_inventory_ui and main_inventory_ui.visible:
-		print("Checking inventory slots, found ", get_all_slots_from_container(main_inventory_ui).size(), " slots")
-		var inventory_slots = get_all_slots_from_container(main_inventory_ui)
-		for slot in inventory_slots:
-			if slot.get_global_rect().has_point(mouse_pos):
-				print("Found matching inventory slot: ", slot.slot_index)
-				return slot
-	else:
-		if main_inventory_ui:
-			print("Main inventory UI not visible or null: visible=", main_inventory_ui.visible)
-		else:
-			print("Main inventory UI not visible or null: visible=null")
+	var inventory_slots = []
+	if main_inventory_ui and main_inventory_ui.has_method("get_all_main_inventory_slots"):
+		# ObjectInventory case
+		inventory_slots = main_inventory_ui.get_all_main_inventory_slots()
+		print("Checking object inventory main slots, found ", inventory_slots.size(), " slots")
+	elif main_inventory_ui and main_inventory_ui.visible:
+		# Regular MainInventory case
+		inventory_slots = get_all_slots_from_container(main_inventory_ui)
+		print("Checking main inventory slots, found ", inventory_slots.size(), " slots")
+	
+	for slot in inventory_slots:
+		if slot.get_global_rect().has_point(mouse_pos):
+			print("Found matching inventory slot: ", slot.slot_index)
+			return slot
 
 	return null
 
@@ -147,9 +165,37 @@ func _connect_weaponbar_signals():
 		return
 
 func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool, is_equipment: bool = false):
+	print("DEBUG: InventorySystem.start_drag called")
+	print("  - slot_index: ", slot_index)
+	print("  - is_hotbar: ", is_hotbar)
+	print("  - is_weaponbar: ", is_weaponbar)
+	print("  - is_equipment: ", is_equipment)
+	print("  - is_dragging (current): ", is_dragging)
+	
 	if is_dragging:
+		print("DEBUG: Already dragging, returning early")
 		return
 	
+	# ADD THIS NEW CHECK FOR OBJECT SLOTS:
+	var object_inventories = get_tree().get_nodes_in_group("object_inventory")
+	for obj_inv in object_inventories:
+		if obj_inv.visible:
+			var obj_slot_data = obj_inv.get_object_slot(slot_index)
+			if obj_slot_data and not obj_slot_data.is_empty():
+				print("DEBUG: Found object slot data, starting object drag")
+				is_dragging = true
+				drag_source_slot = slot_index
+				drag_source_is_hotbar = false
+				drag_source_is_weaponbar = false
+				drag_source_is_equipment = false
+				
+				set_meta("dragging_from_object", true)
+				set_meta("object_inventory", obj_inv)
+				
+				create_drag_preview(obj_slot_data)
+				print("Started dragging from object slot ", slot_index)
+				return
+				
 	var slot_data
 	if is_hotbar:
 		slot_data = InventoryManager.get_hotbar_slot(slot_index)

@@ -52,6 +52,10 @@ func _ready():
 	var resource_timer = $Resources/FiveSecondTimer
 	resource_manager.setup_timer(resource_timer)
 
+	# Create UI manager group
+	add_to_group("ui_manager")
+
+
 func _on_inventory_toggled(is_open: bool):
 	inventory_is_open = is_open
 	print("Inventory is now ", "open" if is_open else "closed")
@@ -134,3 +138,14 @@ func _on_respawn():
 func _close_menus_on_death(stat_name: String):
 	if stat_name == "health":
 		$UI/CraftingMenu.visible = false
+
+func open_object_inventory(object: Node2D, title: String, slot_count: int):
+	# Create or show object inventory UI
+	var object_inventory_ui = get_node_or_null("UI/ObjectInventory")
+	
+	if not object_inventory_ui:
+		# Create the UI if it doesn't exist
+		object_inventory_ui = preload("res://scenes/ui/object_inventory.tscn").instantiate()
+		$UI.add_child(object_inventory_ui)
+	
+	object_inventory_ui.open_object_inventory(object, title, slot_count)

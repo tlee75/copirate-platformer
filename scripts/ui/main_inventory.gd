@@ -3,7 +3,6 @@ extends Control
 # Main Inventory UI - the overlay that appears when pressing TAB
 # Contains 16 inventory slots in a 4x4 grid
 
-@onready var background: ColorRect = $Background
 @onready var inventory_panel: NinePatchRect = $InventoryPanel
 @onready var grid_container: GridContainer = $InventoryPanel/GridContainer
 
@@ -44,6 +43,9 @@ func _ready():
 	
 	# Connect to inventory manager
 	InventoryManager.inventory_changed.connect(_update_display)
+	
+	# Add to a group so other scripts can find it
+	add_to_group("main_inventory")
 	
 	# Initial display update
 	_update_display()

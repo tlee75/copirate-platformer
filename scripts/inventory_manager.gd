@@ -152,6 +152,18 @@ func _ready():
 	leafbandage_item.craft_requirements = {"Gold Coin": 1}
 	item_database["leafbandage"] = leafbandage_item
 
+	# Initialize item database with Stick
+	var stick_item = StickItem.new()
+	stick_item.name = "Stick"
+	stick_item.icon = load("res://assets/tropical/stick_01_48x64.png")
+	stick_item.stack_size = 99
+	stick_item.craftable = false
+	stick_item.category = "fuel"
+	stick_item.underwater_compatible = false
+	stick_item.land_compatible = true
+	stick_item.craft_requirements = {"Gold Coin": 1}
+	item_database["stick"] = stick_item
+
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
 func initialize_hotbar_slots(count: int):

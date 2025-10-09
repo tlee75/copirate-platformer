@@ -38,18 +38,47 @@ func _ready():
 		quantity_label.add_theme_constant_override("shadow_offset_x", 1)
 		quantity_label.add_theme_constant_override("shadow_offset_y", 1)
 
+#func _on_gui_input(event: InputEvent):
+	#if event is InputEventMouseButton:
+		#var mouse_event = event as InputEventMouseButton
+		#if mouse_event.button_index == MOUSE_BUTTON_LEFT:
+			#if mouse_event.pressed:
+				#slot_clicked.emit(slot_index, is_hotbar_slot)
+				#if slot_data and not slot_data.is_empty():
+					## Start drag through inventory system
+					#var inventory_system = get_inventory_system()
+					#if inventory_system:
+						#inventory_system.start_drag(slot_index, is_hotbar_slot, is_weapon_slot, is_equipment_slot)
+			## Mouse release is now handled by the inventory system globally
+
 func _on_gui_input(event: InputEvent):
 	if event is InputEventMouseButton:
 		var mouse_event = event as InputEventMouseButton
 		if mouse_event.button_index == MOUSE_BUTTON_LEFT:
 			if mouse_event.pressed:
+				print("DEBUG: Slot clicked - slot_index: ", slot_index, ", is_hotbar: ", is_hotbar_slot)
+				print("  - slot_data exists: ", slot_data != null)
+				if slot_data:
+					print("  - slot_data.is_empty(): ", slot_data.is_empty())
+					if not slot_data.is_empty():
+						print("  - slot_data.item: ", slot_data.item.name)
+						print("  - slot_data.quantity: ", slot_data.quantity)
+				
 				slot_clicked.emit(slot_index, is_hotbar_slot)
+				
 				if slot_data and not slot_data.is_empty():
+					print("DEBUG: Attempting to start drag...")
 					# Start drag through inventory system
 					var inventory_system = get_inventory_system()
 					if inventory_system:
+						print("DEBUG: Found inventory system, calling start_drag")
 						inventory_system.start_drag(slot_index, is_hotbar_slot, is_weapon_slot, is_equipment_slot)
+					else:
+						print("DEBUG: ERROR - No inventory system found!")
+				else:
+					print("DEBUG: Cannot start drag - slot is empty or slot_data is null")
 			# Mouse release is now handled by the inventory system globally
+
 
 func _on_mouse_entered():
 	if not slot_data or slot_data.is_empty():

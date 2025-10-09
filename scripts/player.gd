@@ -248,11 +248,10 @@ func handle_interact_or_use_action():
 		if not is_interacting:
 			if is_interactable_objects():
 				is_interacting = true
+				print("Interact used by %s" % self.name)
 				if is_underwater:
-					print("Gather used by %s" % self.name)
 					$AnimatedSprite2D.play("swim_gather")
 				else:
-					print("Interact used by %s" % self.name)
 					$AnimatedSprite2D.play("interact")
 				# Disconnect any existing connections first, then connect
 				if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
@@ -717,7 +716,9 @@ func is_interactable_objects():
 	
 	# Find first interactable target
 	for target in all_targets:
+		print(target)
 		if target != self and target.has_method("is_interactable") and target.is_interactable():
+			print("interactable")
 			interact_target = target
 			target.set_cooldown()
 			return true

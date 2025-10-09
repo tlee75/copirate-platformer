@@ -1,0 +1,90 @@
+[gd_scene load_steps=13 format=3 uid="uid://0iommeky2of"]
+
+[ext_resource type="Script" uid="uid://boqr3ta55nrok" path="res://scripts/structures/firepit.gd" id="1_t4sau"]
+[ext_resource type="Texture2D" uid="uid://fi3kfmq2h60w" path="res://assets/structures/firepit_01-sheet.png" id="2_t4sau"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ykup0"]
+atlas = ExtResource("2_t4sau")
+region = Rect2(240, 0, 240, 250)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_urpur"]
+atlas = ExtResource("2_t4sau")
+region = Rect2(480, 0, 240, 250)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2mk83"]
+atlas = ExtResource("2_t4sau")
+region = Rect2(0, 250, 240, 250)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qntky"]
+atlas = ExtResource("2_t4sau")
+region = Rect2(240, 250, 240, 250)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_go0dj"]
+atlas = ExtResource("2_t4sau")
+region = Rect2(480, 250, 240, 250)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iu835"]
+atlas = ExtResource("2_t4sau")
+region = Rect2(0, 500, 240, 250)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t1gec"]
+atlas = ExtResource("2_t4sau")
+region = Rect2(240, 500, 240, 250)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vpxia"]
+atlas = ExtResource("2_t4sau")
+region = Rect2(0, 0, 240, 250)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_gp8tl"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ykup0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_urpur")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2mk83")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qntky")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_go0dj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iu835")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t1gec")
+}],
+"loop": true,
+"name": &"burning",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vpxia")
+}],
+"loop": false,
+"name": &"unlit",
+"speed": 1.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t4sau"]
+size = Vector2(216, 130)
+
+[node name="Firepit" type="Node2D"]
+scale = Vector2(0.25, 0.25)
+script = ExtResource("1_t4sau")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_gp8tl")
+animation = &"unlit"
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0, 43)
+shape = SubResource("RectangleShape2D_t4sau")
