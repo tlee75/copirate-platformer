@@ -33,21 +33,6 @@ func _ready():
 	
 	hide()
 
-#func _input(event):
-	#if not visible:
-		#return
-		#
-	#if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-		## Handle mouse release for drag and drop
-		#var inventory_system = get_inventory_system()
-		#if inventory_system and inventory_system.is_dragging:
-			#var mouse_pos = get_viewport().get_mouse_position()
-			#var drop_target = find_inventory_slot_under_mouse(mouse_pos)
-			#if drop_target:
-				#print("Found drop target in object inventory: slot ", drop_target.slot_index)
-				#inventory_system.end_drag(drop_target.slot_index, drop_target.is_hotbar_slot, drop_target.is_weapon_slot, false)
-				#get_viewport().set_input_as_handled()
-
 func _input(event):
 	if not visible:
 		return
@@ -73,25 +58,6 @@ func _input(event):
 				
 				
 				get_viewport().set_input_as_handled()
-
-#func handle_object_drop(inventory_system, drop_target: Control):
-	#var object_slot_index = drop_target.get_meta("object_slot_index")
-	#var source_slot_data = InventoryManager.get_inventory_slot(inventory_system.drag_source_slot)
-	#var target_slot_data = get_object_slot(object_slot_index)
-	#
-	#if source_slot_data and target_slot_data:
-		## Move item to object inventory
-		#target_slot_data.item = source_slot_data.item
-		#target_slot_data.quantity = source_slot_data.quantity
-		#source_slot_data.clear()
-		#
-		## Update displays
-		#drop_target.update_display(target_slot_data)
-		#InventoryManager.inventory_changed.emit()
-		#
-		#print("Moved item to object slot ", object_slot_index)
-	#
-	#inventory_system.cleanup_drag()
 
 func handle_object_drop(inventory_system, drop_target: Control):
 	var object_slot_index = drop_target.get_meta("object_slot_index")
@@ -190,18 +156,11 @@ func find_inventory_slot_under_mouse(mouse_pos: Vector2) -> Control:
 func get_inventory_system():
 	var systems = get_tree().get_nodes_in_group("inventory_system")
 	return systems[0] if systems.size() > 0 else null
-	#if systems.size() > 0:
-		#inventory_system_reference = systems[0]
-		#return inventory_system_reference
-	#
-	#return null
 
 func open_object_inventory(object: Node2D, title: String, slot_count: int):
 	current_object = object
 	object_title_label.text = title
-	
-	# Get inventory system reference
-	#inventory_system_reference = get_inventory_system()
+
 	
 	# Get reference to the object's actual inventory data
 	var interactive_object = null
@@ -240,7 +199,6 @@ func setup_object_slots(slot_count: int):
 	
 	# Create new slots
 	for i in slot_count:
-		#object_slots.append(InventoryManager.InventorySlotData.new())
 		
 		# Create slot UI (reuse your existing inventory slot scene)
 		var slot_scene = preload("res://scenes/ui/inventory_slot.tscn").instantiate()
@@ -248,9 +206,6 @@ func setup_object_slots(slot_count: int):
 		slot_scene.is_hotbar_slot = false
 		slot_scene.set_meta("is_object_slot", true)
 		slot_scene.set_meta("object_slot_index", i)
-		
-		#if slot_scene.has_signal("drag_started"):
-			#slot_scene.drag_started.connect(_on_object_slot_drag_started.bind(i))
 		
 		slot_scenes.append(slot_scene)
 		object_slots_container.add_child(slot_scene)
@@ -264,17 +219,6 @@ func setup_object_slots(slot_count: int):
 
 		# Ensure the slot knows about its data
 		slot_scene.slot_data = object_slots[i]
-
-
-		## ADD DEBUGGING:
-		#print("DEBUG: Created object slot ", i)
-		#print("  - slot_scene.slot_index: ", slot_scene.slot_index)
-		#print("  - slot_scene.slot_data: ", slot_scene.slot_data)
-		#print("  - object_slots[", i, "]: ", object_slots[i])
-		#print("  - object_slots[", i, "].is_empty(): ", object_slots[i].is_empty())
-		#if not object_slots[i].is_empty():
-			#print("  - object_slots[", i, "].item: ", object_slots[i].item.name)
-			#print("  - object_slots[", i, "].quantity: ", object_slots[i].quantity)
 
 func setup_main_inventory():
 	# Clear existing display
@@ -301,33 +245,6 @@ func setup_main_inventory():
 	
 	print("Created inventory display connected to InventoryManager")
 
-
-
-#func setup_main_inventory():
-	## Find main inventory using groups
-	#var main_inventory_nodes = get_tree().get_nodes_in_group("main_inventory")
-	#if main_inventory_nodes.is_empty():
-		#print("No main inventory found in group")
-		#return
-#
-	#var main_inventory_node = main_inventory_nodes[0]
-	#var main_inventory_panel = main_inventory_node.get_node("InventoryPanel")
-	#if main_inventory_panel:
-		## Clear existing display
-		#for child in main_inventory_container.get_children():
-			#child.queue_free()
-#
-		## Clone the inventory panel instead of moving it
-		#var cloned_panel = main_inventory_panel.duplicate()
-		#main_inventory_container.add_child(cloned_panel)
-#
-		## The cloned slots should automatically connect to InventoryManager
-		## and display the same data since they use the same script
-		#print("Cloned main inventory panel to object inventory")
-	#else:
-		#print("Could not find MainInventory InventoryPanel")
-
-
 func _on_object_slot_clicked(slot_index: int, _is_hotbar: bool, _extra_param = null):
 	print("DEBUG: Object slot ", slot_index, " clicked!")
 	print("  - Object slot has data: ", get_object_slot(slot_index) != null)
@@ -339,26 +256,6 @@ func _on_object_slot_clicked(slot_index: int, _is_hotbar: bool, _extra_param = n
 	
 	# Handle clicking on object inventory slots
 	print("Object slot ", slot_index, " clicked")
-
-#func _on_object_slot_drag_started(slot_index: int, _is_hotbar: bool, _extra_params = null):
-	## Handle dragging from object inventory slots
-	#var inventory_system = get_inventory_system()
-	#if inventory_system:
-		#var slot_data = get_object_slot(slot_index)
-		#if slot_data and not slot_data.is_empty():
-			## Setup custom drag for object slots
-			#inventory_system.is_dragging = true
-			#inventory_system.drag_source_slot = slot_index
-			#inventory_system.drag_source_is_hotbar = false
-			#inventory_system.drag_source_is_weaponbar = false
-			#inventory_system.drag_source_is_equipment = false
-			#
-			## Mark this as object slot drag
-			#inventory_system.set_meta("dragging_from_object", true)
-			#inventory_system.set_meta("object_inventory", self)
-			#
-			#inventory_system.create_drag_preview(slot_data)
-			#print("Started dragging from object slot ", slot_index)
 
 func _on_main_slot_clicked(slot_index: int, _is_hotbar: bool):
 	# Handle clicking on main inventory slots
@@ -396,13 +293,6 @@ func _on_main_inventory_changed():
 			var slot_data = InventoryManager.get_inventory_slot(i)
 			if slot_data and slot_scene.has_method("update_display"):
 				slot_scene.update_display(slot_data)
-
-#func get_all_main_inventory_slots() -> Array:
-	#var slots = []
-	#for child in main_inventory_container.get_children():
-		#if child.has_method("update_display"):
-			#slots.append(child)
-	#return slots
 
 func can_object_accept_item(item: GameItem) -> bool:
 	if not current_object:

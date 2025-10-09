@@ -106,20 +106,6 @@ func find_slot_under_mouse():
 			if slot.get_global_rect().has_point(mouse_pos):
 				return slot
 
-	## Check inventory slots
-	#if main_inventory_ui and main_inventory_ui.visible:
-		#print("Checking inventory slots, found ", get_all_slots_from_container(main_inventory_ui).size(), " slots")
-		#var inventory_slots = get_all_slots_from_container(main_inventory_ui)
-		#for slot in inventory_slots:
-			#if slot.get_global_rect().has_point(mouse_pos):
-				#print("Found matching inventory slot: ", slot.slot_index)
-				#return slot
-	#else:
-		#if main_inventory_ui:
-			#print("Main inventory UI not visible or null: visible=", main_inventory_ui.visible)
-		#else:
-			#print("Main inventory UI not visible or null: visible=null")
-
 	# Check inventory slots
 	var inventory_slots = []
 	if main_inventory_ui and main_inventory_ui.has_method("get_all_main_inventory_slots"):
@@ -164,19 +150,10 @@ func _connect_weaponbar_signals():
 	if not weaponbar_ui:
 		return
 
-func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool, is_equipment: bool = false):
-	print("DEBUG: InventorySystem.start_drag called")
-	print("  - slot_index: ", slot_index)
-	print("  - is_hotbar: ", is_hotbar)
-	print("  - is_weaponbar: ", is_weaponbar)
-	print("  - is_equipment: ", is_equipment)
-	print("  - is_dragging (current): ", is_dragging)
-	
+func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool, is_equipment: bool = false):	
 	if is_dragging:
-		print("DEBUG: Already dragging, returning early")
 		return
 	
-	# ADD THIS NEW CHECK FOR OBJECT SLOTS:
 	var object_inventories = get_tree().get_nodes_in_group("object_inventory")
 	for obj_inv in object_inventories:
 		if obj_inv.visible:
