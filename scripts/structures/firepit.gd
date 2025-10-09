@@ -22,7 +22,7 @@ func _ready():
 	interactive_object = InteractiveObject.new()
 	interactive_object.object_name = "Firepit"
 	interactive_object.inventory_slots = 6
-	interactive_object.accepted_categories = ["tool"] # Only accept fuel items
+	interactive_object.accepted_categories = ["fuel"] # Only accept fuel items
 	add_child(interactive_object)
 
 	# Connect to ResourceManager for fuel consumption

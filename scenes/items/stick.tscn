@@ -1,0 +1,32 @@
+[gd_scene load_steps=6 format=3 uid="uid://ckk3o0r7wv6tc"]
+
+[ext_resource type="Script" uid="uid://cnt0uxtpajki6" path="res://scripts/items/stick.gd" id="1_jknlk"]
+[ext_resource type="Texture2D" uid="uid://bvhsc2mo15fji" path="res://assets/tropical/stick_01_48x64.png" id="2_7rqfo"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tkx6t"]
+atlas = ExtResource("2_7rqfo")
+region = Rect2(0, 0, 48, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hhyfn"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tkx6t")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 1.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qge5b"]
+
+[node name="Stick" type="Area2D"]
+scale = Vector2(0.4, 0.4)
+script = ExtResource("1_jknlk")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_hhyfn")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_qge5b")
