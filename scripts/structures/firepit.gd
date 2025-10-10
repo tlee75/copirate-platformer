@@ -9,6 +9,8 @@ enum ObjectState { UNLIT, BURNING }
 var state: int = ObjectState.UNLIT
 var current_burn_time: float = 0.0  # Time left for current burning item
 var resource_manager: ResourceManager
+var cooking_slots: Array[Dictionary] = []  # Track what's cooking in each slot
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -21,7 +23,7 @@ func _ready():
 	interactive_object = InteractiveObject.new()
 	interactive_object.object_name = "Firepit"
 	interactive_object.inventory_slots = 6
-	interactive_object.accepted_categories = ["fuel"] # Only accept fuel items
+	interactive_object.accepted_categories = ["fuel", "food"]
 	add_child(interactive_object)
 
 	# Connect to ResourceManager for fuel consumption
@@ -100,6 +102,8 @@ func _on_fuel_tick():
 	if state == ObjectState.BURNING and current_burn_time > 0:
 		var time_elapsed = resource_manager.resource_timer.wait_time
 		consume_fuel_time(time_elapsed)
+		# Process cooking for all items
+		process_cooking(time_elapsed)
 
 func consume_fuel_time(amount: float):
 	current_burn_time -= amount
@@ -112,7 +116,71 @@ func consume_fuel_time(amount: float):
 		# If there was remaining time to consume, apply it to new item
 		elif current_burn_time < 0:
 			consume_fuel_time(abs(current_burn_time))
-			
+
+# Add this new function for cooking logic:
+func process_cooking(delta_time: float):
+	# Go through each slot in the firepit inventory
+	for i in range(interactive_object.object_menu.size()):
+		var slot = interactive_object.object_menu[i]
+		
+		# Skip empty slots or non-cookable items
+		if slot.is_empty() or not slot.item.is_cookable:
+			continue
+		
+		# Initialize cooking data for this slot if needed
+		if cooking_slots.size() <= i:
+			cooking_slots.resize(i + 1)
+		
+		if cooking_slots[i] == null:
+			cooking_slots[i] = {}
+		
+		# Start cooking if not already cooking
+		if not cooking_slots[i].has("cook_progress"):
+			cooking_slots[i]["cook_progress"] = 0.0
+			cooking_slots[i]["total_cook_time"] = slot.item.cook_time
+			print("Started cooking ", slot.item.name, " (", slot.item.cook_time, "s)")
+		
+		# Update cooking progress
+		cooking_slots[i]["cook_progress"] += delta_time
+		
+		# Check if item is done cooking
+		if cooking_slots[i]["cook_progress"] >= cooking_slots[i]["total_cook_time"]:
+			cook_item_complete(i)
+
+# Add this function to handle completed cooking:
+func cook_item_complete(slot_index: int):
+	var slot = interactive_object.object_menu[slot_index]
+	if slot.is_empty():
+		return
+	
+	var raw_item = slot.item
+	var cooked_item_name = raw_item.cooked_result_item_name
+	
+	if cooked_item_name == "":
+		print("Warning: ", raw_item.name, " has no cooked result defined!")
+		return
+	
+	# Get the cooked item from inventory manager
+	if InventoryManager.item_database.has(cooked_item_name):
+		var cooked_item = InventoryManager.item_database[cooked_item_name]
+		
+		# Replace the raw item with cooked item
+		slot.item = cooked_item
+		print("Finished cooking ", raw_item.name, " -> ", cooked_item.name)
+		
+		# Clear cooking progress
+		if cooking_slots.size() > slot_index:
+			cooking_slots[slot_index] = {}
+		
+		# Update UI if object menu is open
+		var object_menus = get_tree().get_nodes_in_group("object_menu")
+		for obj_menu in object_menus:
+			if obj_menu.visible and obj_menu.current_object == self:
+				obj_menu.update_object_slot_display(slot_index)
+				break
+	else:
+		print("Error: Cooked item '", cooked_item_name, "' not found in item database!")
+
 func set_cooldown():
 	pass
 

@@ -134,11 +134,26 @@ func _ready():
 	raspberry_item.icon = load("res://assets/tropical/raspberry_icon_01.png")
 	raspberry_item.stack_size = 99
 	raspberry_item.craftable = false
-	raspberry_item.category = "consumable"
+	raspberry_item.category = "food"
 	raspberry_item.underwater_compatible = false
 	raspberry_item.land_compatible = true
 	raspberry_item.craft_requirements = {"Gold Coin": 1}
+	raspberry_item.is_cookable = true
+	raspberry_item.cook_time = 2.0
+	raspberry_item.cooked_result_item_name = "cooked_raspberry"
 	item_database["raspberry"] = raspberry_item
+
+	# Initialize item database with CookedRaspBerry
+	var cooked_raspberry_item = CookedRaspberryItem.new()
+	cooked_raspberry_item.name = "Cooked Raspberry"
+	cooked_raspberry_item.icon = load("res://assets/tropical/raspberry_icon_01.png")
+	cooked_raspberry_item.stack_size = 99
+	cooked_raspberry_item.craftable = false
+	cooked_raspberry_item.category = "food"
+	cooked_raspberry_item.underwater_compatible = false
+	cooked_raspberry_item.land_compatible = true
+	cooked_raspberry_item.craft_requirements = {"Gold Coin": 1}
+	item_database["cooked_raspberry"] = cooked_raspberry_item
 
 	# Initialize item database with Leaf Bandage
 	var leafbandage_item = LeafBandageItem.new()

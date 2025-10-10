@@ -10,6 +10,9 @@ class_name GameItem
 @export var craft_requirements: Dictionary = {}
 @export var underwater_compatible: bool = false
 @export var land_compatible: bool = true
+@export var is_cookable: bool = false
+@export var cook_time: float = 0.0  # Time in seconds to cook
+@export var cooked_result_item_name: String = ""  # What this item becomes when cooked
 
 func is_consumable() -> bool:
 	return false
