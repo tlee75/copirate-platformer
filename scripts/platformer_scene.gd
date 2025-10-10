@@ -6,7 +6,7 @@ extends Node2D
 @onready var ui_layer: CanvasLayer = $UI
 @onready var hotbar = $UI/Hotbar
 @onready var weaponbar = $UI/WeaponBar
-@onready var crafting_menu: Control = $UI/PlayerMenu
+@onready var player_menu: Control = $UI/PlayerMenu
 @onready var main_inventory: Control =  $UI/PlayerMenu/TabBar/InventoryTab/MainInventory
 @onready var inventory_system: Node = $UI/InventorySystem
 @onready var player: CharacterBody2D = $Player
@@ -72,24 +72,24 @@ func _input(event):
 		var key_event = event as InputEventKey
 		if key_event.pressed:
 			if key_event.keycode == KEY_TAB or key_event.keycode == KEY_ESCAPE:
-				# Check if object inventory is open first (priority over craft menu)
-				var object_inventories = get_tree().get_nodes_in_group("object_inventory")
-				var object_inventory_closed = false
+				# Check if object menu is open first (priority over player menu)
+				var object_menus = get_tree().get_nodes_in_group("object_menu")
+				var object_menu_closed = false
 				
-				for obj_inv in object_inventories:
-					if obj_inv.visible:
-						obj_inv.close_inventory()
-						object_inventory_closed = true
+				for obj_menu in object_menus:
+					if obj_menu.visible:
+						obj_menu.close_inventory()
+						object_menu_closed = true
 						break
 				
 				# If no object inventory was closed, handle normal Tab/Escape behavior
-				if not object_inventory_closed:
+				if not object_menu_closed:
 					if key_event.keycode == KEY_TAB:
 						# TAB toggles the combined menu open/closed
-						crafting_menu.visible = not crafting_menu.visible
+						player_menu.visible = not player_menu.visible
 					elif key_event.keycode == KEY_ESCAPE:
-						if crafting_menu.visible:
-							crafting_menu.visible = false
+						if player_menu.visible:
+							player_menu.visible = false
 						else:
 							pause_menu.show()
 							get_tree().paused = true
@@ -150,13 +150,13 @@ func _close_menus_on_death(stat_name: String):
 	if stat_name == "health":
 		$UI/PlayerMenu.visible = false
 
-func open_object_inventory(object: Node2D, title: String, slot_count: int):
+func open_object_menu(object: Node2D, title: String, slot_count: int):
 	# Create or show object inventory UI
-	var object_inventory_ui = get_node_or_null("UI/ObjectMenu")
+	var object_menu_ui = get_node_or_null("UI/ObjectMenu")
 	
-	if not object_inventory_ui:
+	if not object_menu_ui:
 		# Create the UI if it doesn't exist
-		object_inventory_ui = preload("res://scenes/ui/object_inventory.tscn").instantiate()
-		$UI.add_child(object_inventory_ui)
+		object_menu_ui = preload("res://scenes/ui/object_menu.tscn").instantiate()
+		$UI.add_child(object_menu_ui)
 	
-	object_inventory_ui.open_object_inventory(object, title, slot_count)
+	object_menu_ui.open_object_menu(object, title, slot_count)

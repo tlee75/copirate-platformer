@@ -9,7 +9,7 @@ class_name InteractiveObject
 @export var inventory_slots: int = 6
 @export var accepted_categories: Array[String] = [] # What item categories this object accepts
 
-var object_inventory: Array[InventoryManager.InventorySlotData] = []
+var object_menu: Array[InventoryManager.InventorySlotData] = []
 var ui_manager: Node
 
 signal inventory_changed
@@ -26,13 +26,13 @@ func _ready():
 		print("Warning: UI Manager still not found after waiting")
 
 func initialize_inventory():
-	object_inventory.clear()
+	object_menu.clear()
 	for i in inventory_slots:
-		object_inventory.append(InventoryManager.InventorySlotData.new())
+		object_menu.append(InventoryManager.InventorySlotData.new())
 
 func interact():
-	if ui_manager and ui_manager.has_method("open_object_inventory"):
-		ui_manager.open_object_inventory(get_parent(), object_name, inventory_slots)
+	if ui_manager and ui_manager.has_method("open_object_menu"):
+		ui_manager.open_object_menu(get_parent(), object_name, inventory_slots)
 	else:
 		print("UI Manager not found!")
 
@@ -50,7 +50,7 @@ func add_item_to_object(item: GameItem, quantity: int = 1) -> int:
 		return remaining
 	
 	# Try to add to existing stacks
-	for slot in object_inventory:
+	for slot in object_menu:
 		if not slot.is_empty() and slot.item.name == item.name:
 			remaining = slot.add_item(item, remaining)
 			if remaining <= 0:
@@ -58,7 +58,7 @@ func add_item_to_object(item: GameItem, quantity: int = 1) -> int:
 				return 0
 	
 	# Try to add to empty slots
-	for slot in object_inventory:
+	for slot in object_menu:
 		if slot.is_empty():
 			remaining = slot.add_item(item, remaining)
 			if remaining <= 0:
@@ -69,8 +69,8 @@ func add_item_to_object(item: GameItem, quantity: int = 1) -> int:
 	return remaining
 
 func get_object_slot(index: int) -> InventoryManager.InventorySlotData:
-	if index >= 0 and index < object_inventory.size():
-		return object_inventory[index]
+	if index >= 0 and index < object_menu.size():
+		return object_menu[index]
 	return null
 
 func on_inventory_closed():

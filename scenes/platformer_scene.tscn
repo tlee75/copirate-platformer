@@ -13,7 +13,7 @@
 [ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://scripts/ui/inventory_system.gd" id="8_q5qfs"]
 [ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://scenes/ui/pause_menu.tscn" id="9_btm0u"]
 [ext_resource type="PackedScene" uid="uid://o5dk1uupyfxt" path="res://scenes/ui/weaponbar.tscn" id="10_mwf8c"]
-[ext_resource type="PackedScene" uid="uid://k0kkh12kws3d" path="res://scenes/ui/crafting_menu.tscn" id="10_xoih0"]
+[ext_resource type="PackedScene" uid="uid://k0kkh12kws3d" path="res://scenes/ui/player_menu.tscn" id="10_xoih0"]
 [ext_resource type="Script" uid="uid://covte3n64vx2f" path="res://scripts/ui/crafting_menu.gd" id="11_mx3pc"]
 [ext_resource type="Script" uid="uid://dbkq1bkntxiv1" path="res://scripts/ui/weaponbar.gd" id="11_rgya6"]
 [ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://scripts/ui/depth_counter.gd" id="14_atnpy"]

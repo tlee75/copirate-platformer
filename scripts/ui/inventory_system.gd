@@ -150,10 +150,10 @@ func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool, is_equipme
 	if is_dragging:
 		return
 	
-	var object_inventories = get_tree().get_nodes_in_group("object_inventory")
-	for obj_inv in object_inventories:
-		if obj_inv.visible:
-			var obj_slot_data = obj_inv.get_object_slot(slot_index)
+	var object_menus = get_tree().get_nodes_in_group("object_menu")
+	for obj_menu in object_menus:
+		if obj_menu.visible:
+			var obj_slot_data = obj_menu.get_object_slot(slot_index)
 			if obj_slot_data and not obj_slot_data.is_empty():
 				print("DEBUG: Found object slot data, starting object drag")
 				is_dragging = true
@@ -163,7 +163,7 @@ func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool, is_equipme
 				drag_source_is_equipment = false
 				
 				set_meta("dragging_from_object", true)
-				set_meta("object_inventory", obj_inv)
+				set_meta("object_menu", obj_menu)
 				
 				create_drag_preview(obj_slot_data)
 				print("Started dragging from object slot ", slot_index)
@@ -198,8 +198,8 @@ func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: boo
 
 	# Handle dragging FROM object inventory
 	if has_meta("dragging_from_object") and get_meta("dragging_from_object"):
-		var object_inventory = get_meta("object_inventory")
-		var source_slot_data = object_inventory.get_object_slot(drag_source_slot)
+		var object_menu = get_meta("object_menu")
+		var source_slot_data = object_menu.get_object_slot(drag_source_slot)
 		
 		var target_slot_data
 		if target_is_hotbar:
@@ -213,8 +213,8 @@ func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: boo
 			# Check if target slot is occupied for swapping
 			if not target_slot_data.is_empty():
 				# Before swapping, validate that the target item can go into the object inventory
-				if not object_inventory.can_object_accept_item(target_slot_data.item):
-					print("Cannot swap: ", target_slot_data.item.name, " (", target_slot_data.item.category, ") is not accepted by ", object_inventory.current_object.name)
+				if not object_menu.can_object_accept_item(target_slot_data.item):
+					print("Cannot swap: ", target_slot_data.item.name, " (", target_slot_data.item.category, ") is not accepted by ", object_menu.current_object.name)
 					cleanup_drag()
 					return
 				
@@ -238,7 +238,7 @@ func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: boo
 				print("Moved item from object slot ", drag_source_slot, " to ", "hotbar" if target_is_hotbar else "inventory", " slot ", target_slot)
 			
 			# Update displays
-			object_inventory.update_object_slot_display(drag_source_slot)
+			object_menu.update_object_slot_display(drag_source_slot)
 			if target_is_hotbar:
 				InventoryManager.hotbar_changed.emit()
 			elif target_is_weaponbar:
@@ -246,12 +246,12 @@ func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: boo
 			else:
 				InventoryManager.inventory_changed.emit()
 				# Also update the object inventory UI's main inventory display
-				if object_inventory.has_method("_on_main_inventory_changed"):
-					object_inventory._on_main_inventory_changed()
+				if object_menu.has_method("_on_main_inventory_changed"):
+					object_menu._on_main_inventory_changed()
 				
 		# Clean up object metadata
 		set_meta("dragging_from_object", false)
-		set_meta("object_inventory", null)
+		set_meta("object_menu", null)
 		cleanup_drag()
 		return
 
@@ -303,8 +303,8 @@ func cleanup_drag():
 	# Clean up any object inventory metadata
 	if has_meta("dragging_from_object"):
 		remove_meta("dragging_from_object")
-	if has_meta("object_inventory"):
-		remove_meta("object_inventory")
+	if has_meta("object_menu"):
+		remove_meta("object_menu")
 	
 	if drag_preview:
 		drag_preview.queue_free()

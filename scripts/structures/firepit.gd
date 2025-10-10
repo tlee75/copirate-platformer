@@ -51,7 +51,7 @@ func _on_firepit_inventory_changed():
 func calculate_fuel_from_inventory():
 	var total_fuel = 0.0
 	
-	for slot in interactive_object.object_inventory:
+	for slot in interactive_object.object_menu:
 		if not slot.is_empty() and slot.item.category == "fuel":
 			var fuel_per_item = 10.0 # Default
 			if slot.item.has_method("get_fuel_value"):
@@ -83,7 +83,7 @@ func consume_fuel_from_inventory(amount: float):
 	var remaining_to_consume = amount
 	
 	# Consume fuel from inventory slots
-	for slot in interactive_object.object_inventory:
+	for slot in interactive_object.object_menu:
 		if slot.is_empty() or slot.item.category != "fuel":
 			continue
 		

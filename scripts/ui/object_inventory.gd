@@ -20,7 +20,7 @@ func _ready():
 	object_title_label = $HBoxContainer/ObjectPanel/VBoxContainer/TitleLabel
 	close_button = $HBoxContainer/ObjectPanel/VBoxContainer/CloseButton
 	
-	add_to_group("object_inventory")
+	add_to_group("object_menu")
 	
 	if close_button:
 		close_button.pressed.connect(_on_close_pressed)
@@ -87,7 +87,7 @@ func handle_object_drop(inventory_system, drop_target: Control):
 			print("Swapped object slots ", source_index, " and ", object_slot_index)
 		
 		inventory_system.remove_meta("dragging_from_object")
-		inventory_system.remove_meta("object_inventory")
+		inventory_system.remove_meta("object_menu")
 	else:
 		# Dragging FROM inventory/hotbar TO object slot
 		var source_slot_data
@@ -125,10 +125,7 @@ func handle_object_drop(inventory_system, drop_target: Control):
 				source_slot_data.clear()
 				
 				print("Moved item to object slot ", object_slot_index)
-				print("DEBUG: Data after move - target_slot_data.item: ", target_slot_data.item.name if target_slot_data.item else "null")
-				print("DEBUG: Data after move - target_slot_data.quantity: ", target_slot_data.quantity)
-				print("DEBUG: Data after move - object_slots[", object_slot_index, "].item: ", object_slots[object_slot_index].item.name if object_slots[object_slot_index].item else "null")
-			
+				
 			# Update displays
 			update_object_slot_display(object_slot_index)
 					
@@ -191,7 +188,7 @@ func handle_object_to_inventory_drop(inventory_system, drop_target: Control):
 
 	
 	inventory_system.remove_meta("dragging_from_object")
-	inventory_system.remove_meta("object_inventory")
+	inventory_system.remove_meta("object_menu")
 	inventory_system.cleanup_drag()
 
 func find_inventory_slot_under_mouse(mouse_pos: Vector2) -> Control:
@@ -211,7 +208,7 @@ func get_inventory_system():
 	var systems = get_tree().get_nodes_in_group("inventory_system")
 	return systems[0] if systems.size() > 0 else null
 
-func open_object_inventory(object: Node2D, title: String, slot_count: int):
+func open_object_menu(object: Node2D, title: String, slot_count: int):
 	current_object = object
 	object_title_label.text = title
 
@@ -224,11 +221,11 @@ func open_object_inventory(object: Node2D, title: String, slot_count: int):
 			break
 			
 	if interactive_object:
-		object_slots = interactive_object.object_inventory
+		object_slots = interactive_object.object_menu
 		print("DEBUG: Connected to InteractiveObject inventory")
-		print("  - object_inventory size: ", interactive_object.object_inventory.size())
-		for i in range(interactive_object.object_inventory.size()):
-			var slot = interactive_object.object_inventory[i]
+		print("  - object_menu size: ", interactive_object.object_menu.size())
+		for i in range(interactive_object.object_menu.size()):
+			var slot = interactive_object.object_menu[i]
 			print("  - slot[", i, "]: ", "empty" if slot.is_empty() else slot.item.name + " x" + str(slot.quantity))
 	else:
 		print("DEBUG: No InteractiveObject found, creating local slots")
