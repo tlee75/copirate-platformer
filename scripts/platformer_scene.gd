@@ -95,7 +95,7 @@ func _input(event):
 						else:
 							pause_menu.show()
 							get_tree().paused = true
-
+	
 				get_viewport().set_input_as_handled()
 				
 	elif event is InputEventMouseButton:

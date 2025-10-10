@@ -6,6 +6,7 @@ class_name ObjectMenu
 @onready var main_inventory_container: GridContainer
 @onready var object_title_label: Label
 @onready var close_button: Button
+@onready var light_button: Button
 
 var current_object: Node2D
 var object_slots: Array[InventoryManager.InventorySlotData] = []
@@ -19,11 +20,15 @@ func _ready():
 	main_inventory_container = $HBoxContainer/PlayerPanel/VBoxContainer/SlotsGrid
 	object_title_label = $HBoxContainer/ObjectPanel/VBoxContainer/TitleLabel
 	close_button = $HBoxContainer/ObjectPanel/VBoxContainer/CloseButton
+	light_button = $HBoxContainer/ObjectPanel/VBoxContainer/LightButton
 	
 	add_to_group("object_menu")
 	
 	if close_button:
 		close_button.pressed.connect(_on_close_pressed)
+	
+	if light_button:
+		light_button.pressed.connect(_on_light_pressed)
 	
 	# Connect to inventory changes to update main inventory display
 	InventoryManager.inventory_changed.connect(_on_main_inventory_changed)
@@ -322,17 +327,22 @@ func _on_main_slot_clicked(slot_index: int, _is_hotbar: bool):
 	# Handle clicking on main inventory slots
 	print("Main inventory slot ", slot_index, " clicked")
 
+# Recives the 'pressed' signal from CloseButton
 func _on_close_pressed():
 	close_inventory()
 
+# Receive the pressed signal from LightButton and calls the light fire function in firepit.gd
+func _on_light_pressed():
+	if current_object and current_object.has_method("light_fire"):
+		print("Attempting to light ", current_object.name)
+		current_object.light_fire()
+	else:
+		print("Cannot light - no valid object or light_fire method missing")
 
 func close_inventory():
 	# Cleanup cloned inventory display
 	for child in main_inventory_container.get_children():
 		child.queue_free()
-	
-	if current_object and current_object.has_method("on_inventory_closed"):
-		current_object.on_inventory_closed()
 	
 	hide()
 	#is_visible_flag = false

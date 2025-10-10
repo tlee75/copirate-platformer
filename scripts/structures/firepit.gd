@@ -1,6 +1,5 @@
 extends Node2D
 
-@export var extinguish_time: float = 30.0 
 @export var max_fuel: float = 300.0 # Max fuel storage
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -8,7 +7,7 @@ extends Node2D
 
 enum ObjectState { UNLIT, BURNING }
 var state: int = ObjectState.UNLIT
-var fuel_remaining: float = 0.0
+var current_burn_time: float = 0.0  # Time left for current burning item
 var resource_manager: ResourceManager
 
 # Called when the node enters the scene tree for the first time.
@@ -26,15 +25,19 @@ func _ready():
 	add_child(interactive_object)
 
 	# Connect to ResourceManager for fuel consumption
+	# Connect to ResourceManager for fuel consumption (with retry)
 	await get_tree().process_frame
+	_connect_to_resource_manager()
+
+func _connect_to_resource_manager():
 	resource_manager = get_tree().get_first_node_in_group("resource_manager")
-	if resource_manager:
+	if resource_manager and resource_manager.resource_timer:
 		resource_manager.resource_timer.timeout.connect(_on_fuel_tick)
-	
-	# Connect to inventory changes
-	interactive_object.inventory_changed.connect(_on_firepit_inventory_changed)
-		
-	print("Firepit ready - Fuel: ", fuel_remaining, "/", max_fuel)
+		print("DEBUG: Successfully connected firepit to ResourceManager timer")
+	else:
+		print("DEBUG: ResourceManager not ready, retrying in 0.1 seconds...")
+		await get_tree().create_timer(0.1).timeout
+		_connect_to_resource_manager()
 
 func is_interactable() -> bool:
 	return true
@@ -45,12 +48,13 @@ func interact():
 	interactive_object.interact()
 
 func _on_firepit_inventory_changed():
-	# Recalculate fuel when inventory changes
-	calculate_fuel_from_inventory()
+	# If fire is burning but no current burn time, try to start burning something
+	if state == ObjectState.BURNING and current_burn_time <= 0:
+		if not start_burning_next_item():
+			extinguish()
 
-func calculate_fuel_from_inventory():
-	var total_fuel = 0.0
-	
+func start_burning_next_item():
+	# Find the first available fuel item and start burning it
 	for slot in interactive_object.object_menu:
 		if not slot.is_empty() and slot.item.category == "fuel":
 			var fuel_per_item = 10.0 # Default
@@ -59,12 +63,21 @@ func calculate_fuel_from_inventory():
 			elif slot.item.get("fuel_value"):
 				fuel_per_item = slot.item.fuel_value
 			
-			total_fuel += fuel_per_item * slot.quantity
-	fuel_remaining = min(total_fuel, max_fuel)
-	print("Firepit fuel updated: ", fuel_remaining, "/", max_fuel, " seconds")
+			# Start burning this item
+			current_burn_time = fuel_per_item
+			slot.quantity -= 1
+			if slot.quantity <= 0:
+				slot.clear()
+			
+			print("Consumed ", slot.item.name if slot.item else "fuel item", " - burning for ", fuel_per_item, " seconds")
+			return true
+	
+	# No fuel found
+	current_burn_time = 0.0
+	return false
 
 func light_fire():
-	if fuel_remaining <= 0:
+	if not start_burning_next_item():
 		print("Cannot light fire - no fuel!")
 		return
 	
@@ -75,42 +88,21 @@ func light_fire():
 	print("Fire lit!")
 
 func _on_fuel_tick():
-	if state == ObjectState.BURNING and fuel_remaining > 0:
-		var fuel_consumed = resource_manager.resource_timer.wait_time
-		consume_fuel_from_inventory(fuel_consumed)
+	if state == ObjectState.BURNING and current_burn_time > 0:
+		var time_elapsed = resource_manager.resource_timer.wait_time
+		consume_fuel_time(time_elapsed)
 
-func consume_fuel_from_inventory(amount: float):
-	var remaining_to_consume = amount
+func consume_fuel_time(amount: float):
+	current_burn_time -= amount
 	
-	# Consume fuel from inventory slots
-	for slot in interactive_object.object_menu:
-		if slot.is_empty() or slot.item.category != "fuel":
-			continue
-		
-		var fuel_per_item = 10
-		if slot.item.get("fuel_value"):
-			fuel_per_item = slot.item.fuel_value
-		
-		var fuel_from_this_slot = fuel_per_item * slot.quantity
-		
-		if fuel_from_this_slot <= remaining_to_consume:
-			# Consume entire stack
-			remaining_to_consume -= fuel_from_this_slot
-			slot.clear()
-		else:
-			# Consume partial stack
-			var items_to_consume = remaining_to_consume / fuel_per_item
-			slot.quantity -= ceil(items_to_consume)
-			remaining_to_consume = 0
-		
-		if remaining_to_consume <=0:
-			break
-	# Update fuel display
-	calculate_fuel_from_inventory()
-	
-	# Check if fire should go out
-	if fuel_remaining <=0:
-		extinguish()
+	# If current item burned out, try to start burning next item
+	if current_burn_time <= 0:
+		if not start_burning_next_item():
+			# No more fuel - extinguish fire
+			extinguish()
+		# If there was remaining time to consume, apply it to new item
+		elif current_burn_time < 0:
+			consume_fuel_time(abs(current_burn_time))
 			
 func set_cooldown():
 	pass

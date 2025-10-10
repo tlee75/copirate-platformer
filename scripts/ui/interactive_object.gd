@@ -6,13 +6,11 @@ class_name InteractiveObject
 # Base interface for objects that can be interacted with and have inventories
 
 @export var object_name: String = "Object"
-@export var inventory_slots: int = 6
+@export var inventory_slots: int = 1
 @export var accepted_categories: Array[String] = [] # What item categories this object accepts
 
 var object_menu: Array[InventoryManager.InventorySlotData] = []
 var ui_manager: Node
-
-signal inventory_changed
 
 func _ready():
 	initialize_inventory()
@@ -35,44 +33,3 @@ func interact():
 		ui_manager.open_object_menu(get_parent(), object_name, inventory_slots)
 	else:
 		print("UI Manager not found!")
-
-func can_accept_item(item: GameItem) -> bool:
-	if accepted_categories.is_empty():
-		return true  # Accept all items
-	
-	return item.category in accepted_categories
-
-func add_item_to_object(item: GameItem, quantity: int = 1) -> int:
-	var remaining = quantity
-	
-	if not can_accept_item(item):
-		print("This object cannot accept ", item.name)
-		return remaining
-	
-	# Try to add to existing stacks
-	for slot in object_menu:
-		if not slot.is_empty() and slot.item.name == item.name:
-			remaining = slot.add_item(item, remaining)
-			if remaining <= 0:
-				inventory_changed.emit()
-				return 0
-	
-	# Try to add to empty slots
-	for slot in object_menu:
-		if slot.is_empty():
-			remaining = slot.add_item(item, remaining)
-			if remaining <= 0:
-				inventory_changed.emit()
-				return 0
-	
-	inventory_changed.emit()
-	return remaining
-
-func get_object_slot(index: int) -> InventoryManager.InventorySlotData:
-	if index >= 0 and index < object_menu.size():
-		return object_menu[index]
-	return null
-
-func on_inventory_closed():
-	# Called when the inventory UI is closed
-	print(object_name, " inventory closed")
