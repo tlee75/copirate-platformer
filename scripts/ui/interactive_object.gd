@@ -1,8 +1,6 @@
 extends Node
 
 class_name InteractiveObject
-
-
 # Base interface for objects that can be interacted with and have inventories
 
 @export var object_name: String = "Object"

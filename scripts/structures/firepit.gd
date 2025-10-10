@@ -47,12 +47,6 @@ func interact():
 	# Open the firepit inventory UI
 	interactive_object.interact()
 
-func _on_firepit_inventory_changed():
-	# If fire is burning but no current burn time, try to start burning something
-	if state == ObjectState.BURNING and current_burn_time <= 0:
-		if not start_burning_next_item():
-			extinguish()
-
 func start_burning_next_item():
 	# Find the first available fuel item and start burning it
 	for slot in interactive_object.object_menu:
@@ -62,14 +56,29 @@ func start_burning_next_item():
 				fuel_per_item = slot.item.get_fuel_value()
 			elif slot.item.get("fuel_value"):
 				fuel_per_item = slot.item.fuel_value
+			else:
+				print("Item is missing a fuel value, using default: ", fuel_per_item)
+			
+			# Store item name in case case it gets removed
+			var fuel_item_name = slot.item.name
 			
 			# Start burning this item
 			current_burn_time = fuel_per_item
 			slot.quantity -= 1
 			if slot.quantity <= 0:
 				slot.clear()
-			
-			print("Consumed ", slot.item.name if slot.item else "fuel item", " - burning for ", fuel_per_item, " seconds")
+				
+			# Update UI if object menu is open
+			var object_menus = get_tree().get_nodes_in_group("object_menu")
+			for obj_menu in object_menus:
+				if obj_menu.visible and obj_menu.current_object == self:
+					# Find which slot index we just modified
+					var slot_index = interactive_object.object_menu.find(slot)
+					if slot_index >= 0:
+						obj_menu.update_object_slot_display(slot_index)
+					break
+					
+			print("Consumed ", fuel_item_name, " - burning for ", fuel_per_item, " seconds")
 			return true
 	
 	# No fuel found

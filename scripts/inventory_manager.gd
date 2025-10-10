@@ -158,6 +158,7 @@ func _ready():
 	stick_item.icon = load("res://assets/tropical/stick_01_48x64.png")
 	stick_item.stack_size = 99
 	stick_item.craftable = false
+	stick_item.fuel_value = 5
 	stick_item.category = "fuel"
 	stick_item.underwater_compatible = false
 	stick_item.land_compatible = true
