@@ -202,5 +202,8 @@ autostart = true
 [node name="Firepit" parent="." instance=ExtResource("23_oo6ai")]
 position = Vector2(20, 2149)
 
+[node name="Stick2" parent="." instance=ExtResource("24_oo6ai")]
+position = Vector2(-191, 2158)
+
 [node name="Stick" parent="." instance=ExtResource("24_oo6ai")]
 position = Vector2(-150, 2159)

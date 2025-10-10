@@ -149,7 +149,9 @@ func _on_respawn():
 func _close_menus_on_death(stat_name: String):
 	if stat_name == "health":
 		$UI/PlayerMenu.visible = false
-
+		if $UI.has_node("ObjectMenu"):
+			$UI/ObjectMenu.visible = false
+			
 func open_object_menu(object: Node2D, title: String, slot_count: int):
 	# Create or show object inventory UI
 	var object_menu_ui = get_node_or_null("UI/ObjectMenu")
