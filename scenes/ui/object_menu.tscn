@@ -40,9 +40,9 @@ columns = 3
 layout_mode = 2
 text = "Close"
 
-[node name="LightButton" type="Button" parent="HBoxContainer/ObjectPanel/VBoxContainer"]
+[node name="ActionButton" type="Button" parent="HBoxContainer/ObjectPanel/VBoxContainer"]
 layout_mode = 2
-text = "Light Fire"
+text = "Action"
 
 [node name="PlayerPanel" type="Panel" parent="HBoxContainer"]
 layout_mode = 2

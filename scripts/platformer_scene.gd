@@ -49,7 +49,7 @@ func _ready():
 	add_child(resource_manager)
 	
 	# Connect ResourceManager to the StatusUpdateTimer
-	var resource_timer = $Resources/FiveSecondTimer
+	var resource_timer = $Resources/TwoSecondTimer
 	resource_manager.setup_timer(resource_timer)
 
 	# Create UI manager group

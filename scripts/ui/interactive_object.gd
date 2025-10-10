@@ -31,3 +31,13 @@ func interact():
 		ui_manager.open_object_menu(get_parent(), object_name, inventory_slots)
 	else:
 		print("UI Manager not found!")
+
+# Action system - override in child objects
+func get_available_actions() -> Array[String]:
+	return []
+
+func perform_action(action_name: String):
+	print("No action implementation for: ", action_name, " in ", object_name)
+
+func get_current_state_description() -> String:
+	return "Ready"

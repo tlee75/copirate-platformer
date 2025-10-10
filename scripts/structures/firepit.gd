@@ -122,3 +122,28 @@ func extinguish():
 		state = ObjectState.UNLIT
 		if animated_sprite:
 			animated_sprite.play("unlit")
+
+# Action system implementation
+func get_available_actions() -> Array[String]:
+	if state == ObjectState.BURNING:
+		return ["Extinguish"]
+	else:
+		return ["Light Fire"]
+
+func perform_action(action_name: String):
+	match action_name:
+		"Light Fire":
+			light_fire()
+		"Extinguish":
+			extinguish()
+		_:
+			print("Unknown action: ", action_name, " for firepit")
+
+func get_current_state_description() -> String:
+	match state:
+		ObjectState.BURNING:
+			return "Burning (" + str(int(current_burn_time)) + "s remaining)"
+		ObjectState.UNLIT:
+			return "Unlit"
+		_:
+			return "Unknown"

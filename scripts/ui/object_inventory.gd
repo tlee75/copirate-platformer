@@ -6,7 +6,7 @@ class_name ObjectMenu
 @onready var main_inventory_container: GridContainer
 @onready var object_title_label: Label
 @onready var close_button: Button
-@onready var light_button: Button
+@onready var action_button: Button
 
 var current_object: Node2D
 var object_slots: Array[InventoryManager.InventorySlotData] = []
@@ -20,15 +20,15 @@ func _ready():
 	main_inventory_container = $HBoxContainer/PlayerPanel/VBoxContainer/SlotsGrid
 	object_title_label = $HBoxContainer/ObjectPanel/VBoxContainer/TitleLabel
 	close_button = $HBoxContainer/ObjectPanel/VBoxContainer/CloseButton
-	light_button = $HBoxContainer/ObjectPanel/VBoxContainer/LightButton
+	action_button = $HBoxContainer/ObjectPanel/VBoxContainer/ActionButton
 	
 	add_to_group("object_menu")
 	
 	if close_button:
 		close_button.pressed.connect(_on_close_pressed)
 	
-	if light_button:
-		light_button.pressed.connect(_on_light_pressed)
+	if action_button:
+		action_button.pressed.connect(_on_action_pressed)
 	
 	# Connect to inventory changes to update main inventory display
 	InventoryManager.inventory_changed.connect(_on_main_inventory_changed)
@@ -242,7 +242,9 @@ func open_object_menu(object: Node2D, title: String, slot_count: int):
 	setup_object_slots(slot_count)
 	setup_main_inventory()
 
-	
+	# Update action button for this object
+	_update_action_button()
+
 	show()
 	#is_visible_flag = true
 	print("Opened ", title, " inventory")
@@ -331,13 +333,35 @@ func _on_main_slot_clicked(slot_index: int, _is_hotbar: bool):
 func _on_close_pressed():
 	close_inventory()
 
-# Receive the pressed signal from LightButton and calls the light fire function in firepit.gd
-func _on_light_pressed():
-	if current_object and current_object.has_method("light_fire"):
-		print("Attempting to light ", current_object.name)
-		current_object.light_fire()
+# Receive the pressed signal from ActionButton
+func _on_action_pressed():
+	if current_object:
+		if current_object.has_method("get_available_actions") and current_object.has_method("perform_action"):
+			var actions = current_object.get_available_actions()
+			if actions.size() > 0:
+				# Perform the first available action
+				var action = actions[0]
+				current_object.perform_action(action)
+				print("Performed action '", action, "' on ", current_object.name)
+				
+				# Update button text with next available action
+				_update_action_button()
+			else:
+				print(current_object.name, " has no available actions")
+		else:
+			print("Current object doesn't support the action system")
 	else:
-		print("Cannot light - no valid object or light_fire method missing")
+		print("No current object to control")
+
+func _update_action_button():
+	if current_object and action_button and current_object.has_method("get_available_actions"):
+		var actions = current_object.get_available_actions()
+		if actions.size() > 0:
+			action_button.text = actions[0]
+			action_button.visible = true
+		else:
+			action_button.text = "No Actions"
+			action_button.visible = false
 
 func close_inventory():
 	# Cleanup cloned inventory display

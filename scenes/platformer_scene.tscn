@@ -195,7 +195,7 @@ position = Vector2(125, 2075)
 
 [node name="Resources" type="Node" parent="."]
 
-[node name="FiveSecondTimer" type="Timer" parent="Resources"]
+[node name="TwoSecondTimer" type="Timer" parent="Resources"]
 wait_time = 2.0
 autostart = true
 
