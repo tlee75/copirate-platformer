@@ -106,7 +106,7 @@ func _physics_process(delta):
 	# Skip input handling if inventory or object menu is open
 	if inventory_is_open or object_menu_is_open:
 		# Still apply gravity when inventory is open
-		if not is_on_floor():
+		if not is_on_floor() and not is_underwater:
 			vel.y += gravity * delta
 		# Stop horizontal movement gradually
 		vel.x = move_toward(vel.x, 0, WALK_SPEED * 2)  # Stop faster when inventory opens
