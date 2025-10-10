@@ -572,6 +572,7 @@ func destroy_tiles_in_cursor_area():
 		tilemap.set_cell(0, tile_pos, -1)
 		print("Destroyed tile at: ", tile_pos)
 
+
 func _on_inventory_state_changed(is_open: bool):
 	inventory_is_open = is_open
 	print("Player: Inventory is now ", "open" if is_open else "closed")

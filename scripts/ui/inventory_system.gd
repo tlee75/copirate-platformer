@@ -142,10 +142,6 @@ func setup_ui_references(hotbar: Control, inventory: Control, weaponbar: Control
 	equipment_ui = equipment
 	equipment_inventory_ui = equipment_inventory
 
-func _connect_weaponbar_signals():
-	if not weaponbar_ui:
-		return
-
 func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool, is_equipment: bool = false):	
 	if is_dragging:
 		return
@@ -386,11 +382,5 @@ func _can_place_in_equipment_slot(item: GameItem, target_slot_node: Control) -> 
 		return false
 	return true
 
-func toggle_inventory():
-	print("InventorySystem: toggle_inventory called")
-	if main_inventory_ui:
-		print("InventorySystem: main_inventory_ui found, calling toggle")
-		main_inventory_ui.toggle_inventory()
-		inventory_toggled.emit(main_inventory_ui.is_visible_flag)
-	else:
-		print("InventorySystem: main_inventory_ui is null!")
+func emit_inventory_toggled(is_open: bool):
+	inventory_toggled.emit(is_open)

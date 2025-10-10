@@ -87,9 +87,11 @@ func _input(event):
 					if key_event.keycode == KEY_TAB:
 						# TAB toggles the combined menu open/closed
 						player_menu.visible = not player_menu.visible
+						inventory_system.emit_inventory_toggled(player_menu.visible)
 					elif key_event.keycode == KEY_ESCAPE:
 						if player_menu.visible:
 							player_menu.visible = false
+							inventory_system.inventory_toggled.emit(false)
 						else:
 							pause_menu.show()
 							get_tree().paused = true
@@ -149,9 +151,10 @@ func _on_respawn():
 func _close_menus_on_death(stat_name: String):
 	if stat_name == "health":
 		$UI/PlayerMenu.visible = false
+		inventory_system.inventory_toggled.emit(false)
 		if $UI.has_node("ObjectMenu"):
 			$UI/ObjectMenu.visible = false
-			
+
 func open_object_menu(object: Node2D, title: String, slot_count: int):
 	# Create or show object inventory UI
 	var object_menu_ui = get_node_or_null("UI/ObjectMenu")

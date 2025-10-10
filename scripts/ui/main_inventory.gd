@@ -50,22 +50,6 @@ func _ready():
 	# Initial display update
 	_update_display()
 
-func show_inventory():
-	is_visible_flag = true
-	visible = true
-	# Disable background game input when inventory is open
-	get_tree().paused = false  # Don't actually pause, just block input in player script
-
-func hide_inventory():
-	is_visible_flag = false
-	visible = false
-
-func toggle_inventory():
-	if is_visible_flag:
-		hide_inventory()
-	else:
-		show_inventory()
-
 func _update_display():
 	for i in 16:
 		if i < slot_nodes.size():
