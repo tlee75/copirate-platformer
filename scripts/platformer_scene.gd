@@ -6,14 +6,14 @@ extends Node2D
 @onready var ui_layer: CanvasLayer = $UI
 @onready var hotbar = $UI/Hotbar
 @onready var weaponbar = $UI/WeaponBar
-@onready var crafting_menu: Control = $UI/CraftingMenu
-@onready var main_inventory: Control =  $UI/CraftingMenu/TabBar/InventoryTab/MainInventory
+@onready var crafting_menu: Control = $UI/PlayerMenu
+@onready var main_inventory: Control =  $UI/PlayerMenu/TabBar/InventoryTab/MainInventory
 @onready var inventory_system: Node = $UI/InventorySystem
 @onready var player: CharacterBody2D = $Player
 @onready var pause_menu = $UI/PauseMenu
 @onready var player_stats: PlayerStats
-@onready var equipment_panel: Control = $UI/CraftingMenu/TabBar/EquipmentTab/HBoxContainer/EquipmentPanel
-@onready var equipment_inventory: Control = $UI/CraftingMenu/TabBar/EquipmentTab/HBoxContainer/InventoryPanel/EquipmentInventory
+@onready var equipment_panel: Control = $UI/PlayerMenu/TabBar/EquipmentTab/HBoxContainer/EquipmentPanel
+@onready var equipment_inventory: Control = $UI/PlayerMenu/TabBar/EquipmentTab/HBoxContainer/InventoryPanel/EquipmentInventory
 
 var inventory_is_open: bool = false
 var respawn_position: Vector2
@@ -148,11 +148,11 @@ func _on_respawn():
 
 func _close_menus_on_death(stat_name: String):
 	if stat_name == "health":
-		$UI/CraftingMenu.visible = false
+		$UI/PlayerMenu.visible = false
 
 func open_object_inventory(object: Node2D, title: String, slot_count: int):
 	# Create or show object inventory UI
-	var object_inventory_ui = get_node_or_null("UI/ObjectInventory")
+	var object_inventory_ui = get_node_or_null("UI/ObjectMenu")
 	
 	if not object_inventory_ui:
 		# Create the UI if it doesn't exist

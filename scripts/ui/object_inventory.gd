@@ -1,6 +1,6 @@
 extends Control
 
-class_name ObjectInventory
+class_name ObjectMenu
 
 @onready var object_slots_container: GridContainer
 @onready var main_inventory_container: GridContainer
@@ -180,6 +180,9 @@ func handle_object_to_inventory_drop(inventory_system, drop_target: Control):
 		# Update displays
 		update_object_slot_display(source_index)
 		InventoryManager.inventory_changed.emit()
+		
+		# Manually update the main inventory display
+		_on_main_inventory_changed()
 
 	
 	inventory_system.remove_meta("dragging_from_object")

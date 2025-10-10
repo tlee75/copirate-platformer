@@ -52,7 +52,7 @@ var default_hit_frames = {
 func _ready():
 	var ui_layer = get_parent().get_node_or_null("UI")
 	if ui_layer:
-		equipment_panel = ui_layer.get_node_or_null("CraftingMenu/TabBar/EquipmentTab/HBoxContainer/EquipmentPanel")
+		equipment_panel = ui_layer.get_node_or_null("PlayerMenu/TabBar/EquipmentTab/HBoxContainer/EquipmentPanel")
 		
 	var frames = load("res://resources/player_sprites.tres")
 	$AnimatedSprite2D.sprite_frames = frames
@@ -580,13 +580,13 @@ func is_mouse_over_combined_menu() -> bool:
 	var ui_layer = get_parent().get_node_or_null("UI")
 	if not ui_layer:
 		return false
-	var combined_menu = ui_layer.get_node_or_null("CraftingMenu")
+	var combined_menu = ui_layer.get_node_or_null("PlayerMenu")
 	if not combined_menu or not combined_menu.visible:
 		return false
 	
 	var mouse_pos = get_viewport().get_mouse_position()
 	
-	# Check if mouse is over the main CraftingMenu control
+	# Check if mouse is over the main PlayerMenu control
 	if combined_menu.get_global_rect().has_point(mouse_pos):
 		return true
 	

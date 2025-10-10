@@ -141,7 +141,7 @@ offset_top = 235.0
 offset_right = -448.0
 offset_bottom = -325.0
 
-[node name="CraftingMenu" parent="UI" instance=ExtResource("10_xoih0")]
+[node name="PlayerMenu" parent="UI" instance=ExtResource("10_xoih0")]
 visible = false
 offset_left = 241.0
 offset_top = 24.0
@@ -203,4 +203,4 @@ autostart = true
 position = Vector2(20, 2149)
 
 [node name="Stick" parent="." instance=ExtResource("24_oo6ai")]
-position = Vector2(-165, 2134)
+position = Vector2(-150, 2159)
