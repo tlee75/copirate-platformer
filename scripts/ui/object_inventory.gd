@@ -246,7 +246,10 @@ func open_object_menu(object: Node2D, title: String, slot_count: int):
 	_update_action_button()
 
 	show()
-	#is_visible_flag = true
+	# Emit signal to player that object menu is now open
+	var player = get_tree().get_first_node_in_group("player")
+	if player and player.has_signal("object_menu_state_changed"):
+		player.object_menu_state_changed.emit(true)
 	print("Opened ", title, " inventory")
 
 func setup_object_slots(slot_count: int):
@@ -369,8 +372,11 @@ func close_inventory():
 		child.queue_free()
 	
 	hide()
-	#is_visible_flag = false
 	inventory_closed.emit()
+	# Emit signal to player that object menu is now closed
+	var player = get_tree().get_first_node_in_group("player")
+	if player and player.has_signal("object_menu_state_changed"):
+		player.object_menu_state_changed.emit(false)
 	current_object = null
 
 func get_object_slot(index: int) -> InventoryManager.InventorySlotData:

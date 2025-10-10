@@ -86,8 +86,11 @@ func _input(event):
 				if not object_menu_closed:
 					if key_event.keycode == KEY_TAB:
 						# TAB toggles the combined menu open/closed
-						player_menu.visible = not player_menu.visible
-						inventory_system.emit_inventory_toggled(player_menu.visible)
+						if player.is_on_floor() or player.is_underwater:
+							player_menu.visible = not player_menu.visible
+							inventory_system.emit_inventory_toggled(player_menu.visible)
+						else:
+							print("Cannot open menus while airborne")
 					elif key_event.keycode == KEY_ESCAPE:
 						if player_menu.visible:
 							player_menu.visible = false

@@ -3,6 +3,7 @@ extends CharacterBody2D
 class_name Player
 
 signal inventory_state_changed(is_open: bool)
+signal object_menu_state_changed(is_open: bool)
 
 const WALK_SPEED := 100.0
 const RUN_SPEED := 250.0
@@ -23,6 +24,7 @@ var last_move_dir: int = 1  # 1 for right, -1 for left
 var was_running_when_jumped: bool = false
 var jump_speed: float = 0.0
 var inventory_is_open: bool = false
+var object_menu_is_open: bool = false
 var is_in_water: bool = false
 var tile_size: float = 32.0
 var is_dead: bool = false
@@ -81,8 +83,9 @@ func _ready():
 	# Enable input processing so _input can capture key presses
 	set_process_input(true)
 
-	# Connect to inventory state changes
+	# Connect to inventory and object menu state changes
 	inventory_state_changed.connect(_on_inventory_state_changed)
+	object_menu_state_changed.connect(_on_object_menu_state_changed)
 	
 	# Add player to group so other scripts can find it easily
 	add_to_group("player")
@@ -100,8 +103,8 @@ func _physics_process(delta):
 	var vel: Vector2 = velocity
 	var tile_pos = tilemap.local_to_map(global_position)
 	
-	# Skip input handling if inventory is open
-	if inventory_is_open:
+	# Skip input handling if inventory or object menu is open
+	if inventory_is_open or object_menu_is_open:
 		# Still apply gravity when inventory is open
 		if not is_on_floor():
 			vel.y += gravity * delta
@@ -109,6 +112,16 @@ func _physics_process(delta):
 		vel.x = move_toward(vel.x, 0, WALK_SPEED * 2)  # Stop faster when inventory opens
 		velocity = vel
 		move_and_slide()
+		
+		# Reset the player to an appropriate looping idle animation while the menu is open
+		var target_animation = ""
+		if is_underwater:
+			target_animation = "swim_idle"
+		else:
+			target_animation = "idle"
+		if $AnimatedSprite2D.animation != target_animation:
+			$AnimatedSprite2D.play(target_animation)
+		
 		# Don't update cursor position, mouse UI detection, or highlights when inventory is open
 		return
 
@@ -576,6 +589,10 @@ func destroy_tiles_in_cursor_area():
 func _on_inventory_state_changed(is_open: bool):
 	inventory_is_open = is_open
 	print("Player: Inventory is now ", "open" if is_open else "closed")
+
+func _on_object_menu_state_changed(is_open: bool):
+	object_menu_is_open = is_open
+	print("Player: Object menu is now ", "open" if is_open else "closed")
 
 func is_mouse_over_combined_menu() -> bool:
 	var ui_layer = get_parent().get_node_or_null("UI")
