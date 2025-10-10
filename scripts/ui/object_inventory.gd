@@ -125,10 +125,13 @@ func handle_object_drop(inventory_system, drop_target: Control):
 				source_slot_data.clear()
 				
 				print("Moved item to object slot ", object_slot_index)
+				print("DEBUG: Data after move - target_slot_data.item: ", target_slot_data.item.name if target_slot_data.item else "null")
+				print("DEBUG: Data after move - target_slot_data.quantity: ", target_slot_data.quantity)
+				print("DEBUG: Data after move - object_slots[", object_slot_index, "].item: ", object_slots[object_slot_index].item.name if object_slots[object_slot_index].item else "null")
 			
 			# Update displays
 			update_object_slot_display(object_slot_index)
-			
+					
 			# Emit appropriate signal based on source type
 			if inventory_system.drag_source_is_hotbar:
 				InventoryManager.hotbar_changed.emit()
@@ -142,8 +145,10 @@ func update_object_slot_display(slot_index: int):
 		var slot_scene = slot_scenes[slot_index]
 		var slot_data = object_slots[slot_index]
 		if slot_scene and slot_scene.has_method("update_display"):
+			# CRITICAL: Update the slot_data reference first
+			slot_scene.slot_data = slot_data
 			slot_scene.update_display(slot_data)
-
+		
 func handle_object_to_inventory_drop(inventory_system, drop_target: Control):
 	var source_index = inventory_system.drag_source_slot
 	var source_slot_data = get_object_slot(source_index)
@@ -241,13 +246,21 @@ func open_object_inventory(object: Node2D, title: String, slot_count: int):
 	print("Opened ", title, " inventory")
 
 func setup_object_slots(slot_count: int):
+	print("DEBUG: setup_object_slots called with slot_count: ", slot_count)
+	print("DEBUG: Before cleanup - slot_scenes.size(): ", slot_scenes.size())
+	
 	# Clean existing slots
 	for slot_scene in slot_scenes:
 		if is_instance_valid(slot_scene):
 			slot_scene.queue_free()
 	
+	# Clear the array completely
+	slot_scenes.clear()
+	print("DEBUG: After cleanup - slot_scenes.size(): ", slot_scenes.size())
+	
 	# Create new slots
 	for i in slot_count:
+		print("DEBUG: Creating slot scene for index ", i)
 		
 		# Create slot UI (reuse your existing inventory slot scene)
 		var slot_scene = preload("res://scenes/ui/inventory_slot.tscn").instantiate()
@@ -258,6 +271,8 @@ func setup_object_slots(slot_count: int):
 		
 		slot_scenes.append(slot_scene)
 		object_slots_container.add_child(slot_scene)
+		
+		print("DEBUG: Created and added slot scene ", i, " - slot_scenes.size() now: ", slot_scenes.size())
 			
 		# Connect slot signals for drag/drop
 		if slot_scene.has_signal("slot_clicked"):

@@ -245,6 +245,9 @@ func end_drag(target_slot: int, target_is_hotbar: bool, target_is_weaponbar: boo
 				InventoryManager.weapon_changed.emit()
 			else:
 				InventoryManager.inventory_changed.emit()
+				# Also update the object inventory UI's main inventory display
+				if object_inventory.has_method("_on_main_inventory_changed"):
+					object_inventory._on_main_inventory_changed()
 				
 		# Clean up object metadata
 		set_meta("dragging_from_object", false)
