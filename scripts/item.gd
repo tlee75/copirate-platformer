@@ -13,6 +13,7 @@ class_name GameItem
 @export var is_cookable: bool = false
 @export var cook_time: float = 0.0  # Time in seconds to cook
 @export var cooked_result_item_name: String = ""  # What this item becomes when cooked
+@export var is_digging_tool = false
 
 func is_consumable() -> bool:
 	return false

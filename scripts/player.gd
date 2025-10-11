@@ -304,9 +304,23 @@ func handle_attack_action():
 				if main_hand_slot_index != -1:
 					var main_hand_slot = InventoryManager.get_equipment_slot(main_hand_slot_index)
 					if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item and main_hand_slot.item.has_method("action"):
+						var item_name = main_hand_slot.item.name if main_hand_slot.item.has_method("get_name") else str(main_hand_slot.item)
+						
+						## Digging tool check
+						#if main_hand_slot.item.is_digging_tool:
+							#var tile_pos = tilemap.local_to_map(cursor_area.global_position)
+							#var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
+							#if tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
+								#var dig_item_key = "dirt"  # Default fallback
+								#if tile_data.has_custom_data("dig_item"):
+									#dig_item_key = tile_data.get_custom_data("dig_item")
+								#tilemap.set_cell(0, tile_pos, 1, Vector2i(0,0))
+								#InventoryManager.add_item(InventoryManager.item_database[dig_item_key], 1)
+								#print("Dug up ", dig_item_key, " at: ", tile_pos)
+								#return
+								
 						# Check if this item can be used in the current environment
 						if not can_use_item_in_current_environment(main_hand_slot.item):
-							var item_name = main_hand_slot.item.name if main_hand_slot.item.has_method("get_name") else str(main_hand_slot.item)
 							var environment_msg = "underwater" if is_underwater else "on land"
 							print("Cannot use ", item_name, " ", environment_msg, "!")
 							return
@@ -642,6 +656,12 @@ func is_on_water_tile() -> bool:
 	var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
 	if tile_data and tile_data.has_custom_data("is_water"):
 		return tile_data.get_custom_data("is_water")
+	return false
+
+func is_tile_diggable(tile_pos: Vector2i) -> bool:
+	var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
+	if tile_data and tile_data.has_custom_data("is_diggable"):
+		return tile_data.get_custom_data("is_diggable")
 	return false
 
 func find_water_surface_y() -> int:

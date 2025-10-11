@@ -7,7 +7,7 @@ class_name ClayDirt
 func _init():
 	name = "Clay Dirt"
 	stack_size = 99
-	category = "tool"
+	category = "resource"
 	craftable = true
 	icon = load("res://assets/terrain/clay_dirt_icon_01.png")
 	fuel_value = 0

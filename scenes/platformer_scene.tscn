@@ -1,9 +1,10 @@
-[gd_scene load_steps=31 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=33 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_yte5o"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_8w8yu"]
 [ext_resource type="Texture2D" uid="uid://xbvs700g2epd" path="res://resources/crosshair.tres" id="3_xoih0"]
 [ext_resource type="Texture2D" uid="uid://dki1spd0slwxj" path="res://assets/terrain/tropical_tilemap_slice_32x32.png" id="4_8w8yu"]
+[ext_resource type="Texture2D" uid="uid://rn4b115e07qc" path="res://assets/terrain/ground_06_32x32.png" id="4_dutm6"]
 [ext_resource type="Texture2D" uid="uid://djumqlm6wttkh" path="res://assets/terrain/surface_water_32x32.png" id="4_f15g2"]
 [ext_resource type="PackedScene" uid="uid://bqjbr0fr548wk" path="res://scenes/terrain/berry_bush.tscn" id="4_q5qfs"]
 [ext_resource type="Texture2D" uid="uid://b4u6hsbyh7vou" path="res://assets/terrain/underwater_02_32x32.png" id="5_atnpy"]
@@ -26,19 +27,28 @@
 [ext_resource type="PackedScene" uid="uid://ckk3o0r7wv6tc" path="res://scenes/items/stick.tscn" id="24_oo6ai"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
-size = Vector2(13, 3.5)
+size = Vector2(6, 6)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_g2ixt"]
+resource_name = "dirt_hole"
+texture = ExtResource("4_dutm6")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_q5qfs"]
+resource_name = "surface_water"
 texture = ExtResource("4_f15g2")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/custom_data_0 = true
+0:0/0/custom_data_3 = "surface"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_btm0u"]
 texture = ExtResource("5_atnpy")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/custom_data_0 = true
+0:0/0/custom_data_3 = "underwater"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nrqbv"]
 texture = ExtResource("6_cy82x")
@@ -52,24 +62,41 @@ texture = ExtResource("4_8w8yu")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+0:0/0/custom_data_1 = true
+0:0/0/custom_data_2 = "clay_dirt"
 0:1/0 = 0
 0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+0:1/0/custom_data_1 = true
+0:1/0/custom_data_2 = "clay_dirt"
 0:2/0 = 0
 0:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+0:2/0/custom_data_1 = true
+0:2/0/custom_data_2 = "clay_dirt"
 0:3/0 = 0
 0:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+0:3/0/custom_data_1 = true
+0:3/0/custom_data_2 = "clay_dirt"
 0:4/0 = 0
 0:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+0:4/0/custom_data_1 = true
+0:4/0/custom_data_2 = "clay_dirt"
 
 [sub_resource type="TileSet" id="TileSet_gwrsa"]
 tile_size = Vector2i(32, 32)
 physics_layer_0/collision_layer = 1
 custom_data_layer_0/name = "is_water"
 custom_data_layer_0/type = 1
+custom_data_layer_1/name = "is_diggable"
+custom_data_layer_1/type = 1
+custom_data_layer_2/name = "dig_item"
+custom_data_layer_2/type = 4
+custom_data_layer_3/name = "water_type"
+custom_data_layer_3/type = 4
 sources/3 = SubResource("TileSetAtlasSource_xoih0")
 sources/11 = SubResource("TileSetAtlasSource_q5qfs")
 sources/12 = SubResource("TileSetAtlasSource_btm0u")
 sources/13 = SubResource("TileSetAtlasSource_nrqbv")
+sources/1 = SubResource("TileSetAtlasSource_g2ixt")
 
 [node name="Platformer" type="Node2D"]
 script = ExtResource("1_yte5o")
@@ -82,7 +109,7 @@ position = Vector2(-48, 2141)
 position = Vector2(20, 0)
 
 [node name="CursorCollision" type="CollisionShape2D" parent="Player/CursorArea"]
-position = Vector2(4.5, 3.25)
+position = Vector2(8, 3)
 shape = SubResource("RectangleShape2D_ru564")
 
 [node name="Crosshair" type="Sprite2D" parent="Player/CursorArea"]
