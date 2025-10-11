@@ -122,6 +122,9 @@ func _physics_process(delta):
 		if $AnimatedSprite2D.animation != target_animation:
 			$AnimatedSprite2D.play(target_animation)
 		
+		is_trigger_action = false
+		is_interacting = false
+		
 		# Don't update cursor position, mouse UI detection, or highlights when inventory is open
 		return
 

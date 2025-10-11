@@ -85,7 +85,7 @@ func _input(event):
 				# If no object inventory was closed, handle normal Tab/Escape behavior
 				if not object_menu_closed:
 					if key_event.keycode == KEY_TAB:
-						# TAB toggles the combined menu open/closed
+						# TAB toggles the combined menu open/closed if they are not in the air
 						if player.is_on_floor() or player.is_underwater:
 							player_menu.visible = not player_menu.visible
 							inventory_system.emit_inventory_toggled(player_menu.visible)
