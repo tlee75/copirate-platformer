@@ -146,7 +146,7 @@ func _ready():
 	# Initialize item database with CookedRaspBerry
 	var cooked_raspberry_item = CookedRaspberryItem.new()
 	cooked_raspberry_item.name = "Cooked Raspberry"
-	cooked_raspberry_item.icon = load("res://assets/consumablesA/cooked_raspberry_icon_01.png")
+	cooked_raspberry_item.icon = load("res://assets/consumables/cooked_raspberry_icon_01.png")
 	cooked_raspberry_item.stack_size = 99
 	cooked_raspberry_item.craftable = false
 	cooked_raspberry_item.category = "food"
