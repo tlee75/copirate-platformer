@@ -7,6 +7,19 @@ var hit_frames = {
 }
 var player_stats: PlayerStats
 
+func _init():
+	name = "Raspberry"
+	icon = load("res://assets/consumables/raspberry_icon_01.png")
+	stack_size = 99
+	craftable = false
+	category = "food"
+	underwater_compatible = false
+	land_compatible = true
+	craft_requirements = {"Gold Coin": 1}
+	is_cookable = true
+	cook_time = 2.0
+	cooked_result_item_name = "cooked_raspberry"
+
 func is_consumable() -> bool:
 	return true
 

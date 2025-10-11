@@ -9,6 +9,11 @@ func _init():
 	stack_size = 99
 	category = "fuel"
 	craftable = false
+	icon = load("res://assets/tropical/stick_01_48x64.png")
+	fuel_value = 5
+	underwater_compatible = false
+	land_compatible = true
+	craft_requirements = {"Gold Coin": 1}
 
 func action(user):
 	# Sticks can't be used directly, only added to firepits

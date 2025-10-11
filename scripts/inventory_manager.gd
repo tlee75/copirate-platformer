@@ -69,116 +69,16 @@ class InventorySlotData:
 		quantity = 0
 
 func _ready():	
-	# Initialize item database with gold coin	
-	var gold_coin_item = GoldCoinItem.new()
-	gold_coin_item.name = "Gold Coin"
-	gold_coin_item.icon = load("res://assets/Pirate Treasure/Sprites/Gold Coin/01.png")
-	gold_coin_item.stack_size = 10
-	gold_coin_item.craftable = false
-	gold_coin_item.category = "currency"
-	gold_coin_item.underwater_compatible = false
-	gold_coin_item.land_compatible = true
-	item_database["gold_coin"] = gold_coin_item
-	
-	# Initialize item database with sword
-	var sword_item = SwordItem.new()
-	sword_item.name = "Sword"
-	sword_item.icon = load("res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 01.png")
-	sword_item.stack_size = 1
-	sword_item.craftable = true
-	sword_item.category = "weapon"
-	sword_item.underwater_compatible = false
-	sword_item.land_compatible = true
-	item_database["sword"] = sword_item
-	sword_item.craft_requirements = {"Gold Coin": 2}
-	
-	# Initialize item database with pick Axe
-	var pickaxe_item = PickAxeItem.new()
-	pickaxe_item.name = "Pick Axe"
-	pickaxe_item.icon = load("res://assets/sprite-man/pick_axe_icon_01.png")
-	pickaxe_item.stack_size = 1
-	pickaxe_item.craftable = true
-	pickaxe_item.category = "tool"
-	pickaxe_item.underwater_compatible = false
-	pickaxe_item.land_compatible = true
-	item_database["pickaxe"] = pickaxe_item
-	pickaxe_item.craft_requirements = {"Gold Coin": 3}
-
-	# Initialize item database with Wood Axe
-	var woodaxe_item = WoodAxeItem.new()
-	woodaxe_item.name = "Wood Axe"
-	woodaxe_item.icon = load("res://assets/sprite-man/wood_axe_icon_01.png")
-	woodaxe_item.stack_size = 1
-	woodaxe_item.craftable = true
-	woodaxe_item.category = "tool"
-	woodaxe_item.underwater_compatible = false
-	woodaxe_item.land_compatible = true
-	item_database["woodaxe"] = woodaxe_item
-	woodaxe_item.craft_requirements = {"Gold Coin": 3}
-
-	# Initialize item database with Wood Axe
-	var shovel_item = ShovelItem.new()
-	shovel_item.name = "Shovel"
-	shovel_item.icon = load("res://assets/sprite-man/shovel_icon_01.png")
-	shovel_item.stack_size = 1
-	shovel_item.craftable = true
-	shovel_item.category = "tool"
-	shovel_item.underwater_compatible = false
-	shovel_item.land_compatible = true
-	item_database["shovel"] = shovel_item
-	shovel_item.craft_requirements = {"Gold Coin": 2}
-
-	# Initialize item database with RaspBerry
-	var raspberry_item = RaspberryItem.new()
-	raspberry_item.name = "Raspberry"
-	raspberry_item.icon = load("res://assets/consumables/raspberry_icon_01.png")
-	raspberry_item.stack_size = 99
-	raspberry_item.craftable = false
-	raspberry_item.category = "food"
-	raspberry_item.underwater_compatible = false
-	raspberry_item.land_compatible = true
-	raspberry_item.craft_requirements = {"Gold Coin": 1}
-	raspberry_item.is_cookable = true
-	raspberry_item.cook_time = 2.0
-	raspberry_item.cooked_result_item_name = "cooked_raspberry"
-	item_database["raspberry"] = raspberry_item
-
-	# Initialize item database with CookedRaspBerry
-	var cooked_raspberry_item = CookedRaspberryItem.new()
-	cooked_raspberry_item.name = "Cooked Raspberry"
-	cooked_raspberry_item.icon = load("res://assets/consumables/cooked_raspberry_icon_01.png")
-	cooked_raspberry_item.stack_size = 99
-	cooked_raspberry_item.craftable = false
-	cooked_raspberry_item.category = "food"
-	cooked_raspberry_item.underwater_compatible = false
-	cooked_raspberry_item.land_compatible = true
-	cooked_raspberry_item.craft_requirements = {"Gold Coin": 1}
-	item_database["cooked_raspberry"] = cooked_raspberry_item
-
-	# Initialize item database with Leaf Bandage
-	var leafbandage_item = LeafBandageItem.new()
-	leafbandage_item.name = "Leaf Bandage"
-	leafbandage_item.icon = load("res://assets/consumables/leaf_bandage_01_16x18.png")
-	leafbandage_item.stack_size = 99
-	leafbandage_item.craftable = true
-	leafbandage_item.category = "consumable"
-	leafbandage_item.underwater_compatible = false
-	leafbandage_item.land_compatible = true
-	leafbandage_item.craft_requirements = {"Gold Coin": 1}
-	item_database["leafbandage"] = leafbandage_item
-
-	# Initialize item database with Stick
-	var stick_item = StickItem.new()
-	stick_item.name = "Stick"
-	stick_item.icon = load("res://assets/tropical/stick_01_48x64.png")
-	stick_item.stack_size = 99
-	stick_item.craftable = false
-	stick_item.fuel_value = 5
-	stick_item.category = "fuel"
-	stick_item.underwater_compatible = false
-	stick_item.land_compatible = true
-	stick_item.craft_requirements = {"Gold Coin": 1}
-	item_database["stick"] = stick_item
+	# Initialize item database with items	
+	item_database["gold_coin"] = GoldCoinItem.new()
+	item_database["sword"] = SwordItem.new()
+	item_database["pickaxe"] = PickAxeItem.new()
+	item_database["woodaxe"] = WoodAxeItem.new()
+	item_database["shovel"] = ShovelItem.new()
+	item_database["raspberry"] = RaspberryItem.new()
+	item_database["cooked_raspberry"] = CookedRaspberryItem.new()
+	item_database["leafbandage"] = LeafBandageItem.new()
+	item_database["stick"] = StickItem.new()
 
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
