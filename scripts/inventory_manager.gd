@@ -71,15 +71,6 @@ class InventorySlotData:
 func _ready():
 	_register_items_from_dir("res://scripts/items")
 	print("Registered items: ", item_database.keys())
-	#var dir = DirAccess.open("res://scripts/items")
-	#for file in dir.get_files():
-		#print(file)
-		#if file.ends_with(".gd"):
-			#var item_script = load("res://scripts/items/" + file)
-			#var item_instance = item_script.new()
-			#item_database[file.get_basename()] = item_instance
-			#print(item_database)
-
 
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
