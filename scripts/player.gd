@@ -270,10 +270,7 @@ func handle_interact_or_use_action():
 				else:
 					$AnimatedSprite2D.play("interact")
 				# Disconnect any existing connections first, then connect
-				if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
-					$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
-				if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
-					$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
+				cleanup_player_connections()
 
 				$AnimatedSprite2D.animation_finished.connect(_on_interact_animation_finished)
 			else:
@@ -326,13 +323,8 @@ func handle_attack_action():
 							$AnimatedSprite2D.play("punch")
 							
 						# Disconnect any existing connections first, then connect
-						if $AnimatedSprite2D.frame_changed.is_connected(_on_attack_frame_changed):
-							$AnimatedSprite2D.frame_changed.disconnect(_on_attack_frame_changed)
-						if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
-							$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
-						if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
-							$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
-						
+						cleanup_player_connections()
+							
 						$AnimatedSprite2D.frame_changed.connect(_on_attack_frame_changed)
 						$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
 
@@ -632,15 +624,6 @@ func is_mouse_over_hotbar() -> bool:
 	var hotbar_rect = Rect2(hotbar.global_position, hotbar.size)
 	return hotbar_rect.has_point(mouse_pos)
 
-#func get_selected_hotbar_item():
-	#var ui_layer = get_parent().get_node_or_null("UI")
-	#if not ui_layer:
-		#return null
-	#var hotbar = ui_layer.get_node_or_null("Hotbar")
-	#if not hotbar:
-		#return null
-	#return hotbar.get_selected_item()
-
 func get_selected_hotbar_slot_and_item():
 	var ui_layer = get_parent().get_node_or_null("UI")
 	if not ui_layer:
@@ -713,13 +696,10 @@ func _on_stat_depleted(stat_name: String):
 			if $AnimatedSprite2D.animation != "land_death":
 				print("play land death")
 				$AnimatedSprite2D.play("land_death")
+				
 				# Disconnect previous handlers
-				if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
-					$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
-				if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
-					$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
-				if $AnimatedSprite2D.animation_finished.is_connected(_on_death_animation_finished):
-					$AnimatedSprite2D.animation_finished.disconnect(_on_death_animation_finished)
+				cleanup_player_connections()
+				
 				# Connect death animation finished h andler
 				$AnimatedSprite2D.animation_finished.connect(_on_death_animation_finished)
 		"oxygen":
@@ -775,3 +755,13 @@ func add_loot(item_name: String, amount: int):
 		return true
 	else:
 		return false
+
+func cleanup_player_connections():
+	if $AnimatedSprite2D.frame_changed.is_connected(_on_attack_frame_changed):
+		$AnimatedSprite2D.frame_changed.disconnect(_on_attack_frame_changed)
+	if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
+		$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
+	if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
+		$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
+	if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
+		$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)

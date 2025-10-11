@@ -17,7 +17,7 @@ class_name GameItem
 func is_consumable() -> bool:
 	return false
 
-func cleanup_connections(user):	
+func cleanup_connections(user):
 	# Clean up any existing connections first
 	var anim_sprite = user.get_node("AnimatedSprite2D")
 	if anim_sprite.frame_changed.is_connected(user._on_attack_frame_changed):

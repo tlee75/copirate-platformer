@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://ckk3o0r7wv6tc"]
 
 [ext_resource type="Script" uid="uid://cnt0uxtpajki6" path="res://scripts/pickups/stick_pickup.gd" id="1_jknlk"]
-[ext_resource type="Texture2D" uid="uid://bvhsc2mo15fji" path="res://assets/tropical/stick_01_48x64.png" id="2_7rqfo"]
+[ext_resource type="Texture2D" uid="uid://bvhsc2mo15fji" path="res://assets/terrain/stick_01_48x64.png" id="2_7rqfo"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tkx6t"]
 atlas = ExtResource("2_7rqfo")
