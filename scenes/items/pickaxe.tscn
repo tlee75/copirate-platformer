@@ -1,6 +1,6 @@
 [gd_scene load_steps=67 format=3 uid="uid://buc368tv0cjic"]
 
-[ext_resource type="Script" uid="uid://u2oatw2wfluw" path="res://scripts/items/pickaxe_pickup.gd" id="1_2ikqw"]
+[ext_resource type="Script" uid="uid://u2oatw2wfluw" path="res://scripts/pickups/pickaxe_pickup.gd" id="1_2ikqw"]
 [ext_resource type="Texture2D" uid="uid://bbuwoibkprf4m" path="res://assets/sprite-man/pick_axe_idle_01-62.png" id="1_40cab"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2ikqw"]

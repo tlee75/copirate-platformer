@@ -68,17 +68,24 @@ class InventorySlotData:
 		item = null
 		quantity = 0
 
-func _ready():	
-	# Initialize item database with items	
-	item_database["gold_coin"] = GoldCoin.new()
-	item_database["sword"] = Sword.new()
-	item_database["pickaxe"] = PickAxe.new()
-	item_database["woodaxe"] = WoodAxe.new()
-	item_database["shovel"] = Shovel.new()
-	item_database["raspberry"] = Raspberry.new()
-	item_database["cooked_raspberry"] = CookedRaspberry.new()
-	item_database["leafbandage"] = LeafBandage.new()
-	item_database["stick"] = Stick.new()
+func _ready():
+	var dir = DirAccess.open("res://scripts/items")
+	for file in dir.get_files():
+		print(file)
+		if file.ends_with(".gd"):
+			var item_script = load("res://scripts/items/" + file)
+			var item_instance = item_script.new()
+			item_database[file.get_basename()] = item_instance
+			print(item_database)
+	#item_database["gold_coin"] = GoldCoin.new()
+	#item_database["sword"] = Sword.new()
+	#item_database["pickaxe"] = PickAxe.new()
+	#item_database["woodaxe"] = WoodAxe.new()
+	#item_database["shovel"] = Shovel.new()
+	#item_database["raspberry"] = Raspberry.new()
+	#item_database["cooked_raspberry"] = CookedRaspberry.new()
+	#item_database["leafbandage"] = LeafBandage.new()
+	#item_database["stick"] = Stick.new()
 
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 

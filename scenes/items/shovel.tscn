@@ -1,6 +1,6 @@
 [gd_scene load_steps=69 format=3 uid="uid://cqfe0i3jnrxp5"]
 
-[ext_resource type="Script" uid="uid://cgtdgbhaohcoo" path="res://scripts/items/shovel_pickup.gd" id="1_d01uh"]
+[ext_resource type="Script" uid="uid://cgtdgbhaohcoo" path="res://scripts/pickups/shovel_pickup.gd" id="1_d01uh"]
 [ext_resource type="Texture2D" uid="uid://b7iap0wkc104f" path="res://assets/sprite-man/shovel_idle_02-64.png" id="2_081d1"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g60nu"]
