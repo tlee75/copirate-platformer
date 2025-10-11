@@ -69,23 +69,17 @@ class InventorySlotData:
 		quantity = 0
 
 func _ready():
-	var dir = DirAccess.open("res://scripts/items")
-	for file in dir.get_files():
-		print(file)
-		if file.ends_with(".gd"):
-			var item_script = load("res://scripts/items/" + file)
-			var item_instance = item_script.new()
-			item_database[file.get_basename()] = item_instance
-			print(item_database)
-	#item_database["gold_coin"] = GoldCoin.new()
-	#item_database["sword"] = Sword.new()
-	#item_database["pickaxe"] = PickAxe.new()
-	#item_database["woodaxe"] = WoodAxe.new()
-	#item_database["shovel"] = Shovel.new()
-	#item_database["raspberry"] = Raspberry.new()
-	#item_database["cooked_raspberry"] = CookedRaspberry.new()
-	#item_database["leafbandage"] = LeafBandage.new()
-	#item_database["stick"] = Stick.new()
+	_register_items_from_dir("res://scripts/items")
+	print("Registered items: ", item_database.keys())
+	#var dir = DirAccess.open("res://scripts/items")
+	#for file in dir.get_files():
+		#print(file)
+		#if file.ends_with(".gd"):
+			#var item_script = load("res://scripts/items/" + file)
+			#var item_instance = item_script.new()
+			#item_database[file.get_basename()] = item_instance
+			#print(item_database)
+
 
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
@@ -318,3 +312,17 @@ func print_inventory():
 			print("Slot ", i, ": ", slot.item.name, " x", slot.quantity)
 		else:
 			print("Slot ", i, ": Empty")
+
+func _register_items_from_dir(path: String):
+	var dir = DirAccess.open(path)
+	if dir == null:
+		print("Could not open directory: ", path)
+		return
+	for file in dir.get_files():
+		if file.ends_with(".gd"):
+			var item_script = load(path + "/" + file)
+			var item_instance = item_script.new()
+			var key = file.get_basename()
+			item_database[key] = item_instance
+	for subdir in dir.get_directories():
+		_register_items_from_dir(path + "/" + subdir)
