@@ -1,16 +1,24 @@
-extends Area2D
+extends GameItem
+class_name Shovel
 
-func _ready():
-	$AnimatedSprite2D.play("idle")
+# Animation hit frame definition
+var hit_frames = {
+	"shovel_attack": [16, 35,58], # List is required for single frames
+}
 
-	# Connect area entered signal for collection
-	body_entered.connect(_on_body_entered)
+func _init():
+	name = "Shovel"
+	icon = load("res://assets/sprite-man/shovel_icon_01.png")
+	stack_size = 1
+	craftable = true
+	category = "tool"
+	underwater_compatible = false
+	land_compatible = true
+	craft_requirements = {"Gold Coin": 2}
 
-func _on_body_entered(body):
-	# If player touches item, add to inventory
-	if body.is_in_group("player"):
-		if body.add_loot("shovel", 1):
-			print("item added to inventory!")
-			queue_free()
-		else:
-			print("Inventory full! Cannot pick up item.")
+func action(player):
+	print("Shovel attack by %s" % player.name)
+	player.is_trigger_action = true
+	player.get_node("AnimatedSprite2D").play("shovel_attack")
+	
+	cleanup_connections(player) # Defined in base class

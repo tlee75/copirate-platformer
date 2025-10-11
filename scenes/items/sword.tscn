@@ -1,6 +1,6 @@
 [gd_scene load_steps=69 format=3 uid="uid://gc64jn5o6v6i"]
 
-[ext_resource type="Script" uid="uid://dhnrxu4hloio4" path="res://scripts/items/sword.gd" id="1_xccsb"]
+[ext_resource type="Script" uid="uid://dhnrxu4hloio4" path="res://scripts/items/sword_pickup.gd" id="1_xccsb"]
 [ext_resource type="Texture2D" uid="uid://bh8jemultsh80" path="res://assets/sprite-man/short_sword_idle_01-64.png" id="2_n355p"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_s4ec8"]

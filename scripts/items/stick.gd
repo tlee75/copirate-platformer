@@ -1,16 +1,20 @@
-extends Area2D
+extends GameItem
 
-func _ready():
-	$AnimatedSprite2D.play("idle")
+class_name Stick
 
-	# Connect area entered signal for collection
-	body_entered.connect(_on_body_entered)
+@export var fuel_value: float = 10.0 # Seconds of burn time
 
-func _on_body_entered(body):
-	# If player touches item, add to inventory
-	if body.is_in_group("player"):
-		if body.add_loot("stick", 1):
-			print("item added to inventory!")
-			queue_free()
-		else:
-			print("Inventory full! Cannot pick up item.")
+func _init():
+	name = "Stick"
+	stack_size = 99
+	category = "fuel"
+	craftable = false
+	icon = load("res://assets/tropical/stick_01_48x64.png")
+	fuel_value = 5
+	underwater_compatible = false
+	land_compatible = true
+	craft_requirements = {"Gold Coin": 1}
+
+func action(user):
+	# Sticks can't be used directly, only added to firepits
+	print(user, "looks at the stick...Perhaps there is something we can do with it?")

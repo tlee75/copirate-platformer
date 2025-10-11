@@ -70,15 +70,15 @@ class InventorySlotData:
 
 func _ready():	
 	# Initialize item database with items	
-	item_database["gold_coin"] = GoldCoinItem.new()
-	item_database["sword"] = SwordItem.new()
-	item_database["pickaxe"] = PickAxeItem.new()
-	item_database["woodaxe"] = WoodAxeItem.new()
-	item_database["shovel"] = ShovelItem.new()
-	item_database["raspberry"] = RaspberryItem.new()
-	item_database["cooked_raspberry"] = CookedRaspberryItem.new()
-	item_database["leafbandage"] = LeafBandageItem.new()
-	item_database["stick"] = StickItem.new()
+	item_database["gold_coin"] = GoldCoin.new()
+	item_database["sword"] = Sword.new()
+	item_database["pickaxe"] = PickAxe.new()
+	item_database["woodaxe"] = WoodAxe.new()
+	item_database["shovel"] = Shovel.new()
+	item_database["raspberry"] = Raspberry.new()
+	item_database["cooked_raspberry"] = CookedRaspberry.new()
+	item_database["leafbandage"] = LeafBandage.new()
+	item_database["stick"] = Stick.new()
 
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 

@@ -1,5 +1,5 @@
 extends GameItem
-class_name LeafBandageItem
+class_name LeafBandage
 
 # Animation hit frame definition
 var hit_frames = {

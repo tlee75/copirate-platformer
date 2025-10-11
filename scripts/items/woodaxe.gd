@@ -1,16 +1,24 @@
-extends Area2D
+extends GameItem
+class_name WoodAxe
 
-func _ready():
-	$AnimatedSprite2D.play("woodaxe_idle")
+# Animation hit frame definition
+var hit_frames = {
+	"woodaxe_attack": [32, 55], # List is required for single frames
+}
 
-	# Connect area entered signal for collection
-	body_entered.connect(_on_body_entered)
+func _init():
+	name = "Wood Axe"
+	icon = load("res://assets/sprite-man/wood_axe_icon_01.png")
+	stack_size = 1
+	craftable = true
+	category = "tool"
+	underwater_compatible = false
+	land_compatible = true
+	craft_requirements = {"Gold Coin": 3}
 
-func _on_body_entered(body):
-	# If player touches item, add to inventory
-	if body.is_in_group("player"):
-		if body.add_loot("woodaxe", 1):
-			print("Wood Axe added to inventory!")
-			queue_free()
-		else:
-			print("Inventory full! Cannot pick up Wood Axe.")
+func action(player):
+	print("Wood Axe attack by %s" % player.name)
+	player.is_trigger_action = true
+	player.get_node("AnimatedSprite2D").play("woodaxe_attack")
+	
+	cleanup_connections(player) # Defined in base class

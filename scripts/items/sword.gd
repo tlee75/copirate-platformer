@@ -1,16 +1,24 @@
-extends Area2D
+extends GameItem
+class_name Sword
 
-func _ready():
-	$AnimatedSprite2D.play("sword_idle")
+# Animation hit frame definition
+var hit_frames = {
+	"attack": [8], # List is required for single frames
+}
 
-	# Connect area entered signal for collection
-	body_entered.connect(_on_body_entered)
+func _init():
+	name = "Sword"
+	icon = load("res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 01.png")
+	stack_size = 1
+	craftable = true
+	category = "weapon"
+	underwater_compatible = false
+	land_compatible = true
+	craft_requirements = {"Gold Coin": 2}
 
-func _on_body_entered(body):
-	# If player touches item, add to inventory
-	if body.is_in_group("player"):
-		if body.add_loot("sword", 1):
-			print("Sword added to inventory!")
-			queue_free()
-		else:
-			print("Inventory full! Cannot pick up sword.")
+func action(player):
+	print("Sword attack by %s" % player.name)
+	player.is_trigger_action = true
+	player.get_node("AnimatedSprite2D").play("attack")
+	
+	cleanup_connections(player) # Defined in base class
