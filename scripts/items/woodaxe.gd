@@ -15,10 +15,7 @@ func _init():
 	underwater_compatible = false
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 3}
-
-func action(player):
-	print("Wood Axe attack by %s" % player.name)
-	player.is_trigger_action = true
-	player.get_node("AnimatedSprite2D").play("woodaxe_attack")
-	
-	cleanup_connections(player) # Defined in base class
+	attack_animation = "woodaxe_attack"
+	use_animation = "woodaxe_attack"
+	damage = 1
+	is_tool = true

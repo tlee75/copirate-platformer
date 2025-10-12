@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=34 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_yte5o"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_8w8yu"]
@@ -25,6 +25,7 @@
 [ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/terrain/wood_crate.tscn" id="23_ilrow"]
 [ext_resource type="PackedScene" uid="uid://0iommeky2of" path="res://scenes/structures/firepit.tscn" id="23_oo6ai"]
 [ext_resource type="PackedScene" uid="uid://ckk3o0r7wv6tc" path="res://scenes/items/stick.tscn" id="24_oo6ai"]
+[ext_resource type="PackedScene" uid="uid://bau4ht0cid8a1" path="res://scenes/items/wood_axe.tscn" id="26_g2ixt"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(6, 6)
@@ -103,7 +104,7 @@ script = ExtResource("1_yte5o")
 
 [node name="Player" parent="." groups=["player"] instance=ExtResource("2_8w8yu")]
 z_index = 1
-position = Vector2(-48, 2141)
+position = Vector2(-94, 2142)
 
 [node name="CursorArea" type="Area2D" parent="Player"]
 position = Vector2(20, 0)
@@ -203,7 +204,7 @@ metadata/_edit_use_anchors_ = true
 position = Vector2(290, 2159)
 
 [node name="WoodCrate2" parent="WoodCrates" instance=ExtResource("23_ilrow")]
-position = Vector2(84, 2158)
+position = Vector2(-243, 2158)
 
 [node name="WoodCrate3" parent="WoodCrates" instance=ExtResource("23_ilrow")]
 position = Vector2(290, 2123)
@@ -212,13 +213,13 @@ position = Vector2(290, 2123)
 position = Vector2(222, 2154)
 
 [node name="PickAxe" parent="." instance=ExtResource("20_lj68f")]
-position = Vector2(167, 2101)
+position = Vector2(101, 2107)
 
 [node name="Shovel" parent="." instance=ExtResource("21_ilrow")]
-position = Vector2(81, 2095)
+position = Vector2(5, 2086)
 
 [node name="Sword" parent="." instance=ExtResource("22_oo6ai")]
-position = Vector2(125, 2075)
+position = Vector2(60, 2083)
 
 [node name="Resources" type="Node" parent="."]
 
@@ -234,3 +235,6 @@ position = Vector2(-191, 2158)
 
 [node name="Stick" parent="." instance=ExtResource("24_oo6ai")]
 position = Vector2(-150, 2159)
+
+[node name="WoodAxe" parent="." instance=ExtResource("26_g2ixt")]
+position = Vector2(-35, 2111)

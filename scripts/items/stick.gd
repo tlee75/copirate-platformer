@@ -12,9 +12,5 @@ func _init():
 	icon = load("res://assets/terrain/stick_01_48x64.png")
 	fuel_value = 5
 	underwater_compatible = false
-	land_compatible = true
+	land_compatible = false
 	craft_requirements = {"Gold Coin": 1}
-
-func action(user):
-	# Sticks can't be used directly, only added to firepits
-	print(user, "looks at the stick...Perhaps there is something we can do with it?")

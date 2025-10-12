@@ -44,6 +44,12 @@ func is_attackable() -> bool:
 	var result = state != ObjectState.DESTROYED and hit_cooldown <= 0.0
 	return result
 
+func is_attack_target(_target):
+	return true # or custom logic
+
+func is_tool_target():
+	return false # or custom logic
+
 func is_interactable() -> bool:
 	var result = state != ObjectState.DESTROYED and hit_cooldown <= 0.0
 	return result

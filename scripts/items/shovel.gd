@@ -20,6 +20,8 @@ var hit_frames = {
 }
 
 func _init():
+	attack_animation = "shovel_attack"
+	use_animation = "shovel_attack"
 	name = "Shovel"
 	icon = load("res://assets/sprite-man/shovel_icon_01.png")
 	stack_size = 1
@@ -28,88 +30,33 @@ func _init():
 	underwater_compatible = false
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 2}
-	is_digging_tool = true
+	is_tool = true
+	damage = 1
 
+func handle_use_frame(player, anim, frame):
+	handle_attack_frame(player, anim, frame)
 
-# shovel.gd
+func handle_attack_frame(player, anim, frame):
+	var target = player.attack_target
+	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("take_damage"):
+		target.take_damage(damage)
+	elif typeof(target) == TYPE_VECTOR2I:
+		var hit_frame_list = self.hit_frames.get(anim, [])
+		if hit_frame_list.size() > 0 and frame == hit_frame_list[-1]:
+			var tilemap = player.tilemap
+			var tile_pos = target
+			var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
+			if tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
+				var replacement = get_replacement_tile_for_dig(tilemap, tile_pos)
+				tilemap.set_cell(0, tile_pos, replacement["source_id"], replacement["atlas_coords"])
+				var dig_item_key = "dirt"
+				if tile_data.has_custom_data("dig_item"):
+					dig_item_key = tile_data.get_custom_data("dig_item")
+				player.add_loot(dig_item_key, 1)
+				print("Dug up ", dig_item_key, " at: ", tile_pos)
+			else:
+				print("Tile is not diggable: ", tile_pos)
 
-func action(player):
-	# Get the tile under the cursor
-	var tile_pos = player.get_tiles_in_cursor_area()[0]
-	player.is_trigger_action = true
-	player.get_node("AnimatedSprite2D").play("shovel_attack")
-	
-	# Disconnect previous connections to avoid duplicates
-	player.cleanup_player_connections()
-	
-	# Store the tile position for use in the frame handler
-	player.attack_target = tile_pos
-	
-	# Connect to frame_changed to handle dig on hit frame
-	player.get_node("AnimatedSprite2D").frame_changed.connect(_on_shovel_attack_frame_changed.bind(player))
-	player.get_node("AnimatedSprite2D").animation_finished.connect(_on_shovel_attack_animation_finished.bind(player))
-
-func _on_shovel_attack_frame_changed(player):
-	var anim_sprite = player.get_node("AnimatedSprite2D")
-	var anim = anim_sprite.animation
-	var frame = anim_sprite.frame
-	
-	if anim in self.hit_frames and frame in self.hit_frames[anim]:
-		var tilemap = player.tilemap
-		var tile_pos = player.attack_target
-		var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
-		if tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
-			var replacement = get_replacement_tile_for_dig(tilemap, tile_pos)
-			tilemap.set_cell(0, tile_pos, replacement["source_id"], replacement["atlas_coords"])
-			var dig_item_key = "dirt"
-			if tile_data.has_custom_data("dig_item"):
-				dig_item_key = tile_data.get_custom_data("dig_item")
-			player.add_loot(dig_item_key, 1)
-			print("Dug up ", dig_item_key, " at: ", tile_pos)
-		# Disconnect after performing the action
-		if anim_sprite.frame_changed.is_connected(_on_shovel_attack_frame_changed):
-			anim_sprite.frame_changed.disconnect(_on_shovel_attack_frame_changed)
-
-func _on_shovel_attack_animation_finished(player):
-	player.is_trigger_action = false
-	player.attack_target = null
-	if player.get_node("AnimatedSprite2D").animation_finished.is_connected(_on_shovel_attack_animation_finished):
-		player.get_node("AnimatedSprite2D").animation_finished.disconnect(_on_shovel_attack_animation_finished)
-
-#func action(player):
-	#print("Shovel attack by %s" % player.name)
-	#player.is_trigger_action = true
-	#player.get_node("AnimatedSprite2D").play("shovel_attack")
-	#
-	#cleanup_connections(player) # Defined in base class
-
-
-#func action(player):
-	## Get the tilemap and cursor position from the player
-	#var tilemap = player.tilemap
-	#var cursor_area = player.cursor_area
-	#var tile_pos = tilemap.local_to_map(cursor_area.global_position)
-	#
-	## Determine which item to drop and which tile to place
-	#var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
-	#if tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
-		## Determine replacement tile
-		#var replacement = get_replacement_tile_for_dig(tilemap, tile_pos)
-		#tilemap.set_cell(0, tile_pos, replacement["source_id"], replacement["atlas_coords"])
-		#
-		## Determine item to drop
-		#var dig_item_key = "dirt"  # Default fallback
-		#if tile_data.has_custom_data("dig_item"):
-			#dig_item_key = tile_data.get_custom_data("dig_item")
-		#InventoryManager.add_item(InventoryManager.item_database[dig_item_key], 1)
-		#print("Dug up ", dig_item_key, " at: ", tile_pos)
-		#return true
-	#
-	## If not diggable, fallback to shovel attack animation
-	#player.is_trigger_action = true
-	#player.get_node("AnimatedSprite2D").play("shovel_attack")
-	#cleanup_connections(player)
-	#return false
 
 # Helper function for tile replacement logic
 func get_replacement_tile_for_dig(tilemap, tile_pos: Vector2i) -> Dictionary:

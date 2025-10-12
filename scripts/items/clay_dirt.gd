@@ -14,7 +14,3 @@ func _init():
 	underwater_compatible = false
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 1}
-
-func action(user):
-	# Sticks can't be used directly, only added to firepits
-	print(user, "looks at the dirt...Perhaps there is something we can do with it?")

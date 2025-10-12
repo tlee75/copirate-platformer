@@ -29,6 +29,7 @@ var is_in_water: bool = false
 var tile_size: float = 32.0
 var is_dead: bool = false
 var attack_target = null 
+var tool_target = null
 var interact_target = null
 
 # Player stats system
@@ -262,7 +263,7 @@ func handle_interact_or_use_action():
 	# Interact/Use Action
 	if Input.is_action_just_pressed("interact") and not inventory_is_open:
 		if not is_interacting:
-			if is_interactable_objects():
+			if is_interact_target():
 				is_interacting = true
 				print("Interact used by %s" % self.name)
 				if is_underwater:
@@ -270,26 +271,22 @@ func handle_interact_or_use_action():
 				else:
 					$AnimatedSprite2D.play("interact")
 				# Disconnect any existing connections first, then connect
-				cleanup_player_connections()
-
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
+					$AnimatedSprite2D.frame_changed.disconnect(_on_interact_animation_finished)
 				$AnimatedSprite2D.animation_finished.connect(_on_interact_animation_finished)
 			else:
-				print("Using item")
+				print("Using hotbar item")
 				var selected_result = get_selected_hotbar_slot_and_item()
-				var slot_data = selected_result[0]
 				var selected_item = selected_result[1]
-				if selected_item and selected_item.has_method("action"):
-					# Check if this item can be used in current environment
+				if selected_item:
+					print("selected item: ", selected_item)
 					if not can_use_item_in_current_environment(selected_item):
 						var item_name = selected_item.name if selected_item.has_method("get_name") else str(selected_item)
 						var environment_msg = "underwater" if is_underwater else "on land"
 						print("Cannot use ", item_name, " ", environment_msg, "!")
 						return
-					if selected_item.action(self):
-						# Remove item if it's consumable
-						if selected_item.is_consumable():
-							slot_data.remove_item(1)
-							InventoryManager.hotbar_changed.emit()
+					tool_target = get_tool_target()
+					handle_hotbar_action(selected_item, tool_target)
 				else:
 					print("Cannot interact or use an item")
 
@@ -298,49 +295,40 @@ func handle_attack_action():
 	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu():
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
-			is_attackable_objects() # Allow attack even when there is no attackble object
 			if equipment_panel:
 				var main_hand_slot_index = equipment_panel.get_equipment_slot_index_by_node_name("MainHand")
 				if main_hand_slot_index != -1:
 					var main_hand_slot = InventoryManager.get_equipment_slot(main_hand_slot_index)
-					if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item and main_hand_slot.item.has_method("action"):
-						var item_name = main_hand_slot.item.name if main_hand_slot.item.has_method("get_name") else str(main_hand_slot.item)
-						
-						## Digging tool check
-						#if main_hand_slot.item.is_digging_tool:
-							#var tile_pos = tilemap.local_to_map(cursor_area.global_position)
-							#var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
-							#if tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
-								#var dig_item_key = "dirt"  # Default fallback
-								#if tile_data.has_custom_data("dig_item"):
-									#dig_item_key = tile_data.get_custom_data("dig_item")
-								#tilemap.set_cell(0, tile_pos, 1, Vector2i(0,0))
-								#InventoryManager.add_item(InventoryManager.item_database[dig_item_key], 1)
-								#print("Dug up ", dig_item_key, " at: ", tile_pos)
-								#return
-								
-						# Check if this item can be used in the current environment
-						if not can_use_item_in_current_environment(main_hand_slot.item):
+					if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item:
+						var item = main_hand_slot.item
+						if not can_use_item_in_current_environment(item):
 							var environment_msg = "underwater" if is_underwater else "on land"
-							print("Cannot use ", item_name, " ", environment_msg, "!")
+							print("Cannot use ", item.name, " ", environment_msg, "!")
 							return
-						main_hand_slot.item.action(self)
+						# Detect targets
+						attack_target = get_attack_target()
+						tool_target = get_tool_target()
+						handle_mainhand_action(item, attack_target if attack_target else tool_target)
 					else:
-						# Fallback to unarmed attack
-						is_trigger_action = true
-										
-						if is_underwater:
-							print("Gather used by %s" % self.name)
-							$AnimatedSprite2D.play("swim_gather") # Replace this with swim attack
-						else:
-							print("Melee used by %s" % self.name)
-							$AnimatedSprite2D.play("punch")
-							
-						# Disconnect any existing connections first, then connect
-						cleanup_player_connections()
-							
-						$AnimatedSprite2D.frame_changed.connect(_on_attack_frame_changed)
-						$AnimatedSprite2D.animation_finished.connect(_on_attack_animation_finished)
+						# Fallback to melee item attack
+						var melee_item = InventoryManager.item_database["melee"]
+						attack_target = get_attack_target()
+						melee_item.attack(self, attack_target)
+
+func handle_mainhand_action(item, target):
+	if not item.has_method("attack") or not item.has_method("use"):
+		print("WARNING: Item ", item.name, " is missing attack/use methods!")
+	if not item.damage or item.damage <= 0:
+		print("WARNING: Item ", item.name, " is missing damage attribute or damage is zero!")
+	if typeof(target) == TYPE_OBJECT and item.damage > 0:
+		item.attack(self, target)
+	elif item.is_tool:
+		item.use(self, target)
+	elif item.damage > 0:
+		item.attack(self, null)
+
+func handle_hotbar_action(item, target):
+	item.use(self, target)
 
 func handle_animations():
 	# Don't change animations while in the middle of an action or dead
@@ -418,40 +406,40 @@ func _on_ground_animation_finished():
 		else:
 			$AnimatedSprite2D.play("idle")
 
-func _on_attack_animation_finished():
-	# Disconnect the signal immediately to prevent interference
-	if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
-		$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
+#func _on_attack_animation_finished():
+	## Disconnect the signal immediately to prevent interference
+	#if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
+		#$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
+#
+	## Do stuff here when animation is finished
+#
+	## When animation finishes, end actiond state
+	#is_trigger_action = false
+	#
+	## Remove target which was needed for any multi hit frame animations
+	#attack_target = null
 
-	# Do stuff here when animation is finished
-
-	# When animation finishes, end actiond state
-	is_trigger_action = false
-	
-	# Remove target which was needed for any multi hit frame animations
-	attack_target = null
-
-func _on_attack_frame_changed():
-	var anim_sprite = $AnimatedSprite2D
-	var anim = anim_sprite.animation
-	var frame = anim_sprite.frame
-	
-	# Get the equipped item from the main hand slot
-	var item = null
-	if equipment_panel:
-		var main_hand_slot_index = equipment_panel.get_equipment_slot_index_by_node_name("MainHand")
-		if main_hand_slot_index != -1:
-			var main_hand_slot = InventoryManager.get_equipment_slot(main_hand_slot_index)
-			if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item:
-				item = main_hand_slot.item
-	
-	# Use the item's hit_frames if available
-	var item_hit_frames = item.hit_frames if item and "hit_frames" in item else default_hit_frames
-	
-	if anim in item_hit_frames and frame in item_hit_frames[anim]:
-		# Apply hit frame synchronized damage to stored target
-		if attack_target and is_instance_valid(attack_target):
-			attack_target.take_damage(1)  # Damage happens here
+#func _on_attack_frame_changed():
+	#var anim_sprite = $AnimatedSprite2D
+	#var anim = anim_sprite.animation
+	#var frame = anim_sprite.frame
+	#
+	## Get the equipped item from the main hand slot
+	#var item = null
+	#if equipment_panel:
+		#var main_hand_slot_index = equipment_panel.get_equipment_slot_index_by_node_name("MainHand")
+		#if main_hand_slot_index != -1:
+			#var main_hand_slot = InventoryManager.get_equipment_slot(main_hand_slot_index)
+			#if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item:
+				#item = main_hand_slot.item
+	#
+	## Use the item's hit_frames if available
+	#var item_hit_frames = item.hit_frames if item and "hit_frames" in item else default_hit_frames
+	#
+	#if anim in item_hit_frames and frame in item_hit_frames[anim]:
+		## Apply hit frame synchronized damage to stored target
+		#if attack_target and is_instance_valid(attack_target):
+			#attack_target.take_damage(1)  # Damage happens here
 
 
 func _on_interact_animation_finished():
@@ -585,14 +573,14 @@ func create_tile_highlight_optimized(tile_pos: Vector2i):
 	tile_highlights.append(highlight)
 	highlighted_tiles.append(tile_pos)
 
-func destroy_tiles_in_cursor_area():
-	# Get the single tile that would be affected (same logic as highlighting)
-	var affected_tiles = get_tiles_in_cursor_area()
-	
-	# Destroy only the single targeted tile
-	for tile_pos in affected_tiles:
-		tilemap.set_cell(0, tile_pos, -1)
-		print("Destroyed tile at: ", tile_pos)
+#func destroy_tiles_in_cursor_area():
+	## Get the single tile that would be affected (same logic as highlighting)
+	#var affected_tiles = get_tiles_in_cursor_area()
+	#
+	## Destroy only the single targeted tile
+	#for tile_pos in affected_tiles:
+		#tilemap.set_cell(0, tile_pos, -1)
+		#print("Destroyed tile at: ", tile_pos)
 
 
 func _on_inventory_state_changed(is_open: bool):
@@ -658,12 +646,6 @@ func is_on_water_tile() -> bool:
 		return tile_data.get_custom_data("is_water")
 	return false
 
-func is_tile_diggable(tile_pos: Vector2i) -> bool:
-	var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
-	if tile_data and tile_data.has_custom_data("is_diggable"):
-		return tile_data.get_custom_data("is_diggable")
-	return false
-
 func find_water_surface_y() -> int:
 	var tile_pos = tilemap.local_to_map(global_position)
 	var check_pos = tile_pos
@@ -684,9 +666,9 @@ func can_use_item_in_current_environment(item) -> bool:
 	# Check if item has environment compatibility properties
 	if is_underwater:
 		# Check if item works underwater
-		return item.underwater_compatible if item.has_method("action") else false
+		return item.underwater_compatible
 	else:
-		return item.land_compatible if item.has_method("action") else true
+		return item.land_compatible
 		
 
 func update_collision_orientation():
@@ -718,9 +700,8 @@ func _on_stat_depleted(stat_name: String):
 				$AnimatedSprite2D.play("land_death")
 				
 				# Disconnect previous handlers
-				cleanup_player_connections()
-				
-				# Connect death animation finished h andler
+				if $AnimatedSprite2D.animation_finished.is_connected(_on_death_animation_finished):
+					$AnimatedSprite2D.animation_finished.disconnect(_on_death_animation_finished)
 				$AnimatedSprite2D.animation_finished.connect(_on_death_animation_finished)
 		"oxygen":
 			print("Player is suffocating!")
@@ -732,7 +713,7 @@ func _on_stat_depleted(stat_name: String):
 		"thirst":
 			print("Player is dehydrated!")
 
-func is_interactable_objects():
+func is_interact_target():
 	var all_targets = get_potential_targets()
 	
 	# Find first interactable target
@@ -746,15 +727,37 @@ func is_interactable_objects():
 		
 	print("No interactable objects in range")
 
-func is_attackable_objects():
-	var all_targets = get_potential_targets()
-		
-	# Find first attackable target
-	for target in all_targets:
-		if target != self and target.has_method("is_attackable") and target.is_attackable():
-			attack_target = target
-			target.set_cooldown()
-			return true
+func is_attack_target(target):
+	return target and target.has_method("is_attack_target") and target.is_attack_target()
+
+func is_tile_target(tile_pos: Vector2i):
+	var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
+	return tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable")
+
+func get_attack_target():
+	var targets = []
+	for body in cursor_area.get_overlapping_bodies():
+		if body != self and body.has_method("is_attack_target") and body.is_attack_target(body):
+			print("Attackable object found: ", body)
+			targets.append(body)
+	for area in cursor_area.get_overlapping_areas():
+		var parent = area.get_parent()
+		if parent != self and parent.has_method("is_attack_target") and parent.is_attack_target(parent):
+			targets.append(parent)
+	return targets[0] if targets.size() > 0 else null
+
+func get_tool_target():
+	var tile_pos = get_tiles_in_cursor_area()
+	if tile_pos.size() > 0 and is_tile_target(tile_pos[0]):
+		return tile_pos[0]
+	for body in cursor_area.get_overlapping_bodies():
+		if body.has_method("is_tool_target") and body.is_tool_target():
+			return body
+	for area in cursor_area.get_overlapping_areas():
+		var parent = area.get_parent()
+		if parent.has_method("is_tool_target") and parent.is_tool_target():
+			return parent
+	return null
 
 func get_potential_targets() -> Array:
 	var overlapping_areas = cursor_area.get_overlapping_areas()
@@ -775,13 +778,3 @@ func add_loot(item_name: String, amount: int):
 		return true
 	else:
 		return false
-
-func cleanup_player_connections():
-	if $AnimatedSprite2D.frame_changed.is_connected(_on_attack_frame_changed):
-		$AnimatedSprite2D.frame_changed.disconnect(_on_attack_frame_changed)
-	if $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
-		$AnimatedSprite2D.animation_finished.disconnect(_on_ground_animation_finished)
-	if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
-		$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
-	if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
-		$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)

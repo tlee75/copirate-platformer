@@ -42,7 +42,7 @@ class InventorySlotData:
 	
 	func add_item(new_item: GameItem, amount: int = 1) -> int:
 		if is_empty():
-			item = new_item
+			item = new_item.duplicate()
 			quantity = min(amount, new_item.stack_size)
 			return amount - quantity
 		elif item.name == new_item.name:
@@ -189,13 +189,14 @@ func move_item_extended(from_type: SlotType, from_index: int, to_type: SlotType,
 	if not from_slot or not to_slot:
 		return false
 	
-	# Swap items
-	var temp_item = from_slot.item
+	# Swap items - use duplicates to ensure proper instances
+	var temp_item = from_slot.item.duplicate() if from_slot.item else null
 	var temp_quantity = from_slot.quantity
-	from_slot.item = to_slot.item
+	from_slot.item = to_slot.item.duplicate() if to_slot.item else null
 	from_slot.quantity = to_slot.quantity
 	to_slot.item = temp_item
 	to_slot.quantity = temp_quantity
+	
 	# Emit signals
 	if from_type == SlotType.HOTBAR or to_type == SlotType.HOTBAR:
 		hotbar_changed.emit()
@@ -314,6 +315,7 @@ func _register_items_from_dir(path: String):
 			var item_script = load(path + "/" + file)
 			var item_instance = item_script.new()
 			var key = file.get_basename()
+			print("Registered: ", key, " as class: ", item_instance.get_class())
 			item_database[key] = item_instance
 	for subdir in dir.get_directories():
 		_register_items_from_dir(path + "/" + subdir)

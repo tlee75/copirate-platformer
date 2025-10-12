@@ -22,8 +22,6 @@ func _ready():
 			player_stats = player.player_stats
 			connect_to_stats()
 
-
-
 func connect_to_stats():
 	if not player_stats:
 		return
