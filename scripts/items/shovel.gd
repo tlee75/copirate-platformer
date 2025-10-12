@@ -47,38 +47,55 @@ func handle_attack_frame(player, anim, frame):
 			var tile_pos = target
 			var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
 			if tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
-				var replacement = get_replacement_tile_for_dig(tilemap, tile_pos)
-				tilemap.set_cell(0, tile_pos, replacement["source_id"], replacement["atlas_coords"])
+				# Always replace with dirt hole immediately (instant feedback)
+				tilemap.set_cell(0, tile_pos, DIRT_HOLE_SOURCE_ID, Vector2i(DIRT_HOLE_X, DIRT_HOLE_Y))
+				
+				# Get loot
 				var dig_item_key = "dirt"
 				if tile_data.has_custom_data("dig_item"):
 					dig_item_key = tile_data.get_custom_data("dig_item")
 				player.add_loot(dig_item_key, 1)
 				print("Dug up ", dig_item_key, " at: ", tile_pos)
+				
+				# Register with water flow system
+				var water_flow_manager = player.get_tree().current_scene.get_node_or_null("WaterFlowManager")
+				if water_flow_manager:
+					water_flow_manager.register_dug_tile(tile_pos)
+				else:
+					push_error("Shovel: Could not find WaterFlowManager in scene")
+			#if tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
+				#var replacement = get_replacement_tile_for_dig(tilemap, tile_pos)
+				#tilemap.set_cell(0, tile_pos, replacement["source_id"], replacement["atlas_coords"])
+				#var dig_item_key = "dirt"
+				#if tile_data.has_custom_data("dig_item"):
+					#dig_item_key = tile_data.get_custom_data("dig_item")
+				#player.add_loot(dig_item_key, 1)
+				#print("Dug up ", dig_item_key, " at: ", tile_pos)
 			else:
 				print("Tile is not diggable: ", tile_pos)
 
 
-# Helper function for tile replacement logic
-func get_replacement_tile_for_dig(tilemap, tile_pos: Vector2i) -> Dictionary:
-	var above_pos = tile_pos + Vector2i(0, -1)
-	var left_pos = tile_pos + Vector2i(-1, 0)
-	var right_pos = tile_pos + Vector2i(1, 0)
-	
-	var above_data = tilemap.get_cell_tile_data(0, above_pos)
-	var left_data = tilemap.get_cell_tile_data(0, left_pos)
-	var right_data = tilemap.get_cell_tile_data(0, right_pos)
-	
-	# Check above for water
-	if above_data and above_data.has_custom_data("is_water") and above_data.get_custom_data("is_water"):
-		return {"source_id": UNDERWATER_SOURCE_ID, "atlas_coords": Vector2i(UNDERWATER_X, UNDERWATER_Y)}
-	
-	# Check left/right for water
-	for adj_data in [left_data, right_data]:
-		if adj_data and adj_data.has_custom_data("is_water") and adj_data.get_custom_data("is_water"):
-			if adj_data.has_custom_data("water_type") and adj_data.get_custom_data("water_type") == "surface":
-				return {"source_id": SURFACE_WATER_SOURCE_ID, "atlas_coords": Vector2i(SURFACE_WATER_X, SURFACE_WATER_Y)}
-			else:
-				return {"source_id": UNDERWATER_SOURCE_ID, "atlas_coords": Vector2i(UNDERWATER_X, UNDERWATER_Y)}
-	
-	# Default to dirt_hole if no water found
-	return {"source_id": DIRT_HOLE_SOURCE_ID, "atlas_coords": Vector2i(DIRT_HOLE_X, DIRT_HOLE_Y)}
+## Helper function for tile replacement logic
+#func get_replacement_tile_for_dig(tilemap, tile_pos: Vector2i) -> Dictionary:
+	#var above_pos = tile_pos + Vector2i(0, -1)
+	#var left_pos = tile_pos + Vector2i(-1, 0)
+	#var right_pos = tile_pos + Vector2i(1, 0)
+	#
+	#var above_data = tilemap.get_cell_tile_data(0, above_pos)
+	#var left_data = tilemap.get_cell_tile_data(0, left_pos)
+	#var right_data = tilemap.get_cell_tile_data(0, right_pos)
+	#
+	## Check above for water
+	#if above_data and above_data.has_custom_data("is_water") and above_data.get_custom_data("is_water"):
+		#return {"source_id": UNDERWATER_SOURCE_ID, "atlas_coords": Vector2i(UNDERWATER_X, UNDERWATER_Y)}
+	#
+	## Check left/right for water
+	#for adj_data in [left_data, right_data]:
+		#if adj_data and adj_data.has_custom_data("is_water") and adj_data.get_custom_data("is_water"):
+			#if adj_data.has_custom_data("water_type") and adj_data.get_custom_data("water_type") == "surface":
+				#return {"source_id": SURFACE_WATER_SOURCE_ID, "atlas_coords": Vector2i(SURFACE_WATER_X, SURFACE_WATER_Y)}
+			#else:
+				#return {"source_id": UNDERWATER_SOURCE_ID, "atlas_coords": Vector2i(UNDERWATER_X, UNDERWATER_Y)}
+	#
+	## Default to dirt_hole if no water found
+	#return {"source_id": DIRT_HOLE_SOURCE_ID, "atlas_coords": Vector2i(DIRT_HOLE_X, DIRT_HOLE_Y)}

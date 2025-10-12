@@ -53,6 +53,12 @@ func use(player, target, slot_data = null):
 	anim_sprite.frame_changed.connect(_on_use_frame_changed.bind(player))
 	anim_sprite.animation_finished.connect(_on_use_animation_finished.bind(player))
 	anim_sprite.play(use_animation)
+	
+	# For consumables, store the slot data so it can be cleaned up later
+	if is_consumable() and slot_data:
+		pending_slot_data = slot_data
+	else:
+		pending_slot_data = null
 
 func _on_attack_frame_changed(player):
 	var anim_sprite = player.get_node("AnimatedSprite2D")
@@ -92,6 +98,12 @@ func _on_use_animation_finished(player):
 	player.is_trigger_action = false
 	player.attack_target = null
 	extra_use_cleanup(player)
+	
+	# Remove the consumable that was stored previously
+	if is_consumable() and pending_slot_data and not pending_slot_data.is_empty() and pending_slot_data.item.name == self.name:
+		pending_slot_data.remove_item(1)
+		InventoryManager.hotbar_changed.emit()
+		pending_slot_data = null
 	cleanup_connections(player)
 
 func extra_attack_startup(_player):

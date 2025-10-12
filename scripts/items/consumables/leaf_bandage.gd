@@ -35,29 +35,3 @@ func extra_use_startup(player, slot_data):
 		pending_slot_data = slot_data
 	else:
 		print("no player stats")
-
-func extra_use_cleanup(_player):
-	# Remove the item after the animation has finished to prevent breaking signals
-	if pending_slot_data and not pending_slot_data.is_empty() and pending_slot_data.item.name == self.name:
-		pending_slot_data.remove_item(1)
-		InventoryManager.hotbar_changed.emit()
-	pending_slot_data = null
-
-#func action(player):	
-	#if player and player.player_stats:
-		#player_stats = player.player_stats
-		#if player_stats.is_healing:
-			#print("Already healing")
-			#return false
-		#player_stats.is_healing = true
-		#player_stats.set_health_regen_modifier(5)
-		#player_stats.start_healing(10)
-		#player.is_trigger_action = true
-		#player.get_node("AnimatedSprite2D").play("consume")
-	#else:
-		#print("no player stats")
-		#return false
-	#
-	#cleanup_connections(player) # Defined in base class
-	#
-	#return true

@@ -39,10 +39,3 @@ func extra_use_startup(player, slot_data):
 		pending_slot_data = slot_data
 	else:
 		print("no player stats")
-
-func extra_use_cleanup(_player):
-	# Remove the item after the animation has finished to prevent breaking signals
-	if pending_slot_data and not pending_slot_data.is_empty() and pending_slot_data.item.name == self.name:
-		pending_slot_data.remove_item(1)
-		InventoryManager.hotbar_changed.emit()
-	pending_slot_data = null

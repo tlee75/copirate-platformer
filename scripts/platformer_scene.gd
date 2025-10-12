@@ -52,9 +52,21 @@ func _ready():
 	var resource_timer = $Resources/TwoSecondTimer
 	resource_manager.setup_timer(resource_timer)
 
+	var water_flow_manager = $WaterFlowManager
+	if water_flow_manager:
+		water_flow_manager.tile_flooded.connect(_on_tile_flooded)
+		water_flow_manager.flow_completed.connect(_on_water_flow_completed)
+
+
 	# Create UI manager group
 	add_to_group("ui_manager")
 
+func _on_tile_flooded(_tile_pos: Vector2i, _water_type: int):
+	# You could add particle effects, sounds, etc. here
+	pass
+
+func _on_water_flow_completed():
+	print("Water flow animation completed")
 
 func _on_inventory_toggled(is_open: bool):
 	inventory_is_open = is_open
