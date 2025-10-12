@@ -7,9 +7,6 @@ var hit_frames = {
 }
 var player_stats: PlayerStats
 
-# Store slot data so we can access it in cleanup
-var pending_slot_data: InventoryManager.InventorySlotData = null
-
 func _init():
 	name = "Raspberry"
 	icon = load("res://assets/consumables/raspberry_icon_01.png")
@@ -20,7 +17,7 @@ func _init():
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 1}
 	is_cookable = true
-	cook_time = 2.0
+	cook_time = 8.0
 	cooked_result_item_name = "cooked_raspberry"
 	use_animation = "consume"
 

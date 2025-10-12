@@ -21,9 +21,6 @@ func _init():
 func is_consumable() -> bool:
 	return true
 
-# Store slot data so we can access it in cleanup
-var pending_slot_data: InventoryManager.InventorySlotData = null
-
 func extra_use_startup(player, slot_data):
 	if player and player.player_stats:
 		player_stats = player.player_stats

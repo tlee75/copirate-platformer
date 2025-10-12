@@ -3,22 +3,23 @@ extends Resource
 class_name GameItem
 
 @export var name: String
-@export var icon: Texture2D
 @export var stack_size: int = 1
 @export var craftable: bool = false
-@export var category: String = ""
-@export var craft_requirements: Dictionary = {}
 @export var underwater_compatible: bool = false
 @export var land_compatible: bool = true
 @export var is_cookable: bool = false
 @export var cook_time: float = 0.0  # Time in seconds to cook
-@export var cooked_result_item_name: String = ""  # What this item becomes when cooked
 @export var is_tool = false
 @export var is_weapon: bool = false
 @export var damage: int = 0
-@export var attack_animation = ""
-@export var use_animation = ""
 
+var category: String = ""
+var icon: Texture2D
+var craft_requirements: Dictionary = {}
+var cooked_result_item_name: String = ""  # What this item becomes when cooked
+var attack_animation = ""
+var use_animation = ""
+var pending_slot_data: InventoryManager.InventorySlotData = null
 
 func is_consumable() -> bool:
 	return false

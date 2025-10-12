@@ -3,7 +3,7 @@ class_name CookedRaspberry
 
 # Animation hit frame definition
 var hit_frames = {
-	"consumed": [4], # List is required for single frames
+	"consume": [4], # List is required for single frames
 }
 var player_stats: PlayerStats
 
@@ -16,11 +16,12 @@ func _init():
 	underwater_compatible = false
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 1}
+	use_animation = "consume"
 
 func is_consumable() -> bool:
 	return true
 
-func action(player):	
+func extra_use_startup(player, slot_data):
 	if player and player.player_stats:
 		player_stats = player.player_stats
 		if player_stats.is_eating:
@@ -30,12 +31,15 @@ func action(player):
 		player_stats.set_hunger_regen_modifier(5)
 		player_stats.start_eating(10)
 		player_stats.start_drinking(1)
-		player.is_trigger_action = true
-		player.get_node("AnimatedSprite2D").play("consume")
+		
+		# Store slot data for removal after animation finishes
+		pending_slot_data = slot_data
 	else:
 		print("no player stats")
-		return false
-	
-	cleanup_connections(player) # Defined in base class
-	
-	return true
+
+func extra_use_cleanup(_player):
+	# Remove the item after the animation has finished to prevent breaking signals
+	if pending_slot_data and not pending_slot_data.is_empty() and pending_slot_data.item.name == self.name:
+		pending_slot_data.remove_item(1)
+		InventoryManager.hotbar_changed.emit()
+	pending_slot_data = null

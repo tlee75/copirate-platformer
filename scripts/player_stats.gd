@@ -16,13 +16,6 @@ signal stat_depleted(stat_name: String)
 @export var max_hunger: float = 100.0
 @export var max_thirst: float = 100.0
 
-# Current values
-var current_health: float
-var current_oxygen: float
-var current_stamina: float
-var current_hunger: float
-var current_thirst: float
-
 # Damage rates (per second)
 @export var oxygen_damage_rate: float = 5.0
 @export var hunger_damage_rate: float = 2.0
@@ -43,6 +36,13 @@ var current_thirst: float
 
 # Interval
 @export var health_drain_interval: float = 1.0 # seconds between health loss
+
+# Current values
+var current_health: float
+var current_oxygen: float
+var current_stamina: float
+var current_hunger: float
+var current_thirst: float
 
 # Modifiers (multipliers applied to rates)
 var health_regen_modifier: float = 1.0
@@ -306,15 +306,13 @@ func handle_health_update():
 	if current_thirst <= 0.0:
 		modify_health(-thirst_damage_rate)
 	
-	
-
 func handle_thirst_update():
 	# Handle thirst and duration
 	if is_drinking and drinking_time_remaining > 0:
 		modify_thirst(thirst_regen_rate * thirst_regen_modifier)
 		drinking_time_remaining -= stats_timer.wait_time
 		if drinking_time_remaining <= 0:
-			is_eating = false
+			is_drinking = false
 			drinking_time_remaining = 0.0
 			set_health_regen_modifier(1.0)
 			print("Finished drinking")
@@ -322,9 +320,9 @@ func handle_thirst_update():
 		# Deplete thirst - fixed amount per timer tick
 		modify_thirst(-thirst_usage_rate * thirst_usage_modifier)
 
-func handle_hunger_update():
-	# Handle eating and duration
+func handle_hunger_update():	# Handle eating and duration
 	if is_eating and eating_time_remaining > 0:
+		print("Eating time: ", eating_time_remaining)
 		modify_hunger(hunger_regen_rate * hunger_regen_modifier)
 		eating_time_remaining -= stats_timer.wait_time
 		if eating_time_remaining <= 0:
