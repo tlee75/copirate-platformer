@@ -21,8 +21,10 @@ func _init():
 func is_consumable() -> bool:
 	return true
 
-func handle_use_frame(player, _anim, _frame):
-	print("leaf use")
+# Store slot data so we can access it in cleanup
+var pending_slot_data: InventoryManager.InventorySlotData = null
+
+func extra_use_startup(player, slot_data):
 	if player and player.player_stats:
 		player_stats = player.player_stats
 		if player_stats.is_healing:
@@ -31,11 +33,18 @@ func handle_use_frame(player, _anim, _frame):
 		player_stats.is_healing = true
 		player_stats.set_health_regen_modifier(5)
 		player_stats.start_healing(10)
-		player.is_trigger_action = true
-		player.get_node("AnimatedSprite2D").play("consume")
+		
+		# Store slot data for removal after animation finishes
+		pending_slot_data = slot_data
 	else:
 		print("no player stats")
-		return false
+
+func extra_use_cleanup(_player):
+	# Remove the item after the animation has finished to prevent breaking signals
+	if pending_slot_data and not pending_slot_data.is_empty() and pending_slot_data.item.name == self.name:
+		pending_slot_data.remove_item(1)
+		InventoryManager.hotbar_changed.emit()
+	pending_slot_data = null
 
 #func action(player):	
 	#if player and player.player_stats:

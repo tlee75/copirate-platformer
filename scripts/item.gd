@@ -32,28 +32,33 @@ func attack(player, target):
 	player.attack_target = target
 	player.is_trigger_action = true
 	var anim_sprite = player.get_node("AnimatedSprite2D")
-	anim_sprite.play(attack_animation)
 	extra_attack_startup(player)
 	cleanup_connections(player)
 	anim_sprite.frame_changed.connect(_on_attack_frame_changed.bind(player))
 	anim_sprite.animation_finished.connect(_on_attack_animation_finished.bind(player))
+	anim_sprite.play(attack_animation)
 
-
-# Need to add a extensible function here that individual item scripts can extend to do one time stuff
-func use(player, target):
+func use(player, target, slot_data = null):
 	if use_animation == "" or use_animation == null:
 		print("WARNING: Item '%s' has no use_animation set!" % self.name)
 		return
 	if target:
 		player.attack_target = target
 	player.is_trigger_action = true
+	print("trigger action true")
 	var anim_sprite = player.get_node("AnimatedSprite2D")
-	anim_sprite.play(use_animation)
-	extra_use_startup(player)
+	extra_use_startup(player, slot_data)
 	cleanup_connections(player)
 	anim_sprite.frame_changed.connect(_on_use_frame_changed.bind(player))
 	anim_sprite.animation_finished.connect(_on_use_animation_finished.bind(player))
+	anim_sprite.play(use_animation)
 
+func _on_attack_frame_changed(player):
+	var anim_sprite = player.get_node("AnimatedSprite2D")
+	var anim = anim_sprite.animation
+	var frame = anim_sprite.frame
+	if anim in self.hit_frames and frame in self.hit_frames[anim]:
+		handle_attack_frame(player, anim, frame)
 
 func handle_attack_frame(player, anim, frame):
 	print("%s attack by %s with animation %s on frame %s" % [self.name, player.name, anim, frame])
@@ -63,13 +68,6 @@ func handle_attack_frame(player, anim, frame):
 	else:
 		# No target: play swing sound, animation, or feedback
 		print("%s swing: no target hit" % self.name)
-
-func _on_attack_frame_changed(player):
-	var anim_sprite = player.get_node("AnimatedSprite2D")
-	var anim = anim_sprite.animation
-	var frame = anim_sprite.frame
-	if anim in self.hit_frames and frame in self.hit_frames[anim]:
-		handle_attack_frame(player, anim, frame)
 
 func _on_attack_animation_finished(player):
 	player.is_trigger_action = false
@@ -89,8 +87,8 @@ func _on_use_frame_changed(player):
 func handle_use_frame(player, _anim, _frame):
 	print("%s used by %s" % [self.name, player.name])
 
-
 func _on_use_animation_finished(player):
+	print("use animation finished")
 	player.is_trigger_action = false
 	player.attack_target = null
 	extra_use_cleanup(player)
@@ -99,7 +97,7 @@ func _on_use_animation_finished(player):
 func extra_attack_startup(_player):
 	pass
 
-func extra_use_startup(_player):
+func extra_use_startup(_player, _slot_data):
 	pass
 
 func extra_attack_cleanup(_player):
@@ -107,6 +105,7 @@ func extra_attack_cleanup(_player):
 
 func extra_use_cleanup(_player):
 	pass
+
 
 func cleanup_connections(user):
 	var anim_sprite = user.get_node("AnimatedSprite2D")

@@ -121,6 +121,7 @@ func _physics_process(delta):
 		else:
 			target_animation = "idle"
 		if $AnimatedSprite2D.animation != target_animation:
+			print("DEBUG: Inventory override animation from", $AnimatedSprite2D.animation, "to", target_animation)
 			$AnimatedSprite2D.play(target_animation)
 		
 		is_trigger_action = false
@@ -274,19 +275,18 @@ func handle_interact_or_use_action():
 				if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
 					$AnimatedSprite2D.frame_changed.disconnect(_on_interact_animation_finished)
 				$AnimatedSprite2D.animation_finished.connect(_on_interact_animation_finished)
-			else:
+			elif not is_trigger_action:
 				print("Using hotbar item")
 				var selected_result = get_selected_hotbar_slot_and_item()
 				var selected_item = selected_result[1]
 				if selected_item:
-					print("selected item: ", selected_item)
 					if not can_use_item_in_current_environment(selected_item):
 						var item_name = selected_item.name if selected_item.has_method("get_name") else str(selected_item)
 						var environment_msg = "underwater" if is_underwater else "on land"
 						print("Cannot use ", item_name, " ", environment_msg, "!")
 						return
 					tool_target = get_tool_target()
-					handle_hotbar_action(selected_item, tool_target)
+					handle_hotbar_action(selected_result, tool_target)
 				else:
 					print("Cannot interact or use an item")
 
@@ -327,14 +327,16 @@ func handle_mainhand_action(item, target):
 	elif item.damage > 0:
 		item.attack(self, null)
 
-func handle_hotbar_action(item, target):
-	item.use(self, target)
+func handle_hotbar_action(selected_result, target):
+	var slot_data = selected_result[0]
+	var item = selected_result[1]
+	item.use(self, target, slot_data)
 
 func handle_animations():
 	# Don't change animations while in the middle of an action or dead
 	if is_trigger_action or is_interacting or is_dead:
 		return
-	
+
 	var on_floor = is_on_floor()
 	
 	if not on_floor:
@@ -405,42 +407,6 @@ func _on_ground_animation_finished():
 			$AnimatedSprite2D.play(target_anim)
 		else:
 			$AnimatedSprite2D.play("idle")
-
-#func _on_attack_animation_finished():
-	## Disconnect the signal immediately to prevent interference
-	#if $AnimatedSprite2D.animation_finished.is_connected(_on_attack_animation_finished):
-		#$AnimatedSprite2D.animation_finished.disconnect(_on_attack_animation_finished)
-#
-	## Do stuff here when animation is finished
-#
-	## When animation finishes, end actiond state
-	#is_trigger_action = false
-	#
-	## Remove target which was needed for any multi hit frame animations
-	#attack_target = null
-
-#func _on_attack_frame_changed():
-	#var anim_sprite = $AnimatedSprite2D
-	#var anim = anim_sprite.animation
-	#var frame = anim_sprite.frame
-	#
-	## Get the equipped item from the main hand slot
-	#var item = null
-	#if equipment_panel:
-		#var main_hand_slot_index = equipment_panel.get_equipment_slot_index_by_node_name("MainHand")
-		#if main_hand_slot_index != -1:
-			#var main_hand_slot = InventoryManager.get_equipment_slot(main_hand_slot_index)
-			#if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item:
-				#item = main_hand_slot.item
-	#
-	## Use the item's hit_frames if available
-	#var item_hit_frames = item.hit_frames if item and "hit_frames" in item else default_hit_frames
-	#
-	#if anim in item_hit_frames and frame in item_hit_frames[anim]:
-		## Apply hit frame synchronized damage to stored target
-		#if attack_target and is_instance_valid(attack_target):
-			#attack_target.take_damage(1)  # Damage happens here
-
 
 func _on_interact_animation_finished():
 	# Disconnect the signal immediately to prevent interference
@@ -528,9 +494,6 @@ func update_tile_highlights():
 	if affected_tiles.size() > 0:
 		create_tile_highlight_optimized(affected_tiles[0])
 
-
-# Removed unneeded unhandled input handling for inventory toggle
-
 func clear_tile_highlights():
 	# Remove all existing highlight sprites
 	for highlight in tile_highlights:
@@ -572,16 +535,6 @@ func create_tile_highlight_optimized(tile_pos: Vector2i):
 	get_parent().add_child(highlight)
 	tile_highlights.append(highlight)
 	highlighted_tiles.append(tile_pos)
-
-#func destroy_tiles_in_cursor_area():
-	## Get the single tile that would be affected (same logic as highlighting)
-	#var affected_tiles = get_tiles_in_cursor_area()
-	#
-	## Destroy only the single targeted tile
-	#for tile_pos in affected_tiles:
-		#tilemap.set_cell(0, tile_pos, -1)
-		#print("Destroyed tile at: ", tile_pos)
-
 
 func _on_inventory_state_changed(is_open: bool):
 	inventory_is_open = is_open
