@@ -121,7 +121,6 @@ func _physics_process(delta):
 		else:
 			target_animation = "idle"
 		if $AnimatedSprite2D.animation != target_animation:
-			print("DEBUG: Inventory override animation from", $AnimatedSprite2D.animation, "to", target_animation)
 			$AnimatedSprite2D.play(target_animation)
 		
 		is_trigger_action = false

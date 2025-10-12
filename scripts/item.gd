@@ -88,7 +88,6 @@ func handle_use_frame(player, _anim, _frame):
 	print("%s used by %s" % [self.name, player.name])
 
 func _on_use_animation_finished(player):
-	print("use animation finished")
 	player.is_trigger_action = false
 	player.attack_target = null
 	extra_use_cleanup(player)
