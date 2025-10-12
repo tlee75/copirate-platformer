@@ -16,33 +16,40 @@ class_name GameItem
 @export var is_tool = false
 @export var is_weapon: bool = false
 @export var damage: int = 0
-@export var attack_animation = "idle"
-@export var use_animation = "idle"
+@export var attack_animation = ""
+@export var use_animation = ""
 
 
 func is_consumable() -> bool:
 	return false
 
+# Need to add a extensible function here that individual item scripts can extend to do one time stuff
 func attack(player, target):
 	if attack_animation == "" or attack_animation == null:
 		print("WARNING: Item '%s' has no attack_animation set!" % self.name)
+		return
 	# Store the target for use in the hit frame callback
 	player.attack_target = target
 	player.is_trigger_action = true
 	var anim_sprite = player.get_node("AnimatedSprite2D")
 	anim_sprite.play(attack_animation)
+	extra_attack_startup(player)
 	cleanup_connections(player)
 	anim_sprite.frame_changed.connect(_on_attack_frame_changed.bind(player))
 	anim_sprite.animation_finished.connect(_on_attack_animation_finished.bind(player))
 
+
+# Need to add a extensible function here that individual item scripts can extend to do one time stuff
 func use(player, target):
 	if use_animation == "" or use_animation == null:
 		print("WARNING: Item '%s' has no use_animation set!" % self.name)
+		return
 	if target:
 		player.attack_target = target
 	player.is_trigger_action = true
 	var anim_sprite = player.get_node("AnimatedSprite2D")
 	anim_sprite.play(use_animation)
+	extra_use_startup(player)
 	cleanup_connections(player)
 	anim_sprite.frame_changed.connect(_on_use_frame_changed.bind(player))
 	anim_sprite.animation_finished.connect(_on_use_animation_finished.bind(player))
@@ -88,6 +95,12 @@ func _on_use_animation_finished(player):
 	player.attack_target = null
 	extra_use_cleanup(player)
 	cleanup_connections(player)
+
+func extra_attack_startup(_player):
+	pass
+
+func extra_use_startup(_player):
+	pass
 
 func extra_attack_cleanup(_player):
 	pass
