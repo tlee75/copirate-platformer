@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://b5y8lh6n7kve"]
+[gd_scene load_steps=6 format=3 uid="uid://b5y8lh6n7kve"]
 
 [ext_resource type="Texture2D" uid="uid://bryfmi11c3041" path="res://assets/terrain/simple_rock_icon_01.png" id="1_dcqta"]
+[ext_resource type="Script" uid="uid://p5n6d6hnxqrc" path="res://scripts/pickups/simple_rock_pickup.gd" id="1_r777w"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_r777w"]
 atlas = ExtResource("1_dcqta")
@@ -21,6 +22,7 @@ animations = [{
 radius = 6.0
 
 [node name="SimpleRock" type="Area2D"]
+script = ExtResource("1_r777w")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.5, 0.5)
