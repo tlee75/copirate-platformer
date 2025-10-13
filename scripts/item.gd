@@ -24,7 +24,6 @@ var pending_slot_data: InventoryManager.InventorySlotData = null
 func is_consumable() -> bool:
 	return false
 
-# Need to add a extensible function here that individual item scripts can extend to do one time stuff
 func attack(player, target):
 	if attack_animation == "" or attack_animation == null:
 		print("WARNING: Item '%s' has no attack_animation set!" % self.name)

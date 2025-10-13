@@ -306,8 +306,7 @@ func handle_attack_action():
 							return
 						# Detect targets
 						attack_target = get_attack_target()
-						tool_target = get_tool_target()
-						handle_mainhand_action(item, attack_target if attack_target else tool_target)
+						handle_mainhand_action(item, attack_target)
 					else:
 						# Fallback to melee item attack
 						var melee_item = InventoryManager.item_database["melee"]
@@ -315,15 +314,13 @@ func handle_attack_action():
 						melee_item.attack(self, attack_target)
 
 func handle_mainhand_action(item, target):
-	if not item.has_method("attack") or not item.has_method("use"):
-		print("WARNING: Item ", item.name, " is missing attack/use methods!")
+	if not item.has_method("attack"):
+		print("WARNING: Item ", item.name, " is missing attack methods!")
 	if not item.damage or item.damage <= 0:
 		print("WARNING: Item ", item.name, " is missing damage attribute or damage is zero!")
-	if typeof(target) == TYPE_OBJECT and item.damage > 0:
+	if typeof(target) == TYPE_OBJECT:
 		item.attack(self, target)
-	elif item.is_tool:
-		item.use(self, target)
-	elif item.damage > 0:
+	else:
 		item.attack(self, null)
 
 func handle_hotbar_action(selected_result, target):
@@ -439,7 +436,7 @@ func update_cursor_position():
 	var direction = (mouse_pos - player_pos).normalized()
 	
 	# Set cursor area position at fixed distance from player
-	var cursor_distance = 30.0  # Fixed distance to prevent infinite range
+	var cursor_distance = 50.0  # Fixed distance to prevent infinite range
 	cursor_area.position = direction * cursor_distance
 	
 	# Face the direction of movement when moving; otherwise, face the mouse direction when idle
