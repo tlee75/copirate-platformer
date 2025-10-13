@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://b5y8lh6n7kve"]
+
+[ext_resource type="Texture2D" uid="uid://bryfmi11c3041" path="res://assets/terrain/simple_rock_icon_01.png" id="1_dcqta"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r777w"]
+atlas = ExtResource("1_dcqta")
+region = Rect2(0, 0, 32, 30)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lff38"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r777w")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 1.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_47idf"]
+radius = 6.0
+
+[node name="SimpleRock" type="Area2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_lff38")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_47idf")

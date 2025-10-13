@@ -60,7 +60,7 @@ func can_equip_item(item_data, slot_node_name: String) -> bool:
 		"HandsSlot":
 			return item_data.category == "hands"
 		"MainHand":
-			return item_data.category == "weapon" or item_data.category == "tool"
+			return item_data.category == "weapon"
 		"OffHand":
 			return item_data.category == "shield" or item_data.category == "sidearm"
 		"ArmsSlot":
