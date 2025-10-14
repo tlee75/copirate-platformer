@@ -67,7 +67,27 @@ func _input(event):
 			var mouse_pos = get_tree().current_scene.get_global_mouse_position()
 			var snapped_pos = get_snapped_position(mouse_pos)
 			preview_instance.position = snapped_pos
+
+			# Check placement validity and set tint
+			if is_placement_valid(preview_instance):
+				preview_instance.modulate = Color(1, 1, 1, 0.5)  # normal preview
+			else:
+				preview_instance.modulate = Color(1, 0.3, 0.3, 0.7)  # reddish tint
+
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			confirm_structure_placement()
+			if is_placement_valid(preview_instance):
+				confirm_structure_placement()
+			else:
+				print("Invalid placement: overlaps another object.")
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			cancel_structure_placement()
+
+func is_placement_valid(preview_instance: Node2D) -> bool:
+	if not preview_instance.has_node("Area2D"):
+		return true
+	var area = preview_instance.get_node("Area2D")
+	var overlapping = area.get_overlapping_areas() + area.get_overlapping_bodies()
+	for obj in overlapping:
+		if obj != preview_instance and (obj is Node2D or obj is Area2D):
+			return false
+	return true

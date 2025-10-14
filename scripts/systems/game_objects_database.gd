@@ -29,6 +29,6 @@ func _register_structures():
 		icon = load("res://assets/structures/firepit_unlit_01.png"),
 		craft_requirements = {"Simple Rock": 1},
 		scene_path = "res://scenes/structures/firepit.tscn",
-		placement_bottom_padding = -5.0  # Pixels to adjust bottom alignment
+		placement_bottom_padding = -4.0  # Pixels to adjust bottom alignment
 	}
 	# Add more structures as needed with their own padding values
