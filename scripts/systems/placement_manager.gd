@@ -1,8 +1,11 @@
 extends Node
 
+@export	var GROUND_TILE_ID = 3	
+
 var preview_instance: Node2D = null
 var preview_item_data: Dictionary = {}
 var placement_active: bool = false
+
 
 func start_structure_placement(item: Dictionary):
 	var structure_scene = load(item.scene_path)
@@ -82,12 +85,30 @@ func _input(event):
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			cancel_structure_placement()
 
-func is_placement_valid(preview_instance: Node2D) -> bool:
-	if not preview_instance.has_node("Area2D"):
-		return true
-	var area = preview_instance.get_node("Area2D")
+func is_placement_valid(instance) -> bool:
+	if not instance.has_node("Area2D"):
+		return false
+	var area = instance.get_node("Area2D")
 	var overlapping = area.get_overlapping_areas() + area.get_overlapping_bodies()
 	for obj in overlapping:
-		if obj != preview_instance and (obj is Node2D or obj is Area2D):
+		if obj != instance and (obj is Node2D or obj is Area2D):
 			return false
+
+	# Ground tile check - there must be ground below the structure
+	var tilemap = get_tree().current_scene.get_node("TileMap")
+	# Check the tile where the structure center is positioned
+	var structure_cell = tilemap.local_to_map(instance.position)
+	
+	# Check if there's ground in the tile below the structure
+	var ground_check_cell = Vector2i(structure_cell.x, structure_cell.y + 1)
+	var ground_tile_id = tilemap.get_cell_source_id(0, ground_check_cell)
+	
+	# Debug output
+	print("Structure cell: ", structure_cell)
+	print("Ground check cell: ", ground_check_cell)  
+	print("Ground tile ID found: ", ground_tile_id)
+	print("Expected ground ID: ", GROUND_TILE_ID)
+	
+	if ground_tile_id != GROUND_TILE_ID:
+		return false
 	return true
