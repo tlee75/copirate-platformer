@@ -27,7 +27,7 @@ func show_craftable_items(category):
 		list_container.remove_child(child)
 		child.queue_free()
 	
-	var item_db = InventoryManager.item_database
+	var item_db = GameObjectsDatabase.game_objects_database
 	for key in item_db.keys():
 		var item = item_db[key]
 		if item.craftable and item.category == category:
@@ -79,7 +79,15 @@ func show_craft_details(item):
 	# Connect Craft button
 	for c in craft_button.pressed.get_connections():
 		craft_button.pressed.disconnect(c.callable)
-	craft_button.pressed.connect(func(): craft_item(item))
+	craft_button.pressed.connect(func(): craft_object(item))
+	
+func craft_object(item):
+	if item.category == "structure":
+		craft_structure(item)
+		return
+	else:
+		craft_item(item)
+		return
 	
 func craft_item(item):
 	print("Crafting: ", item.name)
@@ -91,16 +99,30 @@ func craft_item(item):
 		if owned < required:
 			print("Not enough ", resource_name, " to craft ", item.name)
 			return
+
+	# Add the crafted item to inventory first (we already checked if they have enough
+	InventoryManager.add_item(item, 1)
 	
 	# Remove required resources from inventory
 	for resource_name in item.craft_requirements.keys():
 		var required = item.craft_requirements[resource_name]
 		InventoryManager.remove_items_by_name(resource_name, required)
-	
-	# Add the crafted item to inventory
-	InventoryManager.add_item(item, 1)
+
 	
 	print("Successfully crafted ", item.name)
+
+func craft_structure(item: Dictionary):
+	print("Calling PlacementManager for structure: ", item.name)
+	self.visible = false
+	
+	# Update player inventory state
+	var player = get_tree().get_first_node_in_group("player")
+	if player:
+		player.inventory_is_open = false
+		player.inventory_state_changed.emit(false)
+	
+	# Start placement preview via PlacementManager
+	PlacementManager.start_structure_placement(item)
 
 func _on_inventory_changed():
 	# Refresh craft details if something is currently displayed

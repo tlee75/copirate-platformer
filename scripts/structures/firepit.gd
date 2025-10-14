@@ -161,8 +161,8 @@ func cook_item_complete(slot_index: int):
 		return
 	
 	# Get the cooked item from inventory manager
-	if InventoryManager.item_database.has(cooked_item_name):
-		var cooked_item = InventoryManager.item_database[cooked_item_name]
+	if GameObjectsDatabase.game_objects_database.has(cooked_item_name):
+		var cooked_item = GameObjectsDatabase.game_objects_database[cooked_item_name]
 		
 		# Replace the raw item with cooked item
 		slot.item = cooked_item

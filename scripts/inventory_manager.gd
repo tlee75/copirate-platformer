@@ -18,8 +18,6 @@ var item_totals: Dictionary = {}
 var weapon_slots: Array[InventorySlotData] = []
 var equipment_slots: Array[InventorySlotData] = []
 
-# GameItem database - you can add more items here
-var item_database: Dictionary = {}
 
 @export var hotbar_container_path: NodePath
 @export var inventory_container_path: NodePath
@@ -69,9 +67,6 @@ class InventorySlotData:
 		quantity = 0
 
 func _ready():
-	_register_items_from_dir("res://scripts/items")
-	print("Registered items: ", item_database.keys())
-
 	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
 
 func initialize_hotbar_slots(count: int):
@@ -93,32 +88,6 @@ func initialize_equipment_slots(count: int):
 	equipment_slots.clear()
 	for i in count:
 		equipment_slots.append(InventorySlotData.new())
-
-#func add_test_items():
-	## Add some gold coins to test drag and drop
-	#if item_database.has("gold_coin"):
-		#var gold_coin = item_database["gold_coin"]
-		#
-		## Add coins to hotbar slots
-		#hotbar_slots[0].item = gold_coin
-		#hotbar_slots[0].quantity = 3
-		#
-		#hotbar_slots[2].item = gold_coin
-		#hotbar_slots[2].quantity = 5
-		#
-		## Add coins to inventory slots
-		#inventory_slots[0].item = gold_coin
-		#inventory_slots[0].quantity = 7
-		#
-		#inventory_slots[4].item = gold_coin
-		#inventory_slots[4].quantity = 2
-		#
-		#print("Added test items to inventory and hotbar")
-		#
-		## Emit signals to update UI
-		#hotbar_changed.emit()
-		#inventory_changed.emit()
-
 
 # Add item to inventory (tries hotbar first, then main inventory)
 func add_item(item: GameItem, amount: int = 1) -> bool:	
@@ -304,18 +273,3 @@ func print_inventory():
 			print("Slot ", i, ": ", slot.item.name, " x", slot.quantity)
 		else:
 			print("Slot ", i, ": Empty")
-
-func _register_items_from_dir(path: String):
-	var dir = DirAccess.open(path)
-	if dir == null:
-		print("Could not open directory: ", path)
-		return
-	for file in dir.get_files():
-		if file.ends_with(".gd"):
-			var item_script = load(path + "/" + file)
-			var item_instance = item_script.new()
-			var key = file.get_basename()
-			print("Registered: ", key, " as class: ", item_instance.get_class())
-			item_database[key] = item_instance
-	for subdir in dir.get_directories():
-		_register_items_from_dir(path + "/" + subdir)

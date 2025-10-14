@@ -24,11 +24,11 @@
 [ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/items/shovel.tscn" id="21_ilrow"]
 [ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/items/sword.tscn" id="22_oo6ai"]
 [ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/terrain/wood_crate.tscn" id="23_ilrow"]
-[ext_resource type="PackedScene" uid="uid://0iommeky2of" path="res://scenes/structures/firepit.tscn" id="23_oo6ai"]
 [ext_resource type="PackedScene" uid="uid://ckk3o0r7wv6tc" path="res://scenes/items/stick.tscn" id="24_oo6ai"]
 [ext_resource type="PackedScene" uid="uid://bau4ht0cid8a1" path="res://scenes/items/wood_axe.tscn" id="26_g2ixt"]
 [ext_resource type="PackedScene" uid="uid://dhi7durjec88o" path="res://scenes/items/gold_coin.tscn" id="27_6g27y"]
 [ext_resource type="Script" uid="uid://31qjwgftkyrw" path="res://scripts/systems/water_flow_manager.gd" id="28_kkoo0"]
+[ext_resource type="Script" uid="uid://duwg2nwj6sc2e" path="res://scripts/systems/placement_manager.gd" id="30_b3g4q"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(6, 6)
@@ -229,9 +229,6 @@ position = Vector2(222, 2154)
 wait_time = 2.0
 autostart = true
 
-[node name="Firepit" parent="." instance=ExtResource("23_oo6ai")]
-position = Vector2(20, 2149)
-
 [node name="Stick2" parent="." instance=ExtResource("24_oo6ai")]
 position = Vector2(-191, 2158)
 
@@ -248,4 +245,7 @@ position = Vector2(-48, 2164)
 script = ExtResource("28_kkoo0")
 
 [node name="SimpleRock" parent="." instance=ExtResource("20_b3g4q")]
-position = Vector2(-321, 2159)
+position = Vector2(-124, 2164)
+
+[node name="PlacementManager" type="Node" parent="."]
+script = ExtResource("30_b3g4q")

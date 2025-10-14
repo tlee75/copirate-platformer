@@ -290,6 +290,8 @@ func handle_interact_or_use_action():
 					print("Cannot interact or use an item")
 
 func handle_attack_action():
+	if PlacementManager.placement_active:
+		return # Placement manager handles input
 	# Main Hand Action - left mouse button (but not when clicking on hotbar)
 	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu():
 		# Only perform an action if one is not already in progress
@@ -309,7 +311,7 @@ func handle_attack_action():
 						handle_mainhand_action(item, attack_target)
 					else:
 						# Fallback to melee item attack
-						var melee_item = InventoryManager.item_database["melee"]
+						var melee_item = GameObjectsDatabase.game_objects_database["melee"]
 						attack_target = get_attack_target()
 						melee_item.attack(self, attack_target)
 
@@ -722,7 +724,7 @@ func get_potential_targets() -> Array:
 
 func add_loot(item_name: String, amount: int):
 	# Implement inventory logic
-	var game_item = InventoryManager.item_database[item_name]
+	var game_item = GameObjectsDatabase.game_objects_database[item_name]
 	if InventoryManager.add_item(game_item, amount):
 		return true
 	else:
