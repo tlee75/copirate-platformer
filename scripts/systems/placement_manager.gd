@@ -103,12 +103,6 @@ func is_placement_valid(instance) -> bool:
 	var ground_check_cell = Vector2i(structure_cell.x, structure_cell.y + 1)
 	var ground_tile_id = tilemap.get_cell_source_id(0, ground_check_cell)
 	
-	# Debug output
-	print("Structure cell: ", structure_cell)
-	print("Ground check cell: ", ground_check_cell)  
-	print("Ground tile ID found: ", ground_tile_id)
-	print("Expected ground ID: ", GROUND_TILE_ID)
-	
 	if ground_tile_id != GROUND_TILE_ID:
 		return false
 	return true

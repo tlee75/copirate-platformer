@@ -84,34 +84,37 @@ func _input(event):
 		var key_event = event as InputEventKey
 		if key_event.pressed:
 			if key_event.keycode == KEY_TAB or key_event.keycode == KEY_ESCAPE:
-				# Check if object menu is open first (priority over player menu)
-				var object_menus = get_tree().get_nodes_in_group("object_menu")
-				var object_menu_closed = false
-				
-				for obj_menu in object_menus:
-					if obj_menu.visible:
-						obj_menu.close_inventory()
-						object_menu_closed = true
-						break
-				
-				# If no object inventory was closed, handle normal Tab/Escape behavior
-				if not object_menu_closed:
-					if key_event.keycode == KEY_TAB:
-						# TAB toggles the combined menu open/closed if they are not in the air
-						if player.is_on_floor() or player.is_underwater:
-							player_menu.visible = not player_menu.visible
-							inventory_system.emit_inventory_toggled(player_menu.visible)
-						else:
-							print("Cannot open menus while airborne")
-					elif key_event.keycode == KEY_ESCAPE:
-						if player_menu.visible:
-							player_menu.visible = false
-							inventory_system.inventory_toggled.emit(false)
-						else:
-							pause_menu.show()
-							get_tree().paused = true
-	
-				get_viewport().set_input_as_handled()
+				if event.keycode == KEY_ESCAPE and PlacementManager.placement_active:
+					PlacementManager.cancel_structure_placement()
+					get_viewport().set_input_as_handled()
+				else:
+					# Check if object menu is open first (priority over player menu)
+					var object_menus = get_tree().get_nodes_in_group("object_menu")
+					var object_menu_closed = false
+					
+					for obj_menu in object_menus:
+						if obj_menu.visible:
+							obj_menu.close_inventory()
+							object_menu_closed = true
+							break
+					
+					# If no object inventory was closed, handle normal Tab/Escape behavior
+					if not object_menu_closed:
+						if key_event.keycode == KEY_TAB:
+							# TAB toggles the combined menu open/closed if they are not in the air
+							if player.is_on_floor() or player.is_underwater:
+								player_menu.visible = not player_menu.visible
+								inventory_system.emit_inventory_toggled(player_menu.visible)
+							else:
+								print("Cannot open menus while airborne")
+						elif key_event.keycode == KEY_ESCAPE:
+							if player_menu.visible:
+								player_menu.visible = false
+								inventory_system.inventory_toggled.emit(false)
+							else:
+								pause_menu.show()
+								get_tree().paused = true
+					get_viewport().set_input_as_handled()
 				
 	elif event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
