@@ -466,6 +466,7 @@ size = Vector2(20, 8)
 script = ExtResource("1_xccsb")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+z_index = 1
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_63by1")
 animation = &"sword_idle"

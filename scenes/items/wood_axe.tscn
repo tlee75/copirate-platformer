@@ -465,6 +465,7 @@ animations = [{
 script = ExtResource("1_b2gdx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+z_index = 1
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_c2w6g")
 animation = &"woodaxe_idle"

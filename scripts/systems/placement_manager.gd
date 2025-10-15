@@ -93,7 +93,6 @@ func is_placement_valid(instance) -> bool:
 	for obj in overlapping:
 		if obj != instance:
 			var cat = get_category(obj)
-			print("Checking object:", obj, "Category:", cat)
 			if cat == "structure" or cat == "terrain":
 				return false
 			if obj is PhysicsBody2D and not obj.is_in_group("player"):

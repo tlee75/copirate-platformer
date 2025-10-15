@@ -452,6 +452,7 @@ size = Vector2(18, 26)
 script = ExtResource("1_2ikqw")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+z_index = 1
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_s4se8")
 animation = &"pickaxe_idle"
