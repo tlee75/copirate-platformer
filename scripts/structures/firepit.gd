@@ -10,7 +10,6 @@ class_name Firepit
 enum ObjectState { UNLIT, BURNING }
 var state: int = ObjectState.UNLIT
 var current_burn_time: float = 0.0  # Time left for current burning item
-var resource_manager: ResourceManager
 var cooking_slots: Array[Dictionary] = []  # Track what's cooking in each slot
 
 
@@ -45,9 +44,8 @@ func _ready():
 	_connect_to_resource_manager()
 
 func _connect_to_resource_manager():
-	resource_manager = get_tree().get_first_node_in_group("resource_manager")
-	if resource_manager and resource_manager.resource_timer:
-		resource_manager.resource_timer.timeout.connect(_on_fuel_tick)
+	if ResourceManager.resource_timer:
+		ResourceManager.resource_timer.timeout.connect(_on_fuel_tick)
 		print("DEBUG: Successfully connected firepit to ResourceManager timer")
 	else:
 		print("DEBUG: ResourceManager not ready, retrying in 0.1 seconds...")
@@ -113,7 +111,7 @@ func light_fire():
 
 func _on_fuel_tick():
 	if state == ObjectState.BURNING and current_burn_time > 0:
-		var time_elapsed = resource_manager.resource_timer.wait_time
+		var time_elapsed = ResourceManager.resource_timer.wait_time
 		consume_fuel_time(time_elapsed)
 		# Process cooking for all items
 		process_cooking(time_elapsed)

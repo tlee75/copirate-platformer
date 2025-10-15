@@ -1,68 +1,68 @@
 [gd_scene load_steps=37 format=3 uid="uid://dj3pqaq3v6bwo"]
 
-[ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_yte5o"]
-[ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_8w8yu"]
-[ext_resource type="Texture2D" uid="uid://xbvs700g2epd" path="res://resources/crosshair.tres" id="3_xoih0"]
-[ext_resource type="Texture2D" uid="uid://dki1spd0slwxj" path="res://assets/terrain/tropical_tilemap_slice_32x32.png" id="4_8w8yu"]
-[ext_resource type="Texture2D" uid="uid://rn4b115e07qc" path="res://assets/terrain/ground_06_32x32.png" id="4_dutm6"]
-[ext_resource type="Texture2D" uid="uid://djumqlm6wttkh" path="res://assets/terrain/surface_water_32x32.png" id="4_f15g2"]
-[ext_resource type="PackedScene" uid="uid://bqjbr0fr548wk" path="res://scenes/terrain/berry_bush.tscn" id="4_q5qfs"]
-[ext_resource type="Texture2D" uid="uid://b4u6hsbyh7vou" path="res://assets/terrain/underwater_02_32x32.png" id="5_atnpy"]
-[ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://scripts/ui/fps_counter.gd" id="5_f15g2"]
-[ext_resource type="PackedScene" uid="uid://bl5dg3fjv4w6g" path="res://scenes/ui/hotbar.tscn" id="6_atnpy"]
-[ext_resource type="Texture2D" uid="uid://dp42rf78somje" path="res://assets/terrain/seafloor_32x32.png" id="6_cy82x"]
-[ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://scripts/ui/inventory_system.gd" id="8_q5qfs"]
-[ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://scenes/ui/pause_menu.tscn" id="9_btm0u"]
-[ext_resource type="PackedScene" uid="uid://o5dk1uupyfxt" path="res://scenes/ui/weaponbar.tscn" id="10_mwf8c"]
-[ext_resource type="PackedScene" uid="uid://k0kkh12kws3d" path="res://scenes/ui/player_menu.tscn" id="10_xoih0"]
-[ext_resource type="Script" uid="uid://covte3n64vx2f" path="res://scripts/ui/crafting_menu.gd" id="11_mx3pc"]
-[ext_resource type="Script" uid="uid://dbkq1bkntxiv1" path="res://scripts/ui/weaponbar.gd" id="11_rgya6"]
-[ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://scripts/ui/depth_counter.gd" id="14_atnpy"]
-[ext_resource type="PackedScene" uid="uid://noyk5n0awjav" path="res://scenes/ui/stats_display.tscn" id="15_cy82x"]
-[ext_resource type="PackedScene" uid="uid://b5y8lh6n7kve" path="res://scenes/items/simple_rock.tscn" id="20_b3g4q"]
-[ext_resource type="PackedScene" uid="uid://buc368tv0cjic" path="res://scenes/items/pickaxe.tscn" id="20_lj68f"]
-[ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/items/shovel.tscn" id="21_ilrow"]
-[ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/items/sword.tscn" id="22_oo6ai"]
-[ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/obstacles/wood_crate.tscn" id="23_ilrow"]
-[ext_resource type="PackedScene" uid="uid://ckk3o0r7wv6tc" path="res://scenes/items/stick.tscn" id="24_oo6ai"]
-[ext_resource type="PackedScene" uid="uid://bau4ht0cid8a1" path="res://scenes/items/wood_axe.tscn" id="26_g2ixt"]
-[ext_resource type="PackedScene" uid="uid://dhi7durjec88o" path="res://scenes/items/gold_coin.tscn" id="27_6g27y"]
-[ext_resource type="Script" uid="uid://31qjwgftkyrw" path="res://scripts/systems/water_flow_manager.gd" id="28_kkoo0"]
-[ext_resource type="Script" uid="uid://duwg2nwj6sc2e" path="res://scripts/systems/placement_manager.gd" id="30_b3g4q"]
+[ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_4bgka"]
+[ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_02d50"]
+[ext_resource type="Texture2D" uid="uid://xbvs700g2epd" path="res://resources/crosshair.tres" id="3_pgk25"]
+[ext_resource type="Texture2D" uid="uid://rn4b115e07qc" path="res://assets/terrain/ground_06_32x32.png" id="4_kkokr"]
+[ext_resource type="Texture2D" uid="uid://djumqlm6wttkh" path="res://assets/terrain/surface_water_32x32.png" id="5_lhwp2"]
+[ext_resource type="Texture2D" uid="uid://b4u6hsbyh7vou" path="res://assets/terrain/underwater_02_32x32.png" id="6_l40q6"]
+[ext_resource type="Texture2D" uid="uid://dp42rf78somje" path="res://assets/terrain/seafloor_32x32.png" id="7_iav3h"]
+[ext_resource type="Texture2D" uid="uid://dki1spd0slwxj" path="res://assets/terrain/tropical_tilemap_slice_32x32.png" id="8_womr8"]
+[ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://scripts/ui/fps_counter.gd" id="9_onjth"]
+[ext_resource type="PackedScene" uid="uid://bl5dg3fjv4w6g" path="res://scenes/ui/hotbar.tscn" id="10_xa0eo"]
+[ext_resource type="PackedScene" uid="uid://o5dk1uupyfxt" path="res://scenes/ui/weaponbar.tscn" id="11_3mjum"]
+[ext_resource type="Script" uid="uid://dbkq1bkntxiv1" path="res://scripts/ui/weaponbar.gd" id="12_p27gv"]
+[ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://scripts/ui/inventory_system.gd" id="13_cn4eu"]
+[ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://scenes/ui/pause_menu.tscn" id="14_0wyf6"]
+[ext_resource type="PackedScene" uid="uid://k0kkh12kws3d" path="res://scenes/ui/player_menu.tscn" id="15_xp01v"]
+[ext_resource type="Script" uid="uid://covte3n64vx2f" path="res://scripts/ui/crafting_menu.gd" id="16_jix7a"]
+[ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://scripts/ui/depth_counter.gd" id="17_segjr"]
+[ext_resource type="PackedScene" uid="uid://noyk5n0awjav" path="res://scenes/ui/stats_display.tscn" id="18_beobj"]
+[ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/obstacles/wood_crate.tscn" id="19_267kh"]
+[ext_resource type="PackedScene" uid="uid://buc368tv0cjic" path="res://scenes/items/pickaxe.tscn" id="20_86meh"]
+[ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/items/shovel.tscn" id="21_duuju"]
+[ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/items/sword.tscn" id="22_8dxha"]
+[ext_resource type="PackedScene" uid="uid://bqjbr0fr548wk" path="res://scenes/terrain/berry_bush.tscn" id="23_j4epa"]
+[ext_resource type="PackedScene" uid="uid://ckk3o0r7wv6tc" path="res://scenes/items/stick.tscn" id="24_ruju6"]
+[ext_resource type="PackedScene" uid="uid://bau4ht0cid8a1" path="res://scenes/items/wood_axe.tscn" id="25_5nybl"]
+[ext_resource type="PackedScene" uid="uid://dhi7durjec88o" path="res://scenes/items/gold_coin.tscn" id="26_cq0lk"]
+[ext_resource type="Script" uid="uid://31qjwgftkyrw" path="res://scripts/systems/water_flow_manager.gd" id="27_j2yw6"]
+[ext_resource type="PackedScene" uid="uid://b5y8lh6n7kve" path="res://scenes/items/simple_rock.tscn" id="28_8pjrr"]
+[ext_resource type="Script" uid="uid://duwg2nwj6sc2e" path="res://scripts/systems/placement_manager.gd" id="29_0xxsb"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(6, 6)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_g2ixt"]
 resource_name = "dirt_hole"
-texture = ExtResource("4_dutm6")
+texture = ExtResource("4_kkokr")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_q5qfs"]
 resource_name = "surface_water"
-texture = ExtResource("4_f15g2")
+texture = ExtResource("5_lhwp2")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/custom_data_0 = true
 0:0/0/custom_data_3 = "surface"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_btm0u"]
-texture = ExtResource("5_atnpy")
+texture = ExtResource("6_l40q6")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/custom_data_0 = true
 0:0/0/custom_data_3 = "underwater"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nrqbv"]
-texture = ExtResource("6_cy82x")
+texture = ExtResource("7_iav3h")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, 7, 16, 7, 16, 16, -16, 16)
 0:0/0/custom_data_0 = true
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xoih0"]
-texture = ExtResource("4_8w8yu")
+texture = ExtResource("8_womr8")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
@@ -103,9 +103,9 @@ sources/13 = SubResource("TileSetAtlasSource_nrqbv")
 sources/1 = SubResource("TileSetAtlasSource_g2ixt")
 
 [node name="Platformer" type="Node2D"]
-script = ExtResource("1_yte5o")
+script = ExtResource("1_4bgka")
 
-[node name="Player" parent="." groups=["player"] instance=ExtResource("2_8w8yu")]
+[node name="Player" parent="." groups=["player"] instance=ExtResource("2_02d50")]
 z_index = 1
 position = Vector2(-94, 2142)
 
@@ -119,7 +119,7 @@ shape = SubResource("RectangleShape2D_ru564")
 modulate = Color(1, 1, 1, 0.7)
 position = Vector2(8.940697e-07, 0)
 scale = Vector2(0.8, 0.8)
-texture = ExtResource("3_xoih0")
+texture = ExtResource("3_pgk25")
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = SubResource("TileSet_gwrsa")
@@ -137,15 +137,15 @@ offset_left = -54.0
 offset_bottom = 23.0
 grow_horizontal = 0
 text = "FPS: 60"
-script = ExtResource("5_f15g2")
+script = ExtResource("9_onjth")
 
-[node name="Hotbar" parent="UI" instance=ExtResource("6_atnpy")]
+[node name="Hotbar" parent="UI" instance=ExtResource("10_xa0eo")]
 offset_left = -251.0
 offset_top = -93.0
 offset_right = 261.0
 offset_bottom = -29.0
 
-[node name="WeaponBar" parent="UI" instance=ExtResource("10_mwf8c")]
+[node name="WeaponBar" parent="UI" instance=ExtResource("11_3mjum")]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -159,37 +159,37 @@ grow_horizontal = 0
 grow_vertical = 0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource("11_rgya6")
+script = ExtResource("12_p27gv")
 
 [node name="InventorySystem" type="Node" parent="UI"]
-script = ExtResource("8_q5qfs")
+script = ExtResource("13_cn4eu")
 
-[node name="PauseMenu" parent="UI" instance=ExtResource("9_btm0u")]
+[node name="PauseMenu" parent="UI" instance=ExtResource("14_0wyf6")]
 visible = false
 offset_left = 482.0
 offset_top = 235.0
 offset_right = -448.0
 offset_bottom = -325.0
 
-[node name="PlayerMenu" parent="UI" instance=ExtResource("10_xoih0")]
+[node name="PlayerMenu" parent="UI" instance=ExtResource("15_xp01v")]
 visible = false
 offset_left = 241.0
 offset_top = 24.0
 offset_right = -175.0
 offset_bottom = -140.0
-script = ExtResource("11_mx3pc")
+script = ExtResource("16_jix7a")
 
 [node name="DepthCounter" type="Label" parent="UI"]
 offset_right = 40.0
 offset_bottom = 23.0
 text = "Depth: 0 Tiles"
-script = ExtResource("14_atnpy")
+script = ExtResource("17_segjr")
 metadata/_edit_use_anchors_ = true
 
 [node name="StatsUpdateTimer" type="Timer" parent="UI"]
 autostart = true
 
-[node name="StatsDisplay" parent="UI/StatsUpdateTimer" instance=ExtResource("15_cy82x")]
+[node name="StatsDisplay" parent="UI/StatsUpdateTimer" instance=ExtResource("18_beobj")]
 anchor_left = 0.026
 anchor_top = 0.7068272
 anchor_right = 0.264812
@@ -202,59 +202,59 @@ metadata/_edit_use_anchors_ = true
 
 [node name="WoodCrates" type="Node" parent="."]
 
-[node name="WoodCrate" parent="WoodCrates" instance=ExtResource("23_ilrow")]
+[node name="WoodCrate" parent="WoodCrates" instance=ExtResource("19_267kh")]
 position = Vector2(290, 2159)
 
-[node name="WoodCrate2" parent="WoodCrates" instance=ExtResource("23_ilrow")]
+[node name="WoodCrate2" parent="WoodCrates" instance=ExtResource("19_267kh")]
 position = Vector2(-243, 2158)
 
-[node name="WoodCrate3" parent="WoodCrates" instance=ExtResource("23_ilrow")]
+[node name="WoodCrate3" parent="WoodCrates" instance=ExtResource("19_267kh")]
 position = Vector2(290, 2123)
 
-[node name="PickAxe" parent="." instance=ExtResource("20_lj68f")]
+[node name="PickAxe" parent="." instance=ExtResource("20_86meh")]
 position = Vector2(101, 2107)
 
-[node name="Shovel" parent="." instance=ExtResource("21_ilrow")]
+[node name="Shovel" parent="." instance=ExtResource("21_duuju")]
 position = Vector2(5, 2086)
 
-[node name="Sword" parent="." instance=ExtResource("22_oo6ai")]
+[node name="Sword" parent="." instance=ExtResource("22_8dxha")]
 position = Vector2(60, 2083)
 
 [node name="Resources" type="Node" parent="."]
 
-[node name="BerryBush" parent="Resources" instance=ExtResource("4_q5qfs")]
+[node name="BerryBush" parent="Resources" instance=ExtResource("23_j4epa")]
 position = Vector2(222, 2154)
 
 [node name="TwoSecondTimer" type="Timer" parent="Resources"]
 wait_time = 2.0
 autostart = true
 
-[node name="Stick2" parent="." instance=ExtResource("24_oo6ai")]
+[node name="Stick2" parent="." instance=ExtResource("24_ruju6")]
 position = Vector2(-191, 2158)
 
-[node name="Stick" parent="." instance=ExtResource("24_oo6ai")]
+[node name="Stick" parent="." instance=ExtResource("24_ruju6")]
 position = Vector2(-150, 2159)
 
-[node name="WoodAxe" parent="." instance=ExtResource("26_g2ixt")]
+[node name="WoodAxe" parent="." instance=ExtResource("25_5nybl")]
 position = Vector2(-35, 2111)
 
-[node name="GoldCoin" parent="." instance=ExtResource("27_6g27y")]
+[node name="GoldCoin" parent="." instance=ExtResource("26_cq0lk")]
 position = Vector2(-48, 2164)
 
 [node name="WaterFlowManager" type="Node" parent="."]
-script = ExtResource("28_kkoo0")
+script = ExtResource("27_j2yw6")
 
-[node name="SimpleRock" parent="." instance=ExtResource("20_b3g4q")]
+[node name="SimpleRock" parent="." instance=ExtResource("28_8pjrr")]
 position = Vector2(-124, 2164)
 
 [node name="PlacementManager" type="Node" parent="."]
-script = ExtResource("30_b3g4q")
+script = ExtResource("29_0xxsb")
 
-[node name="SimpleRock2" parent="." instance=ExtResource("20_b3g4q")]
+[node name="SimpleRock2" parent="." instance=ExtResource("28_8pjrr")]
 position = Vector2(-150, 2121)
 
-[node name="SimpleRock3" parent="." instance=ExtResource("20_b3g4q")]
+[node name="SimpleRock3" parent="." instance=ExtResource("28_8pjrr")]
 position = Vector2(-189, 2124)
 
-[node name="SimpleRock4" parent="." instance=ExtResource("20_b3g4q")]
+[node name="SimpleRock4" parent="." instance=ExtResource("28_8pjrr")]
 position = Vector2(-222, 2117)

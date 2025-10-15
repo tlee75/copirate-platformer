@@ -11,16 +11,17 @@ config_version=5
 [application]
 
 config/name="copirate-platformer"
-run/main_scene="res://scenes/platformer_scene.tscn"
+run/main_scene="res://scenes/main_scene.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
 GDAIMCPRuntime="*res://addons/gdai-mcp-plugin-godot/gdai_mcp_runtime.gd"
-InventoryManager="*res://scripts/inventory_manager.gd"
+InventoryManager="*res://scripts/systems/inventory_manager.gd"
 GameObjectsDatabase="*res://scripts/systems/game_objects_database.gd"
 PlacementManager="*res://scripts/systems/placement_manager.gd"
+ResourceManager="*res://scripts/systems/resource_manager.gd"
 
 [display]
 

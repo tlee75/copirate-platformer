@@ -44,13 +44,9 @@ func _ready():
 
 	respawn_position = player.global_position # Initial position
 	
-	# Create and add Resource Manager
-	var resource_manager = preload("res://scripts/resource_manager.gd").new()
-	add_child(resource_manager)
-	
 	# Connect ResourceManager to the StatusUpdateTimer
 	var resource_timer = $Resources/TwoSecondTimer
-	resource_manager.setup_timer(resource_timer)
+	ResourceManager.setup_timer(resource_timer)
 
 	var water_flow_manager = $WaterFlowManager
 	if water_flow_manager:

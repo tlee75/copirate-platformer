@@ -1,16 +1,10 @@
 extends Node
 
-class_name ResourceManager
-
 var regenerating_resources: Array[Dictionary] = []
 var resource_timer: Timer
 
 signal resource_regenerated(resource: Node2D)
 
-func _ready():
-	add_to_group("resource_manager")
-	print("ResourceManager initialized")
-	
 func setup_timer(timer: Timer):
 	resource_timer = timer
 	if resource_timer:

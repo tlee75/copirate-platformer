@@ -33,11 +33,9 @@ func interact():
 	print("Harvesting berries - will regrow in ", regeneration_time, " seconds")
 	
 	# Register with ResourceManager for regeneration
-	var resource_manager = get_tree().get_first_node_in_group("resource_manager")
-	if resource_manager:
-		resource_manager.register_resource_regeneration(self, regeneration_time)
-	else:
-		print("Warning: ResourceManager not found!")
+
+	ResourceManager.register_resource_regeneration(self, regeneration_time)
+
 
 func set_cooldown():
 	pass
