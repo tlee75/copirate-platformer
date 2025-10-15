@@ -1,6 +1,6 @@
 [gd_scene load_steps=37 format=3 uid="uid://dj3pqaq3v6bwo"]
 
-[ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/platformer_scene.gd" id="1_4bgka"]
+[ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/main_scene.gd" id="1_4bgka"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_02d50"]
 [ext_resource type="Texture2D" uid="uid://xbvs700g2epd" path="res://resources/crosshair.tres" id="3_pgk25"]
 [ext_resource type="Texture2D" uid="uid://rn4b115e07qc" path="res://assets/terrain/ground_06_32x32.png" id="4_kkokr"]
