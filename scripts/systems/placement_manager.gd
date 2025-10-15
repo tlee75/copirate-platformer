@@ -3,16 +3,16 @@ extends Node
 @export	var GROUND_TILE_ID = 3	
 
 var preview_instance: Node2D = null
-var preview_item_data: Dictionary = {}
+var preview_structure_data: Node = null
 var placement_active: bool = false
 
 
-func start_structure_placement(item: Dictionary):
-	var structure_scene = load(item.scene_path)
+func start_structure_placement(object):
+	var structure_scene = load(object.scene_path)
 	preview_instance = structure_scene.instantiate()
 	preview_instance.modulate = Color(1, 1, 1, 0.5)
 	get_tree().current_scene.add_child(preview_instance)
-	preview_item_data = item
+	preview_structure_data = object
 	placement_active = true
 
 	# Use global mouse position (world coordinates)
@@ -26,7 +26,7 @@ func get_snapped_position(mouse_pos: Vector2) -> Vector2:
 	var tile_size = tilemap.tile_set.tile_size
 	
 	# Get placement padding from item data (default to 0 if not specified)
-	var placement_padding = preview_item_data.get("placement_bottom_padding", 0.0)
+	var placement_padding = preview_structure_data.get("placement_bottom_padding")
 	
 	# Get sprite height
 	var sprite_height = tile_size.y  # fallback
@@ -49,19 +49,19 @@ func get_snapped_position(mouse_pos: Vector2) -> Vector2:
 
 func confirm_structure_placement():
 	if preview_instance and placement_active:
-		for resource_name in preview_item_data.craft_requirements.keys():
-			var required = preview_item_data.craft_requirements[resource_name]
+		for resource_name in preview_structure_data.craft_requirements.keys():
+			var required = preview_structure_data.craft_requirements[resource_name]
 			InventoryManager.remove_items_by_name(resource_name, required)
 		preview_instance.modulate = Color(1, 1, 1, 1) # make fully visible
 		preview_instance = null
-		preview_item_data = {}
+		preview_structure_data = null
 		placement_active = false
 
 func cancel_structure_placement():
 	if preview_instance and placement_active:
 		preview_instance.queue_free()
 		preview_instance = null
-		preview_item_data = {}
+		preview_structure_data = null
 		placement_active = false
 
 func _input(event):

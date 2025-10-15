@@ -1,4 +1,6 @@
-extends Node2D
+extends GameStructure
+
+class_name Firepit
 
 @export var max_fuel: float = 300.0 # Max fuel storage
 
@@ -10,6 +12,17 @@ var state: int = ObjectState.UNLIT
 var current_burn_time: float = 0.0  # Time left for current burning item
 var resource_manager: ResourceManager
 var cooking_slots: Array[Dictionary] = []  # Track what's cooking in each slot
+
+
+
+func _init():
+	name = "Firepit"
+	category = "structure"
+	craftable = true
+	icon = load("res://assets/structures/firepit_unlit_01.png")
+	craft_requirements = {"Simple Rock": 1}
+	scene_path = "res://scenes/structures/firepit.tscn"
+	placement_bottom_padding = -4.0  # Pixels to adjust bottom alignment
 
 
 # Called when the node enters the scene tree for the first time.

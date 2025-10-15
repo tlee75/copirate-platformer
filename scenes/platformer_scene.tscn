@@ -23,7 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://buc368tv0cjic" path="res://scenes/items/pickaxe.tscn" id="20_lj68f"]
 [ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/items/shovel.tscn" id="21_ilrow"]
 [ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/items/sword.tscn" id="22_oo6ai"]
-[ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/terrain/wood_crate.tscn" id="23_ilrow"]
+[ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/obstacles/wood_crate.tscn" id="23_ilrow"]
 [ext_resource type="PackedScene" uid="uid://ckk3o0r7wv6tc" path="res://scenes/items/stick.tscn" id="24_oo6ai"]
 [ext_resource type="PackedScene" uid="uid://bau4ht0cid8a1" path="res://scenes/items/wood_axe.tscn" id="26_g2ixt"]
 [ext_resource type="PackedScene" uid="uid://dhi7durjec88o" path="res://scenes/items/gold_coin.tscn" id="27_6g27y"]
@@ -249,3 +249,12 @@ position = Vector2(-124, 2164)
 
 [node name="PlacementManager" type="Node" parent="."]
 script = ExtResource("30_b3g4q")
+
+[node name="SimpleRock2" parent="." instance=ExtResource("20_b3g4q")]
+position = Vector2(-150, 2121)
+
+[node name="SimpleRock3" parent="." instance=ExtResource("20_b3g4q")]
+position = Vector2(-189, 2124)
+
+[node name="SimpleRock4" parent="." instance=ExtResource("20_b3g4q")]
+position = Vector2(-222, 2117)
