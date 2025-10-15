@@ -91,8 +91,13 @@ func is_placement_valid(instance) -> bool:
 	var area = instance.get_node("Area2D")
 	var overlapping = area.get_overlapping_areas() + area.get_overlapping_bodies()
 	for obj in overlapping:
-		if obj != instance and (obj is Node2D or obj is Area2D):
-			return false
+		if obj != instance:
+			var cat = get_category(obj)
+			print("Checking object:", obj, "Category:", cat)
+			if cat == "structure" or cat == "terrain":
+				return false
+			if obj is PhysicsBody2D and not obj.is_in_group("player"):
+				return false
 
 	# Ground tile check - there must be ground below the structure
 	var tilemap = get_tree().current_scene.get_node("TileMap")
@@ -106,3 +111,10 @@ func is_placement_valid(instance) -> bool:
 	if ground_tile_id != GROUND_TILE_ID:
 		return false
 	return true
+
+func get_category(obj):
+	if "category" in obj:
+		return obj.category
+	elif obj.get_parent() and "category" in obj.get_parent():
+		return obj.get_parent().category
+	return null

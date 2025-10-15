@@ -8,6 +8,7 @@ extends Node2D
 enum BerryBushState { FULL, EMPTY }
 var state: int = BerryBushState.FULL
 var health: int = max_health
+var category: String = "terrain"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

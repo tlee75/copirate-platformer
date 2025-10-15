@@ -1,7 +1,7 @@
 [gd_scene load_steps=15 format=3 uid="uid://crl38kj8otjtc"]
 
 [ext_resource type="Texture2D" uid="uid://cufivuekexdn6" path="res://assets/structures/crate_hit_01-8.png" id="1_aqu1o"]
-[ext_resource type="Script" uid="uid://douoo83atpggs" path="res://scripts/terrain/wood_crate.gd" id="1_p4eel"]
+[ext_resource type="Script" uid="uid://douoo83atpggs" path="res://scripts/obstacles/wood_crate.gd" id="1_p4eel"]
 [ext_resource type="PackedScene" uid="uid://dhi7durjec88o" path="res://scenes/items/gold_coin.tscn" id="2_hfctv"]
 [ext_resource type="Texture2D" uid="uid://2a5h6hdlw8lx" path="res://assets/structures/crate_hit_02-8.png" id="2_p4eel"]
 
