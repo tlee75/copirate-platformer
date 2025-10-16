@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=38 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/main_scene.gd" id="1_4bgka"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_02d50"]
@@ -29,6 +29,7 @@
 [ext_resource type="Script" uid="uid://31qjwgftkyrw" path="res://scripts/systems/water_flow_manager.gd" id="27_j2yw6"]
 [ext_resource type="PackedScene" uid="uid://b5y8lh6n7kve" path="res://scenes/items/simple_rock.tscn" id="28_8pjrr"]
 [ext_resource type="Script" uid="uid://duwg2nwj6sc2e" path="res://scripts/systems/placement_manager.gd" id="29_0xxsb"]
+[ext_resource type="PackedScene" uid="uid://cuu2vsbd7syoi" path="res://scenes/terrain/coconut_tree.tscn" id="30_02d50"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(6, 6)
@@ -203,16 +204,16 @@ metadata/_edit_use_anchors_ = true
 [node name="WoodCrates" type="Node" parent="."]
 
 [node name="WoodCrate" parent="WoodCrates" instance=ExtResource("19_267kh")]
-position = Vector2(290, 2159)
+position = Vector2(365, 2159)
 
 [node name="WoodCrate2" parent="WoodCrates" instance=ExtResource("19_267kh")]
-position = Vector2(-243, 2158)
+position = Vector2(-663, 2097)
 
 [node name="WoodCrate3" parent="WoodCrates" instance=ExtResource("19_267kh")]
-position = Vector2(290, 2123)
+position = Vector2(335, 2159)
 
 [node name="PickAxe" parent="." instance=ExtResource("20_86meh")]
-position = Vector2(101, 2107)
+position = Vector2(114, 2083)
 
 [node name="Shovel" parent="." instance=ExtResource("21_duuju")]
 position = Vector2(5, 2086)
@@ -230,31 +231,34 @@ wait_time = 2.0
 autostart = true
 
 [node name="Stick2" parent="." instance=ExtResource("24_ruju6")]
-position = Vector2(-191, 2158)
+position = Vector2(-206, 2164)
 
 [node name="Stick" parent="." instance=ExtResource("24_ruju6")]
-position = Vector2(-150, 2159)
+position = Vector2(-172, 2164)
 
 [node name="WoodAxe" parent="." instance=ExtResource("25_5nybl")]
-position = Vector2(-35, 2111)
+position = Vector2(-42, 2088)
 
 [node name="GoldCoin" parent="." instance=ExtResource("26_cq0lk")]
-position = Vector2(-48, 2164)
+position = Vector2(60, 2169)
 
 [node name="WaterFlowManager" type="Node" parent="."]
 script = ExtResource("27_j2yw6")
 
 [node name="SimpleRock" parent="." instance=ExtResource("28_8pjrr")]
-position = Vector2(-124, 2164)
+position = Vector2(497, 2268)
 
 [node name="PlacementManager" type="Node" parent="."]
 script = ExtResource("29_0xxsb")
 
 [node name="SimpleRock2" parent="." instance=ExtResource("28_8pjrr")]
-position = Vector2(-150, 2121)
+position = Vector2(712, 2429)
 
 [node name="SimpleRock3" parent="." instance=ExtResource("28_8pjrr")]
-position = Vector2(-189, 2124)
+position = Vector2(-572, 2110)
 
 [node name="SimpleRock4" parent="." instance=ExtResource("28_8pjrr")]
-position = Vector2(-222, 2117)
+position = Vector2(-442, 2175)
+
+[node name="CoconutTree" parent="." instance=ExtResource("30_02d50")]
+position = Vector2(-261, 2064)

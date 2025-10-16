@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=3 uid="uid://cuu2vsbd7syoi"]
+
+[ext_resource type="Script" uid="uid://cmwixqf6pe8l5" path="res://scripts/terrain/coconut_tree.gd" id="1_248rl"]
+[ext_resource type="Texture2D" uid="uid://jhaqkrqe5f4" path="res://assets/terrain/coconut_tree_01_128x232.png" id="2_2u3ch"]
+[ext_resource type="Texture2D" uid="uid://dwxqh7amkwyto" path="res://assets/terrain/coconut_tree_02_128x232.png" id="3_2u3ch"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d4nw3"]
+size = Vector2(19, 201)
+
+[node name="CoconutTree" type="Node2D"]
+script = ExtResource("1_248rl")
+full_texture = ExtResource("2_2u3ch")
+empty_texture = ExtResource("3_2u3ch")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_2u3ch")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(-0.5, 11.5)
+shape = SubResource("RectangleShape2D_d4nw3")

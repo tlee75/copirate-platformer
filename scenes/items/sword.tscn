@@ -460,7 +460,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mcaqy"]
-size = Vector2(20, 8)
+size = Vector2(31, 8)
 
 [node name="Sword" type="Area2D"]
 script = ExtResource("1_xccsb")
@@ -472,4 +472,5 @@ sprite_frames = SubResource("SpriteFrames_63by1")
 animation = &"sword_idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.5, 0)
 shape = SubResource("RectangleShape2D_mcaqy")

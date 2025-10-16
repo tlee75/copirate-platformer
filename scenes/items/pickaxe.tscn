@@ -446,7 +446,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gw7q8"]
-size = Vector2(18, 26)
+size = Vector2(18, 27)
 
 [node name="PickAxe" type="Area2D"]
 script = ExtResource("1_2ikqw")
@@ -458,5 +458,5 @@ sprite_frames = SubResource("SpriteFrames_s4se8")
 animation = &"pickaxe_idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(1, 1)
+position = Vector2(1, 1.5)
 shape = SubResource("RectangleShape2D_gw7q8")

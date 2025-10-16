@@ -18,7 +18,9 @@ animations = [{
 "speed": 1.0
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_qge5b"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jknlk"]
+radius = 7.5000005
+height = 74.84954
 
 [node name="Stick" type="Area2D"]
 scale = Vector2(0.4, 0.4)
@@ -30,4 +32,7 @@ sprite_frames = SubResource("SpriteFrames_hhyfn")
 animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_qge5b")
+position = Vector2(2.0489097e-07, 2.4999998)
+rotation = 0.6632251
+scale = Vector2(0.9999998, 0.9999998)
+shape = SubResource("CapsuleShape2D_jknlk")

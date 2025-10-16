@@ -460,6 +460,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s00l6"]
+size = Vector2(20, 23)
 
 [node name="WoodAxe" type="Area2D"]
 script = ExtResource("1_b2gdx")
@@ -471,4 +472,5 @@ sprite_frames = SubResource("SpriteFrames_c2w6g")
 animation = &"woodaxe_idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -1.5)
 shape = SubResource("RectangleShape2D_s00l6")

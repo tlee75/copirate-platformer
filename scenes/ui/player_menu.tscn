@@ -497,15 +497,13 @@ metadata/_tab_index = 0
 
 [node name="MainInventory" parent="TabBar/InventoryTab" instance=ExtResource("1_srlpo")]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 0.0
-offset_top = -0.11975098
-offset_right = 0.0
-offset_bottom = 0.11975098
+anchor_top = 0.455
+anchor_right = 0.0
+anchor_bottom = 0.455
+offset_left = 181.85
+offset_top = 0.049240112
+offset_right = 181.85
+offset_bottom = 0.28874207
 
 [node name="CraftTab" type="Control" parent="TabBar"]
 visible = false

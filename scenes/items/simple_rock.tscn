@@ -19,14 +19,14 @@ animations = [{
 }]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_47idf"]
-radius = 6.0
+radius = 4.0
 
 [node name="SimpleRock" type="Area2D"]
 script = ExtResource("1_r777w")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
-scale = Vector2(0.5, 0.5)
+scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_lff38")
 animation = &"idle"
 
