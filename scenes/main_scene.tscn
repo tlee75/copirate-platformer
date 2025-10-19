@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=33 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/main_scene.gd" id="1_4bgka"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_02d50"]
@@ -9,16 +9,11 @@
 [ext_resource type="Texture2D" uid="uid://dp42rf78somje" path="res://assets/terrain/seafloor_32x32.png" id="7_iav3h"]
 [ext_resource type="Texture2D" uid="uid://dki1spd0slwxj" path="res://assets/terrain/tropical_tilemap_slice_32x32.png" id="8_womr8"]
 [ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://scripts/ui/fps_counter.gd" id="9_onjth"]
-[ext_resource type="PackedScene" uid="uid://bl5dg3fjv4w6g" path="res://scenes/ui/hotbar.tscn" id="10_xa0eo"]
-[ext_resource type="PackedScene" uid="uid://o5dk1uupyfxt" path="res://scenes/ui/weaponbar.tscn" id="11_3mjum"]
-[ext_resource type="Script" uid="uid://dbkq1bkntxiv1" path="res://scripts/ui/weaponbar.gd" id="12_p27gv"]
-[ext_resource type="Script" uid="uid://dvf50mvg0w6tm" path="res://scripts/ui/inventory_system.gd" id="13_cn4eu"]
 [ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://scenes/ui/pause_menu.tscn" id="14_0wyf6"]
-[ext_resource type="PackedScene" uid="uid://k0kkh12kws3d" path="res://scenes/ui/player_menu.tscn" id="15_xp01v"]
-[ext_resource type="Script" uid="uid://covte3n64vx2f" path="res://scripts/ui/crafting_menu.gd" id="16_jix7a"]
 [ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://scripts/ui/depth_counter.gd" id="17_segjr"]
 [ext_resource type="PackedScene" uid="uid://noyk5n0awjav" path="res://scenes/ui/stats_display.tscn" id="18_beobj"]
 [ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/obstacles/wood_crate.tscn" id="19_267kh"]
+[ext_resource type="PackedScene" uid="uid://bcbmqwa8ofwfq" path="res://scenes/ui/inventory_ui.tscn" id="19_pgk25"]
 [ext_resource type="PackedScene" uid="uid://buc368tv0cjic" path="res://scenes/items/pickaxe.tscn" id="20_86meh"]
 [ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/items/shovel.tscn" id="21_duuju"]
 [ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/items/sword.tscn" id="22_8dxha"]
@@ -140,45 +135,13 @@ grow_horizontal = 0
 text = "FPS: 60"
 script = ExtResource("9_onjth")
 
-[node name="Hotbar" parent="UI" instance=ExtResource("10_xa0eo")]
-offset_left = -251.0
-offset_top = -93.0
-offset_right = 261.0
-offset_bottom = -29.0
-
-[node name="WeaponBar" parent="UI" instance=ExtResource("11_3mjum")]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -152.0
-offset_top = -90.0
-offset_right = -88.0
-offset_bottom = -25.0
-grow_horizontal = 0
-grow_vertical = 0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-script = ExtResource("12_p27gv")
-
-[node name="InventorySystem" type="Node" parent="UI"]
-script = ExtResource("13_cn4eu")
-
 [node name="PauseMenu" parent="UI" instance=ExtResource("14_0wyf6")]
 visible = false
 offset_left = 482.0
 offset_top = 235.0
 offset_right = -448.0
 offset_bottom = -325.0
-
-[node name="PlayerMenu" parent="UI" instance=ExtResource("15_xp01v")]
-visible = false
-offset_left = 241.0
-offset_top = 24.0
-offset_right = -175.0
-offset_bottom = -140.0
-script = ExtResource("16_jix7a")
+mouse_filter = 2
 
 [node name="DepthCounter" type="Label" parent="UI"]
 offset_right = 40.0
@@ -199,7 +162,11 @@ offset_left = 0.048000336
 offset_top = 18.975952
 offset_right = 2.3519897
 offset_bottom = -14.792053
+mouse_force_pass_scroll_events = false
 metadata/_edit_use_anchors_ = true
+
+[node name="InventoryUI" parent="UI" instance=ExtResource("19_pgk25")]
+process_mode = 2
 
 [node name="WoodCrates" type="Node" parent="."]
 

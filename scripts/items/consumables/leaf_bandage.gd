@@ -32,6 +32,6 @@ func extra_use_startup(player, slot_data):
 		player_stats.start_healing(10)
 		
 		# Store slot data for removal after animation finishes
-		pending_slot_data = slot_data
+		#pending_slot_data = slot_data
 	else:
 		print("no player stats")

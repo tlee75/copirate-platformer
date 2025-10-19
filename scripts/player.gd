@@ -53,10 +53,6 @@ var default_hit_frames = {
 
 # Remove old procedural Visual node if present
 func _ready():
-	var ui_layer = get_parent().get_node_or_null("UI")
-	if ui_layer:
-		equipment_panel = ui_layer.get_node_or_null("PlayerMenu/TabBar/EquipmentTab/HBoxContainer/EquipmentPanel")
-		
 	var frames = load("res://resources/player_sprites.tres")
 	$AnimatedSprite2D.sprite_frames = frames
 	# Remove procedural Visual if it exists
@@ -96,6 +92,8 @@ func _ready():
 	add_child(player_stats)
 	player_stats.stat_depleted.connect(_on_stat_depleted)
 
+	# Connect to InventoryUI's input handler once the scene is ready
+	call_deferred("_connect_to_inventory_ui")
 
 func _physics_process(delta):	
 	if is_dead:
@@ -110,23 +108,20 @@ func _physics_process(delta):
 		if not is_on_floor() and not is_underwater:
 			vel.y += gravity * delta
 		# Stop horizontal movement gradually
-		vel.x = move_toward(vel.x, 0, WALK_SPEED * 2)  # Stop faster when inventory opens
+		vel.x = move_toward(vel.x, 0, WALK_SPEED * 2)
 		velocity = vel
 		move_and_slide()
 		
-		# Reset the player to an appropriate looping idle animation while the menu is open
-		var target_animation = ""
-		if is_underwater:
-			target_animation = "swim_idle"
-		else:
-			target_animation = "idle"
+		# Set appropriate idle animation
+		var target_animation = "swim_idle" if is_underwater else "idle"
 		if $AnimatedSprite2D.animation != target_animation:
 			$AnimatedSprite2D.play(target_animation)
 		
+		# Clear action states
 		is_trigger_action = false
 		is_interacting = false
 		
-		# Don't update cursor position, mouse UI detection, or highlights when inventory is open
+		# Don't process any other input when menus are open
 		return
 
 	if is_on_water_tile():
@@ -292,8 +287,12 @@ func handle_interact_or_use_action():
 func handle_attack_action():
 	if PlacementManager.placement_active:
 		return # Placement manager handles input
-	# Main Hand Action - left mouse button (but not when clicking on hotbar)
-	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu():
+	
+	# Only block mouse input when actually clicking ON the inventory UI, not when inventory is just open
+	# This allows UI buttons to receive clicks while preventing accidental world actions
+	
+	# Main Hand Action - left mouse button (but not when clicking on UI)
+	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu() and not is_mouse_over_inventory():
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
 			if equipment_panel:
@@ -537,6 +536,35 @@ func create_tile_highlight_optimized(tile_pos: Vector2i):
 func _on_inventory_state_changed(is_open: bool):
 	inventory_is_open = is_open
 	print("Player: Inventory is now ", "open" if is_open else "closed")
+	
+func _on_inventory_action_executed(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack, success: bool):
+	print("Player: Inventory action executed - ", action_type, " on ", stack.item.name, " - Success: ", success)
+	
+	# Handle any player-specific responses to inventory actions
+	if success:
+		match action_type:
+			InventoryActionResolver.ActionType.EQUIP:
+				print("Item equipped: ", stack.item.name)
+			InventoryActionResolver.ActionType.USE:
+				print("Item used: ", stack.item.name)
+			InventoryActionResolver.ActionType.QUICK_MOVE:
+				print("Item moved to hotbar: ", stack.item.name)
+
+func _on_inventory_input_mode_changed(new_mode: InventoryActionResolver.InputMethod):
+	var mode_name = ""
+	match new_mode:
+		InventoryActionResolver.InputMethod.MOUSE_KEYBOARD:
+			mode_name = "Mouse/Keyboard"
+		InventoryActionResolver.InputMethod.CONTROLLER:
+			mode_name = "Controller"
+		InventoryActionResolver.InputMethod.TOUCH:
+			mode_name = "Touch"
+	
+	print("Player: Input mode changed to ", mode_name)
+	
+	# Could trigger UI changes here based on input mode
+	# For example, show/hide controller button hints
+
 
 func _on_object_menu_state_changed(is_open: bool):
 	object_menu_is_open = is_open
@@ -586,9 +614,22 @@ func get_selected_hotbar_slot_and_item():
 		return [null, null]
 	var slot_index = hotbar.selected_slot
 	var slot_data = InventoryManager.get_hotbar_slot(slot_index)
-	if slot_data and not slot_data.is_empty():
+	if slot_data and not (slot_data.item == null or slot_data.quantity <= 0):
 		return [slot_data, slot_data.item]
 	return [null, null]
+
+func execute_hotbar_action_with_resolver(slot_index: int):
+	# Use the new action resolver system for hotbar actions
+	var hotbar_stack = InventoryManager.get_hotbar_stack(slot_index)
+	if hotbar_stack:
+		# Find the InventoryUI's input handler
+		var inventory_ui = get_tree().get_first_node_in_group("inventory_ui")
+		if inventory_ui and inventory_ui.input_handler:
+			# Execute the primary action on the hotbar item
+			var action = inventory_ui.input_handler.action_resolver.get_action_for_input("inventory_use", hotbar_stack)
+			if action:
+				return inventory_ui.input_handler.execute_action_on_stack(action.type, hotbar_stack)
+	return false
 
 func is_on_water_tile() -> bool:
 	var tile_pos = tilemap.local_to_map(global_position)
@@ -729,3 +770,23 @@ func add_loot(item_name: String, amount: int):
 		return true
 	else:
 		return false
+
+func _connect_to_inventory_ui():
+	# Connect to the singleton InventoryInputHandler
+	InventoryInputHandler.action_executed.connect(_on_inventory_action_executed)
+	InventoryInputHandler.input_mode_changed.connect(_on_inventory_input_mode_changed)
+	print("Player connected to InventoryInputHandler singleton")
+
+func is_mouse_over_inventory() -> bool:
+	# Check if mouse is over the inventory UI
+	var ui_layer = get_parent().get_node_or_null("UI")
+	if not ui_layer:
+		return false
+	
+	var inventory_ui = ui_layer.get_node_or_null("InventoryUI")
+	if not inventory_ui or not inventory_ui.visible:
+		return false
+	
+	var mouse_pos = get_viewport().get_mouse_position()
+	var inventory_rect = Rect2(inventory_ui.global_position, inventory_ui.size)
+	return inventory_rect.has_point(mouse_pos)

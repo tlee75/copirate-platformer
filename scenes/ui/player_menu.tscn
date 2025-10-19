@@ -1,8 +1,6 @@
-[gd_scene load_steps=71 format=3 uid="uid://k0kkh12kws3d"]
+[gd_scene load_steps=69 format=3 uid="uid://k0kkh12kws3d"]
 
-[ext_resource type="PackedScene" uid="uid://dxsmual0vxluc" path="res://scenes/ui/main_inventory.tscn" id="1_srlpo"]
 [ext_resource type="Script" uid="uid://vcvkw3xxws36" path="res://scripts/ui/equipment_panel.gd" id="2_cuqmt"]
-[ext_resource type="PackedScene" uid="uid://x72kyodvepj7" path="res://scenes/ui/inventory_slot.tscn" id="2_cywfm"]
 [ext_resource type="PackedScene" uid="uid://c8tdbg3kjuavn" path="res://scenes/ui/equipment_inventory.tscn" id="3_rjctp"]
 [ext_resource type="Texture2D" uid="uid://dl63amqod85d8" path="res://assets/sprite-man/idle_01_64.png" id="4_yadmt"]
 
@@ -489,24 +487,14 @@ offset_right = 0.0759277
 offset_bottom = 134.94
 grow_horizontal = 2
 grow_vertical = 2
-current_tab = 0
+current_tab = 1
 
 [node name="InventoryTab" type="Control" parent="TabBar"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="MainInventory" parent="TabBar/InventoryTab" instance=ExtResource("1_srlpo")]
-layout_mode = 1
-anchor_top = 0.455
-anchor_right = 0.0
-anchor_bottom = 0.455
-offset_left = 181.85
-offset_top = 0.049240112
-offset_right = 181.85
-offset_bottom = 0.28874207
-
 [node name="CraftTab" type="Control" parent="TabBar"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
@@ -602,75 +590,175 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="HeadSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
+[node name="HeadSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 layout_mode = 0
 offset_left = 9.850006
 offset_top = 28.57
 offset_right = 73.850006
 offset_bottom = 92.57
+script = null
 
-[node name="ChestSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
+[node name="ChestSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 layout_mode = 0
 offset_left = 9.850006
 offset_top = 122.57001
 offset_right = 73.850006
 offset_bottom = 186.57
+script = null
 
-[node name="LegsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
+[node name="LegsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 layout_mode = 0
 offset_left = 9.850006
 offset_top = 217.57
 offset_right = 73.850006
 offset_bottom = 281.57
+script = null
 
-[node name="HandsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
+[node name="HandsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 layout_mode = 0
 offset_left = 9.850006
 offset_top = 308.57
 offset_right = 73.850006
 offset_bottom = 372.57
+script = null
 
-[node name="MainHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
+[node name="MainHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 layout_mode = 0
 offset_left = 104.850006
 offset_top = 393.57
 offset_right = 168.85
 offset_bottom = 457.57
+script = null
 
-[node name="OffHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
+[node name="OffHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 layout_mode = 0
 offset_left = 203.85004
 offset_top = 393.57
 offset_right = 267.85004
 offset_bottom = 457.57
+script = null
 
-[node name="ArmsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
+[node name="ArmsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 layout_mode = 0
 offset_left = 296.85
 offset_top = 28.570007
 offset_right = 360.85
 offset_bottom = 92.57001
+script = null
 
-[node name="FeetSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
+[node name="FeetSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 layout_mode = 0
 offset_left = 296.85
 offset_top = 122.57001
 offset_right = 360.85
 offset_bottom = 186.57
+script = null
 
-[node name="AccessorySlot1" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
+[node name="AccessorySlot1" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 layout_mode = 0
 offset_left = 296.85
 offset_top = 217.57
 offset_right = 360.85
 offset_bottom = 281.57
+script = null
 
-[node name="AccessorySlot2" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer" instance=ExtResource("2_cywfm")]
+[node name="AccessorySlot2" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 layout_mode = 0
 offset_left = 296.85
 offset_top = 308.57
 offset_right = 360.85
 offset_bottom = 372.57
+script = null
 
 [node name="InventoryPanel" type="Control" parent="TabBar/EquipmentTab/HBoxContainer"]
 layout_mode = 2

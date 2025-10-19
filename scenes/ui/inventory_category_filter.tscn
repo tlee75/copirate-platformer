@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8kgpkram46gn"]
+
+[ext_resource type="Script" uid="uid://bh0wu7qnmm0fc" path="res://scripts/ui/inventory_category_filter.gd" id="1_feeja"]
+
+[node name="InventoryCategoryFilter" type="Control"]
+custom_minimum_size = Vector2(400, 60)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+script = ExtResource("1_feeja")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0.3254902, 1, 0.23921569)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 10.0
+offset_right = -41.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+vertical_scroll_mode = 0
+
+[node name="CategoryContainer" type="HBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_constants/separation = 10
+
+[node name="LeftArrow" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -20.0
+offset_right = 40.0
+offset_bottom = -628.0
+grow_vertical = 2
+text = "◀"
+
+[node name="RightArrow" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1192.0
+offset_top = -20.0
+offset_right = -1162.0
+offset_bottom = -628.0
+grow_horizontal = 0
+grow_vertical = 2
+text = "▶"

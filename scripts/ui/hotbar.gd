@@ -1,65 +1,87 @@
 extends Control
+class_name Hotbar
 
-# Hotbar UI - displays the 8 hotbar slots at the bottom of the screen
-# Connects to InventoryManager for data
+@onready var h_box_container: HBoxContainer = $HBoxContainer
 
+var hotbar_slot_buttons: Array[Button] = []
 var selected_slot: int = 0
-
-@onready var slot_container: HBoxContainer = $HBoxContainer
-var slot_nodes: Array[Control] = []
+const HOTBAR_SIZE = 8
 
 func _ready():
-	var slot_count = slot_container.get_child_count()
-	InventoryManager.initialize_hotbar_slots(slot_count)
+	_create_dynamic_hotbar_slots()
+	# Connect to the new inventory system
+	InventoryManager.hotbar_changed.connect(_update_hotbar_display)
+	_update_hotbar_display()
+
+func scroll_previous():
+	_select_previous_slot()
+
+func scroll_next():
+	_select_next_slot()
+
+func _create_dynamic_hotbar_slots():
+	# Clear any existing children
+	for child in h_box_container.get_children():
+		child.queue_free()
 	
-	# Get references to all slot nodes
-	for i in slot_count:
-		var slot_node = slot_container.get_child(i)
-		slot_nodes.append(slot_node)
+	hotbar_slot_buttons.clear()
+	
+	# Create 8 dynamic slots
+	for i in range(HOTBAR_SIZE):
+		var slot_button = Button.new()
+		slot_button.custom_minimum_size = Vector2(64, 64)
+		slot_button.flat = true
+		slot_button.name = "HotbarSlot" + str(i)
+		slot_button.toggle_mode = false
 		
-		# Configure each slot
-		slot_node.slot_index = i
-		slot_node.is_hotbar_slot = true
+		# Connect click to select slot
+		slot_button.pressed.connect(_on_hotbar_slot_pressed.bind(i))
+		
+		h_box_container.add_child(slot_button)
+		hotbar_slot_buttons.append(slot_button)
 	
-	# Start the game with slot 0 selectedF
-	select_slot(0)
-	
-	# Connect to inventory manager signals
-	InventoryManager.hotbar_changed.connect(_update_display)
-	
-	# Initial display update
-	_update_display()
+	# Select the first slot by default
+	_update_slot_selection()
 
-func _update_display():
-	for i in 8:
-		var slot_data = InventoryManager.get_hotbar_slot(i)
-		if slot_data:
-			slot_nodes[i].update_display(slot_data)
-
-func _on_drag_started(slot_index: int, _is_hotbar: bool):
-	print("Drag started from hotbar slot ", slot_index)
-	# TODO: Implement drag and drop logic
-
-func _on_drag_ended(slot_index: int, _is_hotbar: bool):
-	print("Drag ended on hotbar slot ", slot_index)
-	# TODO: Implement drag and drop logic
-
-func select_slot(index: int):
-	selected_slot = clamp(index, 0, get_slot_count() -1)
-	print("selected_slot: ", selected_slot)
-	update_slot_highlight()
-
-func update_slot_highlight():
-	for i in slot_nodes.size():
-		if i == selected_slot:
-			slot_nodes[i].modulate = Color(1, 1, 0.5) # Highlighted yellowish
+func _update_hotbar_display():
+	for i in range(HOTBAR_SIZE):
+		var stack = InventoryManager.get_hotbar_stack(i)
+		var button = hotbar_slot_buttons[i]
+		
+		if stack and stack.item:
+			button.text = stack.item.name + "\nx" + str(stack.quantity)
 		else:
-			slot_nodes[i].modulate = Color(1, 1, 1) # Normal
+			button.text = ""
+	
+	_update_slot_selection()
 
-func get_slot_count():
-	return slot_nodes.size()
+func _update_slot_selection():
+	# Update visual selection indicator
+	for i in range(HOTBAR_SIZE):
+		var button = hotbar_slot_buttons[i]
+		if i == selected_slot:
+			button.modulate = Color.YELLOW  # Highlight selected slot
+		else:
+			button.modulate = Color.WHITE
 
-func get_selected_item():
-	if selected_slot >= 0 and selected_slot < slot_nodes.size():
-		return slot_nodes[selected_slot].slot_data.item
-	return null
+func _on_hotbar_slot_pressed(slot_index: int):
+	# Select the clicked slot
+	selected_slot = slot_index
+	_update_slot_selection()
+	print("Selected hotbar slot: ", slot_index)
+
+func _select_next_slot():
+	selected_slot = (selected_slot + 1) % HOTBAR_SIZE
+	_update_slot_selection()
+	print("Selected hotbar slot: ", selected_slot)
+
+func _select_previous_slot():
+	selected_slot = (selected_slot - 1 + HOTBAR_SIZE) % HOTBAR_SIZE
+	_update_slot_selection()
+	print("Selected hotbar slot: ", selected_slot)
+
+func get_selected_slot() -> int:
+	return selected_slot
+
+func get_selected_stack():
+	return InventoryManager.get_hotbar_stack(selected_slot)

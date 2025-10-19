@@ -36,6 +36,6 @@ func extra_use_startup(player, slot_data):
 		player_stats.start_drinking(5)
 		
 		# Store slot data for removal after animation finishes
-		pending_slot_data = slot_data
+		#pending_slot_data = slot_data
 	else:
 		print("no player stats")

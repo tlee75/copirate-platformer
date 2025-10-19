@@ -31,7 +31,7 @@ func _update_filtered_display():
 	var equipment_items = []
 	for i in range(InventoryManager.inventory_slots.size()):
 		var slot_data = InventoryManager.inventory_slots[i]
-		if not slot_data.is_empty() and _is_equipment_item(slot_data.item):
+		if not (slot_data.item == null or slot_data.quantity <= 0) and _is_equipment_item(slot_data.item):
 			equipment_items.append({
 				"slot_data": slot_data,
 				"original_index": i,
@@ -41,7 +41,7 @@ func _update_filtered_display():
 	# Find equipment from the hotbar
 	for i in range(InventoryManager.hotbar_slots.size()):
 		var slot_data = InventoryManager.hotbar_slots[i]
-		if not slot_data.is_empty() and _is_equipment_item(slot_data.item):
+		if not (slot_data.item == null or slot_data.quantity <= 0) and _is_equipment_item(slot_data.item):
 			equipment_items.append({
 				"slot_data": slot_data,
 				"original_index": i,
@@ -109,7 +109,7 @@ func _on_filtered_slot_clicked(display_slot_index: int, _is_hotbar: bool):
 				slot_data = InventoryManager.get_inventory_slot(original_index)
 			elif source == "hotbar":
 				slot_data = InventoryManager.get_hotbar_slot(original_index)
-			if slot_data and not slot_data.is_empty():
+			if slot_data and not (slot_data.item == null or slot_data.quantity <= 0):
 				# Set the correct flags for hotbar/equipment
 				inventory_system.start_drag(original_index, is_hotbar, false, false)
 

@@ -22,7 +22,7 @@ var drag_preview: Control
 func _ready():
 	# This will be connected when added to the main scene
 	# Set process input to handle global mouse releases
-	set_process_input(true)
+	#set_process_input(true)
 	
 	add_to_group("inventory_system")
 
@@ -175,7 +175,7 @@ func start_drag(slot_index: int, is_hotbar: bool, is_weaponbar: bool, is_equipme
 	else:
 		slot_data = InventoryManager.get_inventory_slot(slot_index)
 	
-	if not slot_data or slot_data.is_empty():
+	if not slot_data or (slot_data.item == null or slot_data.quantity <= 0):
 		return
 	
 	is_dragging = true

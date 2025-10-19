@@ -1,0 +1,77 @@
+[gd_scene load_steps=9 format=3 uid="uid://bcbmqwa8ofwfq"]
+
+[ext_resource type="Script" uid="uid://bb2w6ivxttklu" path="res://scripts/ui/inventory_ui.gd" id="1_bsps8"]
+[ext_resource type="PackedScene" uid="uid://b8kgpkram46gn" path="res://scenes/ui/inventory_category_filter.tscn" id="1_nuief"]
+[ext_resource type="PackedScene" uid="uid://cvgrjdhk14guq" path="res://scenes/ui/inventory_item_list.tscn" id="2_bsps8"]
+[ext_resource type="PackedScene" uid="uid://coecdah2bs7x4" path="res://scenes/ui/inventory_item_detail.tscn" id="3_ldtye"]
+[ext_resource type="Script" uid="uid://crdqmbv6vuj6d" path="res://scripts/ui/inventory_item_list.gd" id="4_hbcvs"]
+[ext_resource type="PackedScene" uid="uid://jyu5l75iarfi" path="res://scenes/ui/inventory_action_panel.tscn" id="4_xk7lq"]
+[ext_resource type="Script" uid="uid://btqfh7m2e4t0y" path="res://scripts/ui/inventory_item_detail.gd" id="6_erru2"]
+[ext_resource type="Script" uid="uid://co3v5kj4nyi1e" path="res://scripts/ui/inventory_action_panel.gd" id="8_7csag"]
+
+[node name="InventoryUI" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_force_pass_scroll_events = false
+script = ExtResource("1_bsps8")
+
+[node name="Background" type="ColorRect" parent="."]
+self_modulate = Color(0.09803922, 0.09803922, 0.09803922, 0.9019608)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_force_pass_scroll_events = false
+
+[node name="MainLayout" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="HeaderSection" type="Control" parent="MainLayout"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 1
+
+[node name="InventoryCategoryFilter" parent="MainLayout/HeaderSection" instance=ExtResource("1_nuief")]
+layout_mode = 1
+
+[node name="ContentSection" type="HSplitContainer" parent="MainLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="InventoryItemList" parent="MainLayout/ContentSection" instance=ExtResource("2_bsps8")]
+layout_mode = 2
+script = ExtResource("4_hbcvs")
+
+[node name="InventoryItemDetail" parent="MainLayout/ContentSection" instance=ExtResource("3_ldtye")]
+layout_mode = 2
+script = ExtResource("6_erru2")
+
+[node name="FooterSection" type="Control" parent="MainLayout"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 1
+
+[node name="InventoryActionPanel" parent="MainLayout/FooterSection" instance=ExtResource("4_xk7lq")]
+layout_mode = 1
+script = ExtResource("8_7csag")

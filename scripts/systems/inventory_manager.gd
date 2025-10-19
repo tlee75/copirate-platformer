@@ -1,275 +1,562 @@
 extends Node
 
-# Singleton inventory manager that handles all inventory logic
-# Visual components are handled by UI scenes, this only manages data
+# Slot-free inventory system with ItemStack-based storage
 
 signal inventory_changed
-signal hotbar_changed
-signal weapon_changed
+signal hotbar_changed  
 signal equipment_changed
+signal weapon_changed
+signal item_equipped(item: GameItem, slot_type: String)
+signal item_unequipped(item: GameItem, slot_type: String)
+
+# Core item storage - item stacks
+var inventory_items: Array[ItemStack] = []
+var hotbar_assignments: Array[ItemStack] = []  # Fixed size array of ItemStack references
 
 
-enum SlotType { INVENTORY, HOTBAR, WEAPON, EQUIPMENT }
-
-# Inventory data
-var hotbar_slots: Array[InventorySlotData] = []
-var inventory_slots: Array[InventorySlotData] = []
-var item_totals: Dictionary = {}
-var weapon_slots: Array[InventorySlotData] = []
-var equipment_slots: Array[InventorySlotData] = []
-
-
-@export var hotbar_container_path: NodePath
-@export var inventory_container_path: NodePath
-@export var weaponbar_container_path: NodePath
-@export var equipment_container_path: NodePath
-
-# GameItem data structure
-
+# Compatibility for old object inventory references
 class InventorySlotData:
-	var item: GameItem = null
-	var quantity: int = 0
+	var item: GameItem
+	var quantity: int
+	
+	func _init(game_item: GameItem = null, amount: int = 0):
+		item = game_item
+		quantity = amount
 	
 	func is_empty() -> bool:
 		return item == null or quantity <= 0
-	
-	func can_add_item(new_item: GameItem, amount: int = 1) -> bool:
-		if is_empty():
-			return true
-		return item.name == new_item.name and quantity + amount <= item.stack_size
-	
-	func add_item(new_item: GameItem, amount: int = 1) -> int:
-		if is_empty():
-			item = new_item.duplicate()
-			quantity = min(amount, new_item.stack_size)
-			return amount - quantity
-		elif item.name == new_item.name:
-			var can_add = min(amount, item.stack_size - quantity)
-			quantity += can_add
-			return amount - can_add
-		return amount
-	
-	func remove_item(amount: int = 1) -> int:
-		var removed = min(amount, quantity)
-		quantity -= removed
-		if quantity <= 0:
-			if item:
-				InventoryManager.remove_item_from_total(item.name, removed)
-			item = null
-			quantity = 0
-		else:
-			if item:
-				InventoryManager.remove_item_from_total(item.name, removed)
-		return removed
 	
 	func clear():
 		item = null
 		quantity = 0
 
+# Equipment tracking - direct references to equipped ItemStacks
+var equipped_items: Dictionary = {
+	"helmet": null,
+	"chest": null,
+	"legs": null,
+	"hands": null,
+	"feet": null,
+	"arms": null,
+	"main_hand": null,
+	"off_hand": null,
+	"accessory_1": null,
+	"accessory_2": null
+}
+
+# Category definitions for filtering
+var item_categories: Dictionary = {
+	"all": "All Items",
+	"tool": "Tools",
+	"weapon": "Weapons",
+	"consumable": "Consumables", 
+	"material": "Materials",
+	"equipment": "Equipment",
+	"armor": "Armor",
+	"fuel": "Fuel",
+	"food": "Food"
+}
+
+class ItemStack:
+	var item: GameItem
+	var quantity: int
+	var equipped_as: String = ""           # Which equipment slot (empty = not equipped)
+	var is_locked: bool = false            # Prevent accidental actions
+	var hotbar_slot: int = -1             # Which hotbar slot (-1 = not on hotbar)
+	var date_acquired: float = 0.0        # For sorting by recent
+	
+	func _init(game_item: GameItem, amount: int = 1):
+		item = game_item
+		quantity = amount
+		date_acquired = Time.get_unix_time_from_system()
+	
+	func is_equipped() -> bool:
+		return equipped_as != ""
+	
+	func is_on_hotbar() -> bool:
+		return hotbar_slot != -1
+	
+	func get_display_name() -> String:
+		var name = item.name
+		if is_equipped():
+			name += " [" + equipped_as.replace("_", " ").capitalize() + "]"
+		if is_locked:
+			name += " 🔒"
+		return name
+
 func _ready():
-	print("InventoryManager initialized with ", hotbar_slots.size(), " hotbar slots and ", inventory_slots.size(), " inventory slots")
-
-func initialize_hotbar_slots(count: int):
-	hotbar_slots.clear()
-	for i in count:
-		hotbar_slots.append(InventorySlotData.new())
-
-func initialize_inventory_slots(count: int):
-	inventory_slots.clear()
-	for i in count:
-		inventory_slots.append(InventorySlotData.new())
-
-func initialize_weaponbar_slots(count: int):
-	weapon_slots.clear()
-	for i in count:
-		weapon_slots.append(InventorySlotData.new())
-
-func initialize_equipment_slots(count: int):
-	equipment_slots.clear()
-	for i in count:
-		equipment_slots.append(InventorySlotData.new())
-
-# Add item to inventory (tries hotbar first, then main inventory)
-func add_item(item: GameItem, amount: int = 1) -> bool:	
-	var remaining = amount
+	print("New ItemStack-based InventoryManager initialized")
 	
-	# Try to add to existing stacks in hotbar first
-	for slot in hotbar_slots:
-		if not slot.is_empty() and slot.item.name == item.name:
-			var before_remaining = remaining
-			remaining = slot.add_item(item, remaining)
-			var added = before_remaining - remaining
-			if added > 0:
-				add_item_to_total(item.name, added)
-			if remaining <= 0:
-				hotbar_changed.emit()
-				return true
-	
-	# Try to add to existing stacks in main inventory
-	for slot in inventory_slots:
-		if not slot.is_empty() and slot.item.name == item.name:
-			var before_remaining = remaining
-			remaining = slot.add_item(item, remaining)
-			var added = before_remaining - remaining
-			if added > 0:
-				add_item_to_total(item.name, added)
-			if remaining <= 0:
-				inventory_changed.emit()
-				return true
-	
-	# Try to add to empty slots in hotbar
-	for slot in hotbar_slots:
-		if slot.is_empty():
-			var before_remaining = remaining
-			remaining = slot.add_item(item, remaining)
-			var added = before_remaining - remaining
-			if added > 0:
-				add_item_to_total(item.name, added)
-			if remaining <= 0:
-				hotbar_changed.emit()
-				return true
-	
-	# Try to add to empty slots in main inventory
-	for slot in inventory_slots:
-		if slot.is_empty():
-			var before_remaining = remaining
-			remaining = slot.add_item(item, remaining)
-			var added = before_remaining - remaining
-			if added > 0:
-				add_item_to_total(item.name, added)
-			if remaining <= 0:
-				inventory_changed.emit()
-				return true
-	
-	# If we couldn't add everything, emit signals anyway for partial adds
-	if remaining < amount:
-		add_item_to_total(item.name, amount - remaining)
-		hotbar_changed.emit()
-		inventory_changed.emit()
-		print("Added ", amount - remaining, " of ", amount, " ", item.name, "(s). ", remaining, " couldn't fit.")
-		return true
-	
-	print("Inventory full! Couldn't add ", item.name)
-	return false
+	# Initialize hotbar with 8 empty slots
+	hotbar_assignments.resize(8)
+	for i in range(8):
+		hotbar_assignments[i] = null
 
-func move_item_extended(from_type: SlotType, from_index: int, to_type: SlotType, to_index: int) -> bool:
-	var from_slot = get_slot_by_type(from_type, from_index)
-	var to_slot = get_slot_by_type(to_type, to_index)
-	if not from_slot or not to_slot:
+# ============================================================================
+# CORE INVENTORY OPERATIONS
+# ============================================================================
+
+func add_item(item: GameItem, amount: int = 1) -> bool:
+	if not item:
+		print("ERROR: Attempted to add null item")
 		return false
 	
-	# Swap items - use duplicates to ensure proper instances
-	var temp_item = from_slot.item.duplicate() if from_slot.item else null
-	var temp_quantity = from_slot.quantity
-	from_slot.item = to_slot.item.duplicate() if to_slot.item else null
-	from_slot.quantity = to_slot.quantity
-	to_slot.item = temp_item
-	to_slot.quantity = temp_quantity
+	var remaining = amount
 	
-	# Emit signals
-	if from_type == SlotType.HOTBAR or to_type == SlotType.HOTBAR:
-		hotbar_changed.emit()
-	if from_type == SlotType.INVENTORY or to_type == SlotType.INVENTORY:
-		inventory_changed.emit()
-	if from_type == SlotType.WEAPON or to_type == SlotType.WEAPON:
-		weapon_changed.emit()
-	if from_type == SlotType.EQUIPMENT or to_type == SlotType.EQUIPMENT:
-		equipment_changed.emit()
+	# Try to add to existing stacks first (same item, not at stack limit)
+	for stack in inventory_items:
+		if stack.item.name == item.name and stack.quantity < item.stack_size:
+			var can_add = min(remaining, item.stack_size - stack.quantity)
+			stack.quantity += can_add
+			remaining -= can_add
+			if remaining <= 0:
+				print("Added ", amount, "x ", item.name, " to existing stack")
+				inventory_changed.emit()
+				return true
+	
+	# Create new stacks as needed
+	while remaining > 0:
+		var stack_size = min(remaining, item.stack_size)
+		var new_stack = ItemStack.new(item, stack_size)
+		inventory_items.append(new_stack)
+		remaining -= stack_size
+		print("Created new stack: ", stack_size, "x ", item.name)
+	
+	inventory_changed.emit()
 	return true
 
-func get_slot_by_type(slot_type: SlotType, index: int) -> InventorySlotData:
-	match slot_type:
-		SlotType.HOTBAR:
-			return get_hotbar_slot(index)
-		SlotType.INVENTORY:
-			return get_inventory_slot(index)
-		SlotType.WEAPON:
-			return get_weaponbar_slot(index)
-		SlotType.EQUIPMENT:
-			return get_equipment_slot(index)
-	return null
+func remove_items_by_name(item_name: String, amount: int = 1) -> bool:
+	var remaining = amount
+	
+	# Remove from stacks, starting from the end to safely remove empty stacks
+	for i in range(inventory_items.size() - 1, -1, -1):
+		var stack = inventory_items[i]
+		if stack.item.name == item_name:
+			var to_remove = min(remaining, stack.quantity)
+			stack.quantity -= to_remove
+			remaining -= to_remove
+			
+			print("Removed ", to_remove, "x ", item_name, " (", remaining, " remaining to remove)")
+			
+			# Clean up empty stack
+			if stack.quantity <= 0:
+				_cleanup_depleted_stack(stack, i)
+			
+			if remaining <= 0:
+				inventory_changed.emit()
+				if stack.is_on_hotbar():
+					hotbar_changed.emit()
+				return true
+	
+	if remaining > 0:
+		print("Could not remove all requested ", item_name, " (", remaining, " not found)")
+	
+	inventory_changed.emit()
+	return remaining == 0
 
-# Get slot data for UI
-func get_hotbar_slot(index: int) -> InventorySlotData:
-	if index >= 0 and index < hotbar_slots.size():
-		return hotbar_slots[index]
-	return null
+func _cleanup_depleted_stack(stack: ItemStack, index: int):
+	print("Cleaning up depleted stack: ", stack.item.name)
+	
+	# Handle equipped items
+	if stack.is_equipped():
+		print("  Unequipping depleted item from ", stack.equipped_as)
+		equipped_items[stack.equipped_as] = null
+		equipment_changed.emit()
+	
+	# Handle hotbar assignments
+	if stack.is_on_hotbar():
+		print("  Removing depleted item from hotbar slot ", stack.hotbar_slot)
+		hotbar_assignments[stack.hotbar_slot] = null
+		hotbar_changed.emit()
+	
+	# Remove from inventory
+	inventory_items.remove_at(index)
 
-func get_inventory_slot(index: int) -> InventorySlotData:
-	if index >= 0 and index < inventory_slots.size():
-		return inventory_slots[index]
-	return null
+func remove_stack(stack: ItemStack, amount: int = -1) -> bool:
+	if not stack:
+		return false
+	
+	if amount == -1:
+		amount = stack.quantity
+	
+	return remove_items_by_name(stack.item.name, amount)
 
-func get_weaponbar_slot(index: int) -> InventorySlotData:
-	if index >= 0 and index < weapon_slots.size():
-		return weapon_slots[index]
-	return null
+# ============================================================================
+# EQUIPMENT SYSTEM
+# ============================================================================
 
-func get_equipment_slot(index: int) -> InventorySlotData:
-	if index >= 0 and index < equipment_slots.size():
-		return equipment_slots[index]
-	return null
+func equip_item_stack(stack: ItemStack, equipment_slot: String = "") -> bool:
+	if not stack or stack.quantity <= 0:
+		print("Cannot equip: invalid stack")
+		return false
+	
+	# Auto-determine equipment slot if not specified
+	if equipment_slot == "":
+		equipment_slot = _get_equipment_slot_for_item(stack.item)
+	
+	if equipment_slot == "":
+		print("Cannot equip ", stack.item.name, ": no suitable equipment slot")
+		return false
+	
+	if not _can_equip_to_slot(stack.item, equipment_slot):
+		print("Cannot equip ", stack.item.name, " to slot ", equipment_slot)
+		return false
+	
+	# Unequip current item if slot occupied
+	if equipped_items[equipment_slot]:
+		var current_equipped = equipped_items[equipment_slot]
+		current_equipped.equipped_as = ""
+		print("Unequipped ", current_equipped.item.name, " from ", equipment_slot)
+	
+	# Equip new item
+	stack.equipped_as = equipment_slot
+	equipped_items[equipment_slot] = stack
+	
+	print("Equipped ", stack.item.name, " as ", equipment_slot)
+	item_equipped.emit(stack.item, equipment_slot)
+	equipment_changed.emit()
+	inventory_changed.emit()
+	return true
 
-func add_item_to_total(item_name: String, quantity: int):
-	if item_name in item_totals:
-		item_totals[item_name] += quantity
+func unequip_item(equipment_slot: String) -> bool:
+	var stack = equipped_items[equipment_slot]
+	if not stack:
+		print("No item equipped in slot: ", equipment_slot)
+		return false
+	
+	return _unequip_stack(stack)
+
+func _unequip_stack(stack: ItemStack) -> bool:
+	if not stack.is_equipped():
+		print("Item not equipped: ", stack.item.name)
+		return false
+	
+	var equipment_slot = stack.equipped_as
+	stack.equipped_as = ""
+	equipped_items[equipment_slot] = null
+	
+	print("Unequipped ", stack.item.name, " from ", equipment_slot)
+	item_unequipped.emit(stack.item, equipment_slot)
+	equipment_changed.emit()
+	inventory_changed.emit()
+	return true
+
+func toggle_equip_item_stack(stack: ItemStack) -> bool:
+	if stack.is_equipped():
+		return _unequip_stack(stack)
 	else:
-		item_totals[item_name] = quantity
+		return equip_item_stack(stack)
 
-func remove_item_from_total(item_name: String, quantity: int):
-	if item_name in item_totals:
-		item_totals[item_name] -= quantity
-		if item_totals[item_name] <= 0:
-			item_totals.erase(item_name)
+func get_equipped_item(equipment_slot: String) -> GameItem:
+	var stack = equipped_items[equipment_slot]
+	return stack.item if stack else null
+
+func get_equipped_stack(equipment_slot: String) -> ItemStack:
+	return equipped_items[equipment_slot]
+
+func is_item_equipped(item: GameItem) -> bool:
+	for stack in equipped_items.values():
+		if stack and stack.item == item:
+			return true
+	return false
+
+# ============================================================================
+# HOTBAR SYSTEM  
+# ============================================================================
+
+func assign_to_hotbar(stack: ItemStack, hotbar_slot: int) -> bool:
+	if hotbar_slot < 0 or hotbar_slot >= hotbar_assignments.size():
+		print("Invalid hotbar slot: ", hotbar_slot)
+		return false
+	
+	# Remove from previous hotbar slot if assigned
+	if stack.is_on_hotbar():
+		hotbar_assignments[stack.hotbar_slot] = null
+		print("Removed ", stack.item.name, " from hotbar slot ", stack.hotbar_slot)
+	
+	# Clear target slot if occupied
+	if hotbar_assignments[hotbar_slot]:
+		hotbar_assignments[hotbar_slot].hotbar_slot = -1
+		print("Cleared hotbar slot ", hotbar_slot)
+	
+	# Assign to new slot
+	hotbar_assignments[hotbar_slot] = stack
+	stack.hotbar_slot = hotbar_slot
+	
+	print("Assigned ", stack.item.name, " to hotbar slot ", hotbar_slot)
+	hotbar_changed.emit()
+	return true
+
+func remove_from_hotbar(hotbar_slot: int) -> bool:
+	if hotbar_slot < 0 or hotbar_slot >= hotbar_assignments.size():
+		return false
+	
+	var stack = hotbar_assignments[hotbar_slot]
+	if stack:
+		stack.hotbar_slot = -1
+		hotbar_assignments[hotbar_slot] = null
+		print("Removed item from hotbar slot ", hotbar_slot)
+		hotbar_changed.emit()
+		return true
+	
+	return false
+
+func get_hotbar_item(slot: int) -> GameItem:
+	var stack = get_hotbar_stack(slot)
+	return stack.item if stack else null
+
+func get_hotbar_stack(slot: int) -> ItemStack:
+	if slot >= 0 and slot < hotbar_assignments.size():
+		return hotbar_assignments[slot]
+	return null
+
+func quick_move_to_hotbar(stack: ItemStack) -> bool:
+	# Find first empty hotbar slot
+	for i in range(hotbar_assignments.size()):
+		if hotbar_assignments[i] == null:
+			return assign_to_hotbar(stack, i)
+	
+	print("Hotbar is full")
+	return false
+
+# ============================================================================
+# CATEGORY FILTERING & SEARCH
+# ============================================================================
+
+func get_items_by_category(category: String) -> Array[ItemStack]:
+	if category == "all":
+		return inventory_items.duplicate()
+	
+	return inventory_items.filter(func(stack): return stack.item.category == category)
+
+func get_available_categories() -> Array:
+	var categories = ["all"]
+	var found_categories = {}
+	
+	for stack in inventory_items:
+		if not found_categories.has(stack.item.category):
+			found_categories[stack.item.category] = true
+			categories.append(stack.item.category)
+	
+	return categories
+
+func search_items(search_text: String) -> Array[ItemStack]:
+	if search_text.is_empty():
+		return inventory_items.duplicate()
+	
+	var search_lower = search_text.to_lower()
+	return inventory_items.filter(func(stack): 
+		return stack.item.name.to_lower().contains(search_lower)
+	)
+
+# ============================================================================
+# ITEM OPERATIONS
+# ============================================================================
+
+func use_item_stack(stack: ItemStack) -> bool:
+	if not stack or not stack.item.is_consumable():
+		print("Cannot use item: ", stack.item.name if stack else "null")
+		return false
+	
+	print("Using consumable: ", stack.item.name)
+	
+	# TODO: Implement actual item use effects
+	# For now, just consume one item
+	return remove_stack(stack, 1)
+
+func lock_item_stack(stack: ItemStack) -> bool:
+	if not stack:
+		return false
+	
+	stack.is_locked = true
+	print("Locked item: ", stack.item.name)
+	inventory_changed.emit()
+	return true
+
+func unlock_item_stack(stack: ItemStack) -> bool:
+	if not stack:
+		return false
+	
+	stack.is_locked = false
+	print("Unlocked item: ", stack.item.name)
+	inventory_changed.emit()
+	return true
+
+func toggle_lock_item_stack(stack: ItemStack) -> bool:
+	if stack.is_locked:
+		return unlock_item_stack(stack)
+	else:
+		return lock_item_stack(stack)
+
+func can_drop_stack(stack: ItemStack) -> bool:
+	return stack and not stack.is_locked
+
+func drop_item_stack(stack: ItemStack, amount: int = -1) -> bool:
+	if not can_drop_stack(stack):
+		print("Cannot drop locked item: ", stack.item.name)
+		return false
+	
+	if amount == -1:
+		amount = stack.quantity
+	
+	# TODO: Spawn item in world
+	print("Dropping ", amount, "x ", stack.item.name)
+	
+	return remove_stack(stack, amount)
+
+# ============================================================================
+# UTILITY FUNCTIONS
+# ============================================================================
 
 func get_total_item_count(item_name: String) -> int:
-	return item_totals.get(item_name, 0)
+	var total = 0
+	for stack in inventory_items:
+		if stack.item.name == item_name:
+			total += stack.quantity
+	return total
 
-func remove_items_by_name(item_name: String, quantity: int) -> bool:
-	var remaining = quantity
-	
-	# Remove from hotbarslots first
-	for slot in hotbar_slots:
-		if not slot.is_empty() and slot.item.name == item_name:
-			var removed = slot.remove_item(remaining)
-			remaining -= removed
-			if remaining <= 0:
-				hotbar_changed.emit()
-				break
-	
-	# Remove from inventory slots if still needed
-	if remaining > 0:
-		for slot in inventory_slots:
-			if not slot.is_empty() and slot.item.name == item_name:
-				var removed = slot.remove_item(remaining)
-				remaining -= removed
-				if remaining <= 0:
-					inventory_changed.emit()
-					break
-	
-	# Emit signals for UI updates
-	if remaining < quantity:
-		hotbar_changed.emit()
-		inventory_changed.emit()
-	
-	return remaining == 0 # Return true if all items were removed
+func find_item_stack(item_name: String) -> ItemStack:
+	for stack in inventory_items:
+		if stack.item.name == item_name:
+			return stack
+	return null
 
+func find_all_item_stacks(item_name: String) -> Array[ItemStack]:
+	var stacks = []
+	for stack in inventory_items:
+		if stack.item.name == item_name:
+			stacks.append(stack)
+	return stacks
 
+func _get_equipment_slot_for_item(item: GameItem) -> String:
+	match item.category:
+		"helmet":
+			return "helmet"
+		"chest", "armor":
+			return "chest"
+		"legs":
+			return "legs"
+		"hands":
+			return "hands"
+		"feet":
+			return "feet"
+		"arms":
+			return "arms"
+		"weapon":
+			return "main_hand"
+		"shield":
+			return "off_hand"
+		"accessory":
+			# Find first available accessory slot
+			if equipped_items["accessory_1"] == null:
+				return "accessory_1"
+			elif equipped_items["accessory_2"] == null:
+				return "accessory_2"
+			else:
+				return "accessory_1"  # Replace first one
+		_:
+			return ""
 
-# Debug functions
+func _can_equip_to_slot(item: GameItem, equipment_slot: String) -> bool:
+	var expected_slot = _get_equipment_slot_for_item(item)
+	return expected_slot == equipment_slot or (expected_slot == "accessory_1" and equipment_slot == "accessory_2")
+
+# ============================================================================
+# BACKWARD COMPATIBILITY LAYER
+# ============================================================================
+
+# These methods provide compatibility with existing code that expects the old interface
+func initialize_hotbar_slots(count: int):
+	print("Backward compatibility: initialize_hotbar_slots called with ", count)
+	# Hotbar is already initialized in _ready()
+
+func initialize_inventory_slots(count: int):
+	print("Backward compatibility: initialize_inventory_slots called with ", count)
+	# New system doesn't need pre-allocated slots
+
+func get_hotbar_slot(index: int):
+	# Return a compatibility object that mimics the old InventorySlotData
+	var stack = get_hotbar_stack(index)
+	if stack:
+		return CompatibilitySlotData.new(stack)
+	else:
+		return CompatibilitySlotData.new(null)
+
+func get_inventory_slot(index: int):
+	# For compatibility, treat this as getting the nth item in inventory
+	if index >= 0 and index < inventory_items.size():
+		var stack = inventory_items[index]
+		return CompatibilitySlotData.new(stack)
+	else:
+		return CompatibilitySlotData.new(null)
+
+# Compatibility class that mimics old InventorySlotData interface
+class CompatibilitySlotData:
+	var item: GameItem
+	var quantity: int
+	var _stack_reference: ItemStack
+	
+	func _init(stack: ItemStack):
+		_stack_reference = stack
+		if stack:
+			item = stack.item
+			quantity = stack.quantity
+		else:
+			item = null
+			quantity = 0
+	
+	func is_empty() -> bool:
+		return item == null or quantity <= 0
+
+# ============================================================================
+# DEBUG FUNCTIONS
+# ============================================================================
+
 func print_inventory():
-	print("=== HOTBAR ===")
-	for i in hotbar_slots.size():
-		var slot = hotbar_slots[i]
-		if not slot.is_empty():
-			print("Slot ", i, ": ", slot.item.name, " x", slot.quantity)
-		else:
-			print("Slot ", i, ": Empty")
+	print("=== NEW INVENTORY SYSTEM ===")
+	print("Total items: ", inventory_items.size())
 	
-	print("=== INVENTORY ===")
-	for i in inventory_slots.size():
-		var slot = inventory_slots[i]
-		if not slot.is_empty():
-			print("Slot ", i, ": ", slot.item.name, " x", slot.quantity)
+	for i in range(inventory_items.size()):
+		var stack = inventory_items[i]
+		var status = ""
+		if stack.is_equipped():
+			status += " [EQUIPPED:" + stack.equipped_as + "]"
+		if stack.is_on_hotbar():
+			status += " [HOTBAR:" + str(stack.hotbar_slot) + "]"
+		if stack.is_locked:
+			status += " [LOCKED]"
+		
+		print("  ", i, ": ", stack.item.name, " x", stack.quantity, status)
+	
+	print("=== HOTBAR ===")
+	for i in range(hotbar_assignments.size()):
+		var stack = hotbar_assignments[i]
+		if stack:
+			print("  ", i, ": ", stack.item.name, " x", stack.quantity)
 		else:
-			print("Slot ", i, ": Empty")
+			print("  ", i, ": Empty")
+	
+	print("=== EQUIPMENT ===")
+	for slot_name in equipped_items.keys():
+		var stack = equipped_items[slot_name]
+		if stack:
+			print("  ", slot_name, ": ", stack.item.name)
+		else:
+			print("  ", slot_name, ": Empty")
+
+func debug_add_test_items():
+	print("Adding test items...")
+	
+	# Add some test items if they exist in the database
+	var db = GameObjectsDatabase.game_objects_database
+	
+	if "stick" in db:
+		add_item(db["stick"], 10)
+	if "simple_rock" in db:
+		add_item(db["simple_rock"], 5)
+	if "pickaxe" in db:
+		add_item(db["pickaxe"], 1)
+	if "woodaxe" in db:
+		add_item(db["woodaxe"], 1)
+	
+	print_inventory()
