@@ -166,7 +166,6 @@ mouse_force_pass_scroll_events = false
 metadata/_edit_use_anchors_ = true
 
 [node name="InventoryUI" parent="UI" instance=ExtResource("19_pgk25")]
-process_mode = 2
 
 [node name="WoodCrates" type="Node" parent="."]
 
