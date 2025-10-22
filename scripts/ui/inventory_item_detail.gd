@@ -11,7 +11,7 @@ var status_label: Label
 var description_text: RichTextLabel
 
 var current_stack: InventoryManager.ItemStack
-var input_handler: InventoryInputHandler
+var input_handler: PlayerMenuInputHandler
 
 func _ready():
 	_setup_ui_references()
@@ -29,7 +29,7 @@ func _setup_ui_references():
 func _setup_empty_state():
 	_clear_display()
 
-func set_input_handler(handler: InventoryInputHandler):
+func set_input_handler(handler: PlayerMenuInputHandler):
 	input_handler = handler
 
 func display_item(stack: InventoryManager.ItemStack):

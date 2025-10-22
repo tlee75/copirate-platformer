@@ -9,7 +9,7 @@ signal input_mode_changed(new_mode: InventoryActionResolver.InputMethod)
 var action_resolver: InventoryActionResolver
 var current_input_mode: InventoryActionResolver.InputMethod = InventoryActionResolver.InputMethod.MOUSE_KEYBOARD
 var selected_stack: InventoryManager.ItemStack = null
-var is_inventory_open: bool = false
+var is_player_menu_open: bool = false
 
 # Touch/controller navigation state
 var selected_category: String = "all"
@@ -20,25 +20,25 @@ func _ready():
 	action_resolver = InventoryActionResolver.new()
 	_detect_initial_input_mode()
 	set_process_unhandled_input(true)
-	print("DEBUG: InventoryInputHandler singleton initialized")
+	print("DEBUG: PlayerMenuInputHandler singleton initialized")
 
 func _input(event):
-	if event.is_action_pressed("inventory_toggle"):
-		var inventory_ui = get_tree().get_first_node_in_group("inventory_ui")
-		if inventory_ui and inventory_ui.has_method("toggle_inventory"):
-			inventory_ui.toggle_inventory()
+	if event.is_action_pressed("player_menu_toggle"):
+		var inventory_ui = get_tree().get_first_node_in_group("player_menu")
+		if inventory_ui and inventory_ui.has_method("toggle_player_menu"):
+			inventory_ui.toggle_player_menu()
 			get_viewport().set_input_as_handled()
 	
 	# Don't process other inputs when inventory is closed
-	if not is_inventory_open:
+	if not is_player_menu_open:
 		return
 	
 	# Handle mouse wheel scrolling when inventory is open
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			var inventory_ui = get_tree().get_first_node_in_group("inventory_ui")
-			if inventory_ui:
-				var item_list = inventory_ui.item_list
+			var player_menu = get_tree().get_first_node_in_group("player_menu")
+			if player_menu:
+				var item_list = player_menu.item_list
 				if item_list:
 					if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 						if item_list.has_method("scroll_up"):
@@ -51,7 +51,7 @@ func _input(event):
 
 #func _unhandled_input(event):
 	## Only detect input mode changes for controller/keyboard input
-	#if event is InputEventJoypadButton and event.pressed:
+	#if event is InputEventJoypadButton and event.pvar inventory_ui = get_tree().get_first_node_in_group("inventory_ui")ressed:
 		#set_input_mode(InventoryActionResolver.InputMethod.CONTROLLER)
 	#elif event is InputEventKey and event.pressed:
 		## Don't switch to keyboard mode, stay in mouse mode for UI interaction
@@ -73,7 +73,7 @@ func _update_input_mode(event):
 	var new_mode = current_input_mode
 	
 	# Only allow controller input to switch modes when inventory is open
-	if is_inventory_open:
+	if is_player_menu_open:
 		if event is InputEventJoypadButton and event.pressed:
 			new_mode = InventoryActionResolver.InputMethod.CONTROLLER
 		# Don't change modes for mouse/keyboard when inventory is open
@@ -258,8 +258,8 @@ func execute_action_on_stack(action_type: InventoryActionResolver.ActionType, st
 	
 	return success
 
-func set_inventory_open(open: bool):
-	is_inventory_open = open
+func set_player_menu_open(open: bool):
+	is_player_menu_open = open
 	if open:
 		_refresh_available_items()
 	else:

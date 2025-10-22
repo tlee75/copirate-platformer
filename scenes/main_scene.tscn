@@ -13,7 +13,7 @@
 [ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://scripts/ui/depth_counter.gd" id="17_segjr"]
 [ext_resource type="PackedScene" uid="uid://noyk5n0awjav" path="res://scenes/ui/stats_display.tscn" id="18_beobj"]
 [ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/obstacles/wood_crate.tscn" id="19_267kh"]
-[ext_resource type="PackedScene" uid="uid://bcbmqwa8ofwfq" path="res://scenes/ui/inventory_ui.tscn" id="19_pgk25"]
+[ext_resource type="PackedScene" uid="uid://bcbmqwa8ofwfq" path="res://scenes/ui/player_menu.tscn" id="19_pgk25"]
 [ext_resource type="PackedScene" uid="uid://buc368tv0cjic" path="res://scenes/items/pickaxe.tscn" id="20_86meh"]
 [ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/items/shovel.tscn" id="21_duuju"]
 [ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/items/sword.tscn" id="22_8dxha"]
@@ -165,7 +165,7 @@ offset_bottom = -14.792053
 mouse_force_pass_scroll_events = false
 metadata/_edit_use_anchors_ = true
 
-[node name="InventoryUI" parent="UI" instance=ExtResource("19_pgk25")]
+[node name="PlayerMenu" parent="UI" instance=ExtResource("19_pgk25")]
 
 [node name="WoodCrates" type="Node" parent="."]
 

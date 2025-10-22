@@ -103,7 +103,7 @@ func _physics_process(delta):
 	var tile_pos = tilemap.local_to_map(global_position)
 	
 	# Skip input handling if inventory or object menu is open
-	if InventoryInputHandler.is_inventory_open or object_menu_is_open:
+	if PlayerMenuInputHandler.is_player_menu_open or object_menu_is_open:
 		# Still apply gravity when inventory is open
 		if not is_on_floor() and not is_underwater:
 			vel.y += gravity * delta
@@ -256,7 +256,7 @@ func _physics_process(delta):
 
 func handle_interact_or_use_action():
 	# Interact/Use Action
-	if Input.is_action_just_pressed("interact") and not InventoryInputHandler.is_inventory_open:
+	if Input.is_action_just_pressed("interact") and not PlayerMenuInputHandler.is_player_menu_open:
 		if not is_interacting:
 			if is_interact_target():
 				is_interacting = true
@@ -473,7 +473,7 @@ func create_highlight_texture():
 
 func update_tile_highlights():
 	# Don't show tile highlights when inventory is open
-	if InventoryInputHandler.is_inventory_open:
+	if PlayerMenuInputHandler.is_player_menu_open:
 		clear_tile_highlights()
 		return
 		
@@ -774,10 +774,10 @@ func add_loot(item_name: String, amount: int):
 		return false
 
 func _connect_to_inventory_ui():
-	# Connect to the singleton InventoryInputHandler
-	InventoryInputHandler.action_executed.connect(_on_inventory_action_executed)
-	InventoryInputHandler.input_mode_changed.connect(_on_inventory_input_mode_changed)
-	print("Player connected to InventoryInputHandler singleton")
+	# Connect to the singleton PlayerMenuInputHandler
+	PlayerMenuInputHandler.action_executed.connect(_on_inventory_action_executed)
+	PlayerMenuInputHandler.input_mode_changed.connect(_on_inventory_input_mode_changed)
+	print("Player connected to PlayerMenuInputHandler singleton")
 
 func is_mouse_over_inventory() -> bool:
 	# Check if mouse is over the inventory UI

@@ -1,779 +1,88 @@
-[gd_scene load_steps=69 format=3 uid="uid://k0kkh12kws3d"]
-
-[ext_resource type="Script" uid="uid://vcvkw3xxws36" path="res://scripts/ui/equipment_panel.gd" id="2_cuqmt"]
-[ext_resource type="PackedScene" uid="uid://c8tdbg3kjuavn" path="res://scenes/ui/equipment_inventory.tscn" id="3_rjctp"]
-[ext_resource type="Texture2D" uid="uid://dl63amqod85d8" path="res://assets/sprite-man/idle_01_64.png" id="4_yadmt"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_wjsuv"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(0, 0, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ueecy"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(37, 0, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_70c10"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(74, 0, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_7htwy"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(111, 0, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_1chfx"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(148, 0, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_5pubk"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(185, 0, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_4swim"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(222, 0, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_qwjit"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(259, 0, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_8m1jc"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(0, 66, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_u0dax"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(37, 66, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_32be8"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(74, 66, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_5bo03"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(111, 66, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_4vu8k"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(148, 66, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_y1v4o"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(185, 66, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_tk57j"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(222, 66, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_b5sb6"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(259, 66, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_l21ub"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(0, 132, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_faeks"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(37, 132, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_c1v4l"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(74, 132, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_hbmlj"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(111, 132, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_gch83"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(148, 132, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_i88pv"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(185, 132, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_8kvhx"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(222, 132, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_cacxo"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(259, 132, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_jot61"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(0, 198, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_hvyxp"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(37, 198, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_1s2r5"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(74, 198, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_gp8cd"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(111, 198, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_iqoq6"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(148, 198, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_k710s"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(185, 198, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_1s6uf"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(222, 198, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_vdx8q"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(259, 198, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_07gew"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(0, 264, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_0x1th"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(37, 264, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ragwo"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(74, 264, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_tsj7p"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(111, 264, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ygyn5"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(148, 264, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_1sm0t"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(185, 264, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_v0wvy"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(222, 264, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_joy8k"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(259, 264, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_rxr8h"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(0, 330, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_a1w06"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(37, 330, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_pv8uu"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(74, 330, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_a0g8b"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(111, 330, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ihgss"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(148, 330, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_vunjf"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(185, 330, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_m252l"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(222, 330, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_i8kpt"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(259, 330, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_6b8xb"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(0, 396, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_2c0nl"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(37, 396, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_bcr37"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(74, 396, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_p3qdh"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(111, 396, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_d615p"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(148, 396, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_uoxma"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(185, 396, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_x7qoo"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(222, 396, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_g56w2"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(259, 396, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_cv5ws"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(0, 462, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_b7jvv"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(37, 462, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_unxak"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(74, 462, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_3d8x6"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(111, 462, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_biu7v"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(148, 462, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_mk6sr"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(185, 462, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_vhe5c"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(222, 462, 37, 66)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_utgoc"]
-atlas = ExtResource("4_yadmt")
-region = Rect2(259, 462, 37, 66)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_u6k0j"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_wjsuv")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ueecy")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_70c10")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_7htwy")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_1chfx")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_5pubk")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_4swim")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_qwjit")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_8m1jc")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_u0dax")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_32be8")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_5bo03")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_4vu8k")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_y1v4o")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_tk57j")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_b5sb6")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_l21ub")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_faeks")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_c1v4l")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_hbmlj")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_gch83")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_i88pv")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_8kvhx")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_cacxo")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_jot61")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_hvyxp")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_1s2r5")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_gp8cd")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_iqoq6")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_k710s")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_1s6uf")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_vdx8q")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_07gew")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_0x1th")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ragwo")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_tsj7p")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ygyn5")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_1sm0t")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_v0wvy")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_joy8k")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_rxr8h")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_a1w06")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_pv8uu")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_a0g8b")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ihgss")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_vunjf")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_m252l")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_i8kpt")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_6b8xb")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_2c0nl")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_bcr37")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_p3qdh")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_d615p")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_uoxma")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_x7qoo")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_g56w2")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_cv5ws")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_b7jvv")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_unxak")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_3d8x6")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_biu7v")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_mk6sr")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_vhe5c")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_utgoc")
-}],
-"loop": true,
-"name": &"equipment_idle",
-"speed": 30.0
-}]
+[gd_scene load_steps=9 format=3 uid="uid://bcbmqwa8ofwfq"]
+
+[ext_resource type="Script" uid="uid://bb2w6ivxttklu" path="res://scripts/ui/player_menu.gd" id="1_bsps8"]
+[ext_resource type="PackedScene" uid="uid://b8kgpkram46gn" path="res://scenes/ui/inventory_category_filter.tscn" id="1_nuief"]
+[ext_resource type="PackedScene" uid="uid://cvgrjdhk14guq" path="res://scenes/ui/inventory_item_list.tscn" id="2_bsps8"]
+[ext_resource type="PackedScene" uid="uid://coecdah2bs7x4" path="res://scenes/ui/inventory_item_detail.tscn" id="3_ldtye"]
+[ext_resource type="Script" uid="uid://crdqmbv6vuj6d" path="res://scripts/ui/inventory_item_list.gd" id="4_hbcvs"]
+[ext_resource type="PackedScene" uid="uid://jyu5l75iarfi" path="res://scenes/ui/inventory_action_panel.tscn" id="4_xk7lq"]
+[ext_resource type="Script" uid="uid://btqfh7m2e4t0y" path="res://scripts/ui/inventory_item_detail.gd" id="6_erru2"]
+[ext_resource type="Script" uid="uid://co3v5kj4nyi1e" path="res://scripts/ui/inventory_action_panel.gd" id="8_7csag"]
 
 [node name="PlayerMenu" type="Control"]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 332.0
-offset_top = 74.0
-offset_right = -194.0
-offset_bottom = -85.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+mouse_force_pass_scroll_events = false
+script = ExtResource("1_bsps8")
 
-[node name="TabBar" type="TabContainer" parent="."]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.202
-anchor_top = 0.07
-anchor_right = 1.124
-anchor_bottom = 0.759
-offset_left = -0.397995
-offset_top = -43.8
-offset_right = 0.0759277
-offset_bottom = 134.94
-grow_horizontal = 2
-grow_vertical = 2
-current_tab = 1
-
-[node name="InventoryTab" type="Control" parent="TabBar"]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 0
-
-[node name="CraftTab" type="Control" parent="TabBar"]
-layout_mode = 2
-metadata/_tab_index = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="TabBar/CraftTab"]
+[node name="Background" type="ColorRect" parent="."]
+self_modulate = Color(0.09803922, 0.09803922, 0.09803922, 0.9019608)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 13.0
-offset_top = 9.0
-offset_right = -11.0
-offset_bottom = -9.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_force_pass_scroll_events = false
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer"]
+[node name="TabContainer" type="TabContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+
+[node name="Inventory" type="VBoxContainer" parent="TabContainer"]
 layout_mode = 2
+theme_override_constants/separation = 15
+metadata/_tab_index = 0
 
-[node name="ToolsButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
+[node name="HeaderSection" type="Control" parent="TabContainer/Inventory"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
-text = "Tools"
+size_flags_vertical = 0
+mouse_filter = 1
 
-[node name="WeaponsButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
+[node name="InventoryCategoryFilter" parent="TabContainer/Inventory/HeaderSection" instance=ExtResource("1_nuief")]
+layout_mode = 1
+
+[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Inventory"]
 layout_mode = 2
-text = "Weapons"
+size_flags_vertical = 3
 
-[node name="StructuresButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
+[node name="InventoryItemList" parent="TabContainer/Inventory/ContentSection" instance=ExtResource("2_bsps8")]
 layout_mode = 2
-text = "Structures"
+script = ExtResource("4_hbcvs")
 
-[node name="ConsumablesButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/VBoxContainer"]
+[node name="InventoryItemDetail" parent="TabContainer/Inventory/ContentSection" instance=ExtResource("3_ldtye")]
 layout_mode = 2
-text = "Consumables"
+script = ExtResource("6_erru2")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="TabBar/CraftTab/HBoxContainer"]
+[node name="FooterSection" type="Control" parent="TabContainer/Inventory"]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_vertical = 0
+mouse_filter = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer/ScrollContainer"]
+[node name="InventoryActionPanel" parent="TabContainer/Inventory/FooterSection" instance=ExtResource("4_xk7lq")]
+layout_mode = 1
+script = ExtResource("8_7csag")
+
+[node name="Crafting" type="Control" parent="TabContainer"]
+visible = false
 layout_mode = 2
+metadata/_tab_index = 1
 
-[node name="CraftDetailsPanel" type="Panel" parent="TabBar/CraftTab/HBoxContainer"]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="ItemImage" type="TextureRect" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
-layout_mode = 2
-
-[node name="ItemNameLabel" type="Label" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
-layout_mode = 2
-
-[node name="RequirementsList" type="VBoxContainer" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
-layout_mode = 2
-
-[node name="CraftButton" type="Button" parent="TabBar/CraftTab/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
-layout_mode = 2
-text = "Craft"
-
-[node name="EquipmentTab" type="Control" parent="TabBar"]
+[node name="Equipment" type="Control" parent="TabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="TabBar/EquipmentTab"]
-position = Vector2(185, 215.529)
-scale = Vector2(3.635137, 3.6351364)
-sprite_frames = SubResource("SpriteFrames_u6k0j")
-animation = &"equipment_idle"
-autoplay = "equipment_idle"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="TabBar/EquipmentTab"]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 1.0
-anchor_bottom = 0.998
-offset_top = 7.5699997
-offset_right = -6.69989
-offset_bottom = -0.1217041
-
-[node name="EquipmentPanel" type="Control" parent="TabBar/EquipmentTab/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-script = ExtResource("2_cuqmt")
-
-[node name="EquipmentSlotsContainer" type="Control" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel"]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="HeadSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-layout_mode = 0
-offset_left = 9.850006
-offset_top = 28.57
-offset_right = 73.850006
-offset_bottom = 92.57
-script = null
-
-[node name="ChestSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-layout_mode = 0
-offset_left = 9.850006
-offset_top = 122.57001
-offset_right = 73.850006
-offset_bottom = 186.57
-script = null
-
-[node name="LegsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-layout_mode = 0
-offset_left = 9.850006
-offset_top = 217.57
-offset_right = 73.850006
-offset_bottom = 281.57
-script = null
-
-[node name="HandsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-layout_mode = 0
-offset_left = 9.850006
-offset_top = 308.57
-offset_right = 73.850006
-offset_bottom = 372.57
-script = null
-
-[node name="MainHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-layout_mode = 0
-offset_left = 104.850006
-offset_top = 393.57
-offset_right = 168.85
-offset_bottom = 457.57
-script = null
-
-[node name="OffHand" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-layout_mode = 0
-offset_left = 203.85004
-offset_top = 393.57
-offset_right = 267.85004
-offset_bottom = 457.57
-script = null
-
-[node name="ArmsSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-layout_mode = 0
-offset_left = 296.85
-offset_top = 28.570007
-offset_right = 360.85
-offset_bottom = 92.57001
-script = null
-
-[node name="FeetSlot" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-layout_mode = 0
-offset_left = 296.85
-offset_top = 122.57001
-offset_right = 360.85
-offset_bottom = 186.57
-script = null
-
-[node name="AccessorySlot1" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-layout_mode = 0
-offset_left = 296.85
-offset_top = 217.57
-offset_right = 360.85
-offset_bottom = 281.57
-script = null
-
-[node name="AccessorySlot2" parent="TabBar/EquipmentTab/HBoxContainer/EquipmentPanel/EquipmentSlotsContainer"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-layout_mode = 0
-offset_left = 296.85
-offset_top = 308.57
-offset_right = 360.85
-offset_bottom = 372.57
-script = null
-
-[node name="InventoryPanel" type="Control" parent="TabBar/EquipmentTab/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="EquipmentInventory" parent="TabBar/EquipmentTab/HBoxContainer/InventoryPanel" instance=ExtResource("3_rjctp")]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.078
-anchor_top = 0.061000004
-anchor_right = 0.97
-anchor_bottom = 0.9760001
-offset_left = -0.16999245
-offset_top = -0.036001205
-offset_right = 0.14996338
-offset_bottom = 0.21697998
-grow_horizontal = 2
-grow_vertical = 2

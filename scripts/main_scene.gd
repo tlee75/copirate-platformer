@@ -5,7 +5,7 @@ extends Node2D
 
 @onready var ui_layer: CanvasLayer = $UI
 #@onready var hotbar = $UI/Hotbar
-@onready var inventory_ui = $UI/InventoryUI
+@onready var player_menu = $UI/PlayerMenu
 @onready var player: CharacterBody2D = $Player
 @onready var pause_menu = $UI/PauseMenu
 @onready var player_stats: PlayerStats

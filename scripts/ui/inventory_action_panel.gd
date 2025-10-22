@@ -7,7 +7,7 @@ signal action_requested(action_type: InventoryActionResolver.ActionType)
 var button_container: HBoxContainer
 var action_buttons: Array[Button] = []
 var current_stack: InventoryManager.ItemStack
-var input_handler: InventoryInputHandler
+var input_handler: PlayerMenuInputHandler
 
 func _ready():
 	_setup_ui_references()
@@ -15,7 +15,7 @@ func _ready():
 func _setup_ui_references():
 	button_container = $ButtonContainer
 
-func set_input_handler(handler: InventoryInputHandler):
+func set_input_handler(handler: PlayerMenuInputHandler):
 	input_handler = handler
 
 func display_actions_for_item(stack: InventoryManager.ItemStack, context: Dictionary = {}):

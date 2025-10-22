@@ -1,6 +1,10 @@
 extends Control
-class_name InventoryUI
+class_name PlayerMenu
 
+var tab_container
+var inventory_tab
+var crafting_tab
+var equipment_tab
 var category_filter
 var item_list
 var item_detail
@@ -11,7 +15,7 @@ var current_category: String = "all"
 var is_open: bool = false
 
 func _ready():
-	add_to_group("inventory_ui")  # Add to group so it can be found
+	add_to_group("player_menu")  # Add to group so it can be found
 	_setup_ui_references()
 	_setup_input_handler()
 	_connect_signals()
@@ -59,14 +63,20 @@ func _ready():
 			#get_viewport().set_input_as_handled()
 
 func _setup_ui_references():
-	category_filter = $MainLayout/HeaderSection/InventoryCategoryFilter
-	item_list = $MainLayout/ContentSection/InventoryItemList
-	item_detail = $MainLayout/ContentSection/InventoryItemDetail
-	action_panel = $MainLayout/FooterSection/InventoryActionPanel
+	tab_container = $TabContainer
+	inventory_tab = $TabContainer/Inventory
+	crafting_tab = $TabContainer/Crafting
+	equipment_tab = $TabContainer/Equipment
+	
+	# Set up inventory tab components
+	category_filter = $TabContainer/Inventory/HeaderSection/InventoryCategoryFilter
+	item_list = $TabContainer/Inventory/ContentSection/InventoryItemList
+	item_detail = $TabContainer/Inventory/ContentSection/InventoryItemDetail
+	action_panel = $TabContainer/Inventory/FooterSection/InventoryActionPanel
 
 func _setup_input_handler():
 	# Reference the singleton autoload instead of creating a new instance
-	input_handler = InventoryInputHandler
+	input_handler = PlayerMenuInputHandler
 	
 	# Pass input handler to all components (with null checks)
 	if item_list and item_list.has_method("set_input_handler"):
@@ -114,7 +124,7 @@ func _initialize_ui():
 	if action_panel:
 		action_panel.visible = true
 
-func open_inventory():
+func open_player_menu():
 	if is_open:
 		return
 	
@@ -127,7 +137,7 @@ func open_inventory():
 		#player._on_inventory_state_changed(true)
 	
 	# Update input handler
-	input_handler.set_inventory_open(true)
+	input_handler.set_player_menu_open(true)
 	
 	# Refresh all content
 	if category_filter and category_filter.has_method("refresh_categories"):
@@ -139,30 +149,30 @@ func open_inventory():
 	_auto_select_first_item()
 
 		
-	print("Inventory UI opened")
+	print("Player Menu opened - Default tab: ", get_current_tab())
 
-func close_inventory():
+func close_player_menu():
 	if not is_open:
 		return
 	
 	is_open = false
 	visible = false
 	
-	# Notify player that inventory closed
+	# Notify player that player menu closed
 	#var player = get_tree().get_first_node_in_group("player")
 	#if player and player.has_method("_on_inventory_state_changed"):
 		#player._on_inventory_state_changed(false)  # FALSE when closing
 	
 	# Update input handler
-	input_handler.set_inventory_open(false)
+	input_handler.set_player_menu_open(false)
 	
-	print("Inventory UI closed")
+	print("Player Menu closed")
 
-func toggle_inventory():
+func toggle_player_menu():
 	if is_open:
-		close_inventory()
+		close_player_menu()
 	else:
-		open_inventory()
+		open_player_menu()
 
 # More robust ScrollContainer access
 func _scroll_item_list(delta: int):
@@ -323,3 +333,38 @@ func _auto_select_first_item():
 		# Clear details when no items
 		if item_detail:
 			item_detail.display_item(null)
+
+# Tab management methods
+func switch_to_tab(tab_name: String):
+	if not tab_container:
+		return
+	
+	match tab_name.to_lower():
+		"inventory":
+			tab_container.current_tab = 0
+		"crafting":
+			tab_container.current_tab = 1
+		"equipment":
+			tab_container.current_tab = 2
+		_:
+			print("Unknown tab: ", tab_name)
+
+func get_current_tab() -> String:
+	if not tab_container:
+		return "inventory"
+	
+	match tab_container.current_tab:
+		0:
+			return "inventory"
+		1:
+			return "crafting"
+		2:
+			return "equipment"
+		_:
+			return "inventory"
+
+func get_current_tab_index() -> int:
+	if not tab_container:
+		return 0
+	return tab_container.current_tab
+	

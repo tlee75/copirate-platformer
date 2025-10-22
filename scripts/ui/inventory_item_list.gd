@@ -11,7 +11,7 @@ var empty_label: Label
 var item_buttons: Array[Control] = []
 var current_items: Array[InventoryManager.ItemStack] = []
 var selected_index: int = -1
-var input_handler: InventoryInputHandler
+var input_handler: PlayerMenuInputHandler
 
 func _ready():
 	_setup_ui_references()
@@ -37,7 +37,7 @@ func _setup_empty_state():
 	empty_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	empty_label.anchors_preset = Control.PRESET_FULL_RECT
 
-func set_input_handler(handler: InventoryInputHandler):
+func set_input_handler(handler: PlayerMenuInputHandler):
 	input_handler = handler
 
 func refresh_items(items: Array[InventoryManager.ItemStack]):
