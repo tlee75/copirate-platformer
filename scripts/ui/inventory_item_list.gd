@@ -20,15 +20,6 @@ func _ready():
 	# FIX: ScrollContainer consumes mouse events by default, set to PASS
 	if scroll_container:
 		scroll_container.mouse_filter = Control.MOUSE_FILTER_PASS
-	
-	print("DEBUG: InventoryItemList._ready() - mouse_filter=", mouse_filter)
-	print("DEBUG: ScrollContainer mouse_filter=", scroll_container.mouse_filter if scroll_container else "null")
-	print("DEBUG: ItemContainer mouse_filter=", item_container.mouse_filter if item_container else "null")
-
-func _gui_input(event):
-	if event is InputEventMouseButton:
-		print("DEBUG: InventoryItemList._gui_input - button=", event.button_index, " pressed=", event.pressed)
-		print("DEBUG: Mouse position: ", event.position, " global: ", event.global_position)
 
 func _setup_ui_references():
 	scroll_container = $ScrollContainer
@@ -90,57 +81,14 @@ func _create_item_button(stack: InventoryManager.ItemStack, index: int) -> Contr
 	var button = Button.new()
 	button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS  # ADD THIS LINE
 	button.text = stack.get_display_name() + " (x" + str(stack.quantity) + ")"
-	button.text = stack.get_display_name() + " (x" + str(stack.quantity) + ")"
 	if stack.item.icon:
 		button.icon = stack.item.icon
-	
-	# CRITICAL: Set proper button sizing
-	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	button.custom_minimum_size = Vector2(200, 40)
-	button.mouse_force_pass_scroll_events = false
-	
-	# CRITICAL: Set button alignment and text properties
-	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.expand_icon = false
 	
 	# Add comprehensive mouse event tracking
 	button.pressed.connect(func():
 		print("DEBUG: Button.pressed signal fired for ", stack.item.name, " at index ", index)
 		_on_item_selected(index)
 	)
-	
-	button.button_down.connect(func():
-		print("DEBUG: Button.button_down signal fired for ", stack.item.name)
-	)
-	
-	button.button_up.connect(func():
-		print("DEBUG: Button.button_up signal fired for ", stack.item.name)
-	)
-	
-	button.mouse_entered.connect(func():
-		print("DEBUG: Mouse entered button for ", stack.item.name)
-	)
-	
-	button.mouse_exited.connect(func():
-		print("DEBUG: Mouse exited button for ", stack.item.name)
-	)
-	
-	# Add gui_input handler for even more detailed tracking
-	button.gui_input.connect(func(event):
-		if event is InputEventMouseButton:
-			print("DEBUG: *** BUTTON.GUI_INPUT *** received for ", stack.item.name, " button=", event.button_index, " pressed=", event.pressed)
-	)
-	print("DEBUG: Created button for ", stack.item.name, " at index ", index)
-	print("DEBUG:   - custom_minimum_size: ", button.custom_minimum_size)
-	print("DEBUG:   - mouse_filter will be: ", Control.MOUSE_FILTER_STOP)
-	print("DEBUG:   - focus_mode will be: ", Control.FOCUS_ALL)	
-	print("DEBUG: Created button for ", stack.item.name, " at index ", index, " with size: ", button.custom_minimum_size)
-	# Force the button to be on top and explicitly set mouse filter
-	button.set_mouse_filter(Control.MOUSE_FILTER_STOP)
-	print("DEBUG:   - Explicitly set mouse_filter to: ", button.mouse_filter)
-	print("DEBUG:   - mouse_force_pass_scroll_events: ", button.mouse_force_pass_scroll_events)
 	return button
 
 
@@ -196,10 +144,6 @@ func get_selected_stack() -> InventoryManager.ItemStack:
 
 
 func debug_button_info():
-	print("=== BUTTON DEBUG INFO ===")
-	print("Item buttons count: ", item_buttons.size())
-	print("Current items count: ", current_items.size())
-	print("Selected index: ", selected_index)
 	for i in range(item_buttons.size()):
 		if i < item_buttons.size() and is_instance_valid(item_buttons[i]):
 			var btn = item_buttons[i]

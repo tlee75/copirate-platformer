@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 class_name Player
 
-signal inventory_state_changed(is_open: bool)
+#signal inventory_state_changed(is_open: bool)
 signal object_menu_state_changed(is_open: bool)
 
 const WALK_SPEED := 100.0
@@ -23,7 +23,7 @@ var current_highlighted_tile: Vector2i = Vector2i(-999, -999)  # Invalid positio
 var last_move_dir: int = 1  # 1 for right, -1 for left
 var was_running_when_jumped: bool = false
 var jump_speed: float = 0.0
-var inventory_is_open: bool = false
+#var inventory_is_open: bool = false
 var object_menu_is_open: bool = false
 var is_in_water: bool = false
 var tile_size: float = 32.0
@@ -55,9 +55,9 @@ var default_hit_frames = {
 func _ready():
 	var frames = load("res://resources/player_sprites.tres")
 	$AnimatedSprite2D.sprite_frames = frames
-	# Remove procedural Visual if it exists
-	if has_node("Visual"):
-		get_node("Visual").queue_free()
+	## Remove procedural Visual if it exists
+	#if has_node("Visual"):
+		#get_node("Visual").queue_free()
 
 	# Ensure an AnimatedSprite2D is present
 	var anim: AnimatedSprite2D
@@ -81,7 +81,7 @@ func _ready():
 	set_process_input(true)
 
 	# Connect to inventory and object menu state changes
-	inventory_state_changed.connect(_on_inventory_state_changed)
+	#inventory_state_changed.connect(_on_inventory_state_changed)
 	object_menu_state_changed.connect(_on_object_menu_state_changed)
 	
 	# Add player to group so other scripts can find it easily
@@ -103,7 +103,7 @@ func _physics_process(delta):
 	var tile_pos = tilemap.local_to_map(global_position)
 	
 	# Skip input handling if inventory or object menu is open
-	if inventory_is_open or object_menu_is_open:
+	if InventoryInputHandler.is_inventory_open or object_menu_is_open:
 		# Still apply gravity when inventory is open
 		if not is_on_floor() and not is_underwater:
 			vel.y += gravity * delta
@@ -256,7 +256,7 @@ func _physics_process(delta):
 
 func handle_interact_or_use_action():
 	# Interact/Use Action
-	if Input.is_action_just_pressed("interact") and not inventory_is_open:
+	if Input.is_action_just_pressed("interact") and not InventoryInputHandler.is_inventory_open:
 		if not is_interacting:
 			if is_interact_target():
 				is_interacting = true
@@ -288,14 +288,14 @@ func handle_attack_action():
 	if PlacementManager.placement_active:
 		return # Placement manager handles input
 	
-	# Only block mouse input when actually clicking ON the inventory UI, not when inventory is just open
-	# This allows UI buttons to receive clicks while preventing accidental world actions
-	
 	# Main Hand Action - left mouse button (but not when clicking on UI)
 	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu() and not is_mouse_over_inventory():
+		print("left click")
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
+			print("not trigger action")
 			if equipment_panel:
+				print("equipment panel")
 				var main_hand_slot_index = equipment_panel.get_equipment_slot_index_by_node_name("MainHand")
 				if main_hand_slot_index != -1:
 					var main_hand_slot = InventoryManager.get_equipment_slot(main_hand_slot_index)
@@ -313,7 +313,9 @@ func handle_attack_action():
 						var melee_item = GameObjectsDatabase.game_objects_database["melee"]
 						attack_target = get_attack_target()
 						melee_item.attack(self, attack_target)
-
+			else:
+				print("else equipment panel")
+				
 func handle_mainhand_action(item, target):
 	if not item.has_method("attack"):
 		print("WARNING: Item ", item.name, " is missing attack methods!")
@@ -471,7 +473,7 @@ func create_highlight_texture():
 
 func update_tile_highlights():
 	# Don't show tile highlights when inventory is open
-	if inventory_is_open:
+	if InventoryInputHandler.is_inventory_open:
 		clear_tile_highlights()
 		return
 		
@@ -533,9 +535,9 @@ func create_tile_highlight_optimized(tile_pos: Vector2i):
 	tile_highlights.append(highlight)
 	highlighted_tiles.append(tile_pos)
 
-func _on_inventory_state_changed(is_open: bool):
-	inventory_is_open = is_open
-	print("Player: Inventory is now ", "open" if is_open else "closed")
+#func _on_inventory_state_changed(is_open: bool):
+	#inventory_is_open = is_open
+	#print("Player: Inventory is now ", "open" if is_open else "closed")
 	
 func _on_inventory_action_executed(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack, success: bool):
 	print("Player: Inventory action executed - ", action_type, " on ", stack.item.name, " - Success: ", success)

@@ -5,7 +5,6 @@ extends Node
 signal inventory_changed
 signal hotbar_changed  
 signal equipment_changed
-signal weapon_changed
 signal item_equipped(item: GameItem, slot_type: String)
 signal item_unequipped(item: GameItem, slot_type: String)
 

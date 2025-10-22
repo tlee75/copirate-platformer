@@ -22,23 +22,12 @@ func _ready():
 	set_process_unhandled_input(true)
 	print("DEBUG: InventoryInputHandler singleton initialized")
 
-func _unhandled_input(event):
-	# Log ALL unhandled input when inventory is open
-	if is_inventory_open and event is InputEventMouseButton:
-		print("DEBUG: InventoryInputHandler._unhandled_input - Mouse event: button=", event.button_index, " pressed=", event.pressed)
-		print("DEBUG: This event reached _unhandled_input (was not consumed by UI)")
-	# Handle inventory toggle regardless of open state
+func _input(event):
 	if event.is_action_pressed("inventory_toggle"):
-		print("DEBUG: InventoryInputHandler detected inventory_toggle")
-		# Find the InventoryUI in the scene tree
 		var inventory_ui = get_tree().get_first_node_in_group("inventory_ui")
 		if inventory_ui and inventory_ui.has_method("toggle_inventory"):
-			print("DEBUG: Calling InventoryUI.toggle_inventory()")
 			inventory_ui.toggle_inventory()
 			get_viewport().set_input_as_handled()
-		else:
-			print("DEBUG: Could not find InventoryUI in scene tree")
-		return
 	
 	# Don't process other inputs when inventory is closed
 	if not is_inventory_open:
@@ -59,21 +48,18 @@ func _unhandled_input(event):
 							item_list.scroll_down()
 			get_viewport().set_input_as_handled()
 			return
-	
-	# Don't intercept other mouse events - let them pass through to UI
-	if event is InputEventMouse:
-		return
-	
-	# Only detect input mode changes for controller/keyboard input
-	if event is InputEventJoypadButton and event.pressed:
-		set_input_mode(InventoryActionResolver.InputMethod.CONTROLLER)
-	elif event is InputEventKey and event.pressed:
-		# Don't switch to keyboard mode, stay in mouse mode for UI interaction
-		pass
-	
-	# Handle input based on current mode (controller only)
-	if current_input_mode == InventoryActionResolver.InputMethod.CONTROLLER:
-		_handle_controller_input(event)
+
+#func _unhandled_input(event):
+	## Only detect input mode changes for controller/keyboard input
+	#if event is InputEventJoypadButton and event.pressed:
+		#set_input_mode(InventoryActionResolver.InputMethod.CONTROLLER)
+	#elif event is InputEventKey and event.pressed:
+		## Don't switch to keyboard mode, stay in mouse mode for UI interaction
+		#pass
+	#
+	## Handle input based on current mode (controller only)
+	#if current_input_mode == InventoryActionResolver.InputMethod.CONTROLLER:
+		#_handle_controller_input(event)
 
 func _detect_initial_input_mode():
 	# Check for connected controllers
@@ -307,14 +293,3 @@ func _input_mode_to_string(mode: InventoryActionResolver.InputMethod) -> String:
 			return "Touch"
 		_:
 			return "Unknown"
-
-func debug_print_state():
-	print("=== INPUT HANDLER STATE ===")
-	print("Input Mode: ", _input_mode_to_string(current_input_mode))
-	print("Inventory Open: ", is_inventory_open)
-	print("Selected Category: ", selected_category)
-	print("Selected Item Index: ", selected_item_index)
-	print("Available Items: ", available_items.size())
-	print("Selected Stack: ", selected_stack.item.name if selected_stack else "None")
-	var current = _get_current_selected_stack()
-	print("Current Navigation Stack: ", current.item.name if current else "None")

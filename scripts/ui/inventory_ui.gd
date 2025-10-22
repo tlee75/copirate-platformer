@@ -1,8 +1,5 @@
-@tool
 extends Control
 class_name InventoryUI
-
-signal inventory_closed
 
 var category_filter
 var item_list
@@ -14,27 +11,12 @@ var current_category: String = "all"
 var is_open: bool = false
 
 func _ready():
-	print("DEBUG: InventoryUI mouse_filter = ", mouse_filter)
-	print("DEBUG: InventoryUI focus_mode = ", focus_mode)
-	print("DEBUG: InventoryUI._ready() called")
 	add_to_group("inventory_ui")  # Add to group so it can be found
 	_setup_ui_references()
 	_setup_input_handler()
 	_connect_signals()
 	_initialize_ui()
 	print("DEBUG: InventoryUI._ready() completed")
-
-func _gui_input(event):
-	if event is InputEventMouseButton:
-		print("DEBUG: InventoryUI._gui_input - Mouse button event: button=", event.button_index, " pressed=", event.pressed, " is_open=", is_open)
-		print("DEBUG: Event position: ", event.position, " global: ", event.global_position)
-		
-		if is_open and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			var ui_rect = Rect2(Vector2.ZERO, size)
-			print("DEBUG: InventoryUI rect: ", ui_rect)
-			print("DEBUG: Click in bounds: ", ui_rect.has_point(event.position))
-			print("DEBUG: InventoryUI mouse_filter: ", mouse_filter)
-			print("DEBUG: InventoryUI received click in _gui_input")
 
 #func _input(event):
 	#print("DEBUG: InventoryUI._input called, event: ", event.get_class(), ", is_open: ", is_open)
@@ -75,11 +57,6 @@ func _gui_input(event):
 			#if item_list and item_list.has_method("scroll_down"):
 				#item_list.scroll_down()
 			#get_viewport().set_input_as_handled()
-
-#func _unhandled_input(event):
-	#print("DEBUG: InventoryUI._unhandled_input called, event: ", event.get_class())
-	#if event.is_action_pressed("inventory_toggle"):
-		#print("DEBUG: Tab detected in _unhandled_input")
 
 func _setup_ui_references():
 	category_filter = $MainLayout/HeaderSection/InventoryCategoryFilter
@@ -144,21 +121,13 @@ func open_inventory():
 	is_open = true
 	visible = true
 	
-	# Remove this entire test button section:
-	# var test_btn = Button.new()
-	# test_btn.text = "TEST BUTTON - CLICK ME"
-	# ... (delete all test button code)
-	
-	# Notify player correctly (TRUE when opening)
-	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("_on_inventory_state_changed"):
-		player._on_inventory_state_changed(true)
+	## Notify player correctly (TRUE when opening)
+	#var player = get_tree().get_first_node_in_group("player")
+	#if player and player.has_method("_on_inventory_state_changed"):
+		#player._on_inventory_state_changed(true)
 	
 	# Update input handler
 	input_handler.set_inventory_open(true)
-	
-	# Add debug output
-	print("DEBUG: Inventory opened, is_open = ", is_open)
 	
 	# Refresh all content
 	if category_filter and category_filter.has_method("refresh_categories"):
@@ -169,9 +138,6 @@ func open_inventory():
 	await get_tree().process_frame  # Wait for UI to update
 	_auto_select_first_item()
 
-	if item_list and item_list.has_method("debug_button_info"):
-		await get_tree().process_frame
-		item_list.debug_button_info()
 		
 	print("Inventory UI opened")
 
@@ -183,17 +149,13 @@ func close_inventory():
 	visible = false
 	
 	# Notify player that inventory closed
-	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("_on_inventory_state_changed"):
-		player._on_inventory_state_changed(false)  # FALSE when closing
+	#var player = get_tree().get_first_node_in_group("player")
+	#if player and player.has_method("_on_inventory_state_changed"):
+		#player._on_inventory_state_changed(false)  # FALSE when closing
 	
 	# Update input handler
 	input_handler.set_inventory_open(false)
 	
-	# Add debug output
-	print("DEBUG: Inventory closed, is_open = ", is_open)
-	
-	inventory_closed.emit()
 	print("Inventory UI closed")
 
 func toggle_inventory():
