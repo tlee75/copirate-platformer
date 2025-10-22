@@ -557,5 +557,6 @@ func debug_add_test_items():
 		add_item(db["pickaxe"], 1)
 	if "woodaxe" in db:
 		add_item(db["woodaxe"], 1)
-	
+	if "sword" in db:
+		add_item(db["sword"], 1)
 	print_inventory()

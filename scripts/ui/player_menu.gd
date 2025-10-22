@@ -1,6 +1,13 @@
 extends Control
 class_name PlayerMenu
 
+# Equipment tab components
+var equipment_category_filter
+var equipment_body_display  
+var equipment_item_list
+var equipment_item_detail
+var equipment_action_panel
+
 var tab_container
 var inventory_tab
 var crafting_tab
@@ -21,6 +28,10 @@ func _ready():
 	_connect_signals()
 	_initialize_ui()
 	print("DEBUG: InventoryUI._ready() completed")
+
+	# Add some test equipment items for testing
+	if InventoryManager:
+		InventoryManager.debug_add_test_items()
 
 #func _input(event):
 	#print("DEBUG: InventoryUI._input called, event: ", event.get_class(), ", is_open: ", is_open)
@@ -73,6 +84,13 @@ func _setup_ui_references():
 	item_list = $TabContainer/Inventory/ContentSection/InventoryItemList
 	item_detail = $TabContainer/Inventory/ContentSection/InventoryItemDetail
 	action_panel = $TabContainer/Inventory/FooterSection/InventoryActionPanel
+	
+	# Set up equipment tab components - ADD THESE LINES
+	equipment_category_filter = $TabContainer/Equipment/HeaderSection/EquipmentCategoryFilter
+	equipment_body_display = $TabContainer/Equipment/ContentSection/EquipmentBodyDisplay
+	equipment_item_list = $TabContainer/Equipment/ContentSection/RightPanelSplit/EquipmentItemList
+	equipment_item_detail = $TabContainer/Equipment/ContentSection/RightPanelSplit/EquipmentItemDetail
+	equipment_action_panel = $TabContainer/Equipment/FooterSection/EquipmentActionPanel
 
 func _setup_input_handler():
 	# Reference the singleton autoload instead of creating a new instance
@@ -85,6 +103,14 @@ func _setup_input_handler():
 		item_detail.set_input_handler(input_handler)
 	if action_panel and action_panel.has_method("set_input_handler"):
 		action_panel.set_input_handler(input_handler)
+	
+	# Set input handler for equipment components
+	if equipment_item_list and equipment_item_list.has_method("set_input_handler"):
+		equipment_item_list.set_input_handler(input_handler)
+	if equipment_item_detail and equipment_item_detail.has_method("set_input_handler"):
+		equipment_item_detail.set_input_handler(input_handler)
+	if equipment_action_panel and equipment_action_panel.has_method("set_input_handler"):
+		equipment_action_panel.set_input_handler(input_handler)
 
 func _connect_signals():
 	# Category filter signals
@@ -96,7 +122,20 @@ func _connect_signals():
 		item_list.item_selected.connect(_on_item_selected)
 	if item_list and item_list.has_signal("item_action_requested"):
 		item_list.item_action_requested.connect(_on_item_action_requested)
+
+	# Equipment tab signals
+	if equipment_category_filter:
+		equipment_category_filter.category_selected.connect(_on_equipment_category_selected)
 	
+	if equipment_body_display:
+		equipment_body_display.equipment_slot_selected.connect(_on_equipment_slot_selected)
+	
+	if equipment_item_list:
+		equipment_item_list.item_selected.connect(_on_equipment_item_selected)
+	
+	if equipment_action_panel:
+		equipment_action_panel.action_requested.connect(_on_equipment_action_requested)	
+
 	# Action panel signals
 	if action_panel and action_panel.has_signal("action_requested"):
 		action_panel.action_requested.connect(_on_action_requested)
@@ -143,6 +182,10 @@ func open_player_menu():
 	if category_filter and category_filter.has_method("refresh_categories"):
 		category_filter.refresh_categories()
 	_refresh_current_view()
+
+	# Also refresh equipment tab if it's the current tab
+	if get_current_tab() == "equipment":
+		_on_equipment_category_selected("all")
 
 	# Auto-select first item after refreshing
 	await get_tree().process_frame  # Wait for UI to update
@@ -276,6 +319,44 @@ func _refresh_action_panel():
 	if action_panel and action_panel.has_method("refresh_actions"):
 		action_panel.refresh_actions()
 
+func get_equipment_items_by_category(category: String) -> Array:
+	"""Get equipment items filtered by equipment category"""
+	var all_items = InventoryManager.inventory_items
+	var equipment_items: Array[InventoryManager.ItemStack] = []
+	
+	for stack in all_items:
+		var item_category = stack.item.category
+		var is_equipment = _is_equipment_item(item_category)
+		
+		if is_equipment:
+			if category == "all":
+				equipment_items.append(stack)
+			elif category == "weapons" and _is_weapon_category(item_category):
+				equipment_items.append(stack)
+			elif category == "armor" and _is_armor_category(item_category):
+				equipment_items.append(stack)
+			elif category == "accessories" and _is_accessory_category(item_category):
+				equipment_items.append(stack)
+	
+	return equipment_items
+
+func _is_equipment_item(item_category: String) -> bool:
+	"""Check if an item category represents equipment"""
+	var equipment_categories = [
+		"weapon", "helmet", "chest", "armor", "legs", "hands", "feet", "arms", 
+		"shield", "accessory"
+	]
+	return item_category in equipment_categories
+
+func _is_weapon_category(item_category: String) -> bool:
+	return item_category in ["weapon", "tool"]
+
+func _is_armor_category(item_category: String) -> bool:
+	return item_category in ["helmet", "chest", "armor", "legs", "hands", "feet", "arms", "shield"]
+
+func _is_accessory_category(item_category: String) -> bool:
+	return item_category in ["accessory"]
+
 # Public API for external integration
 func set_selected_category(category: String):
 	if category_filter:
@@ -368,3 +449,44 @@ func get_current_tab_index() -> int:
 		return 0
 	return tab_container.current_tab
 	
+# Equipment tab event handlers
+func _on_equipment_category_selected(category: String):
+	print("Equipment category selected: ", category)
+	
+	# Get filtered equipment items
+	var equipment_items = get_equipment_items_by_category(category)
+	
+	# Update equipment item list
+	if equipment_item_list and equipment_item_list.has_method("refresh_items"):
+		equipment_item_list.refresh_items(equipment_items)
+		print("Updated equipment list with ", equipment_items.size(), " items")
+	
+	# Auto-select first equipment item
+	await get_tree().process_frame
+	if equipment_items.size() > 0:
+		var first_item = equipment_items[0]
+		if equipment_item_list and equipment_item_list.has_method("set_selected_index"):
+			equipment_item_list.set_selected_index(0)
+		_on_equipment_item_selected(first_item)
+
+func _on_equipment_slot_selected(slot_type: String, item_stack):
+	print("Equipment slot selected: ", slot_type, " with item: ", item_stack.item.name if item_stack else "empty")
+	# TODO: Select corresponding item in equipment item list
+
+func _on_equipment_item_selected(stack: InventoryManager.ItemStack):
+	print("Equipment item selected: ", stack.item.name)
+	# Update equipment item detail panel
+	if equipment_item_detail:
+		equipment_item_detail.display_item(stack)
+	
+	# Update equipment action panel
+	if equipment_action_panel:
+		print("DEBUG: Calling equipment_action_panel.display_actions_for_item()")
+		equipment_action_panel.display_actions_for_item(stack, {})
+	else:
+		print("DEBUG: ERROR - equipment_action_panel is null!")
+
+func _on_equipment_action_requested(action_type: InventoryActionResolver.ActionType):
+	var selected_stack = equipment_item_list.get_selected_stack() if equipment_item_list else null
+	if selected_stack:
+		_execute_action(action_type, selected_stack)
