@@ -203,13 +203,13 @@ func _execute_use_action(stack: InventoryManager.ItemStack) -> bool:
 	print("DEBUG: _execute_use_action called")
 	print("  stack:", stack)
 	# Handle object interaction first
-	var scene_tree = get_tree()
-	if scene_tree == null:
-		# Scene tree not available, skip object interaction
-		var item = stack.item
-		# Skip to the item logic below
-	else:
-		var main_scene = scene_tree.current_scene
+	#var scene_tree = get_tree()
+	#if scene_tree == null:
+		## Scene tree not available, skip object interaction
+		#var item = stack.item
+		## Skip to the item logic below
+	#else:
+		#var main_scene = scene_tree.current_scene
 		#if main_scene:
 			#var player_menu = main_scene.get_node("UI/PlayerMenu")  
 			#if player_menu and player_menu.has_meta("interacting_with_object"):
