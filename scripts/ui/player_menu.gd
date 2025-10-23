@@ -94,7 +94,7 @@ func _setup_ui_references():
 
 func _setup_input_handler():
 	# Reference the singleton autoload instead of creating a new instance
-	input_handler = PlayerMenuInputHandler
+	input_handler = PlayerInputHandler
 	
 	# Pass input handler to all components (with null checks)
 	if item_list and item_list.has_method("set_input_handler"):
@@ -147,7 +147,7 @@ func _connect_signals():
 	# Inventory manager signals
 	InventoryManager.inventory_changed.connect(_refresh_current_view)
 	InventoryManager.equipment_changed.connect(_refresh_current_view)
-	InventoryManager.hotbar_changed.connect(_refresh_current_view)
+	InventoryManager.quick_access_changed.connect(_refresh_current_view)
 
 func _initialize_ui():
 	print("DEBUG: InventoryUI._initialize_ui() called")

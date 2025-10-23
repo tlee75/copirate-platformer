@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=34 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/main_scene.gd" id="1_4bgka"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_02d50"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dki1spd0slwxj" path="res://assets/terrain/tropical_tilemap_slice_32x32.png" id="8_womr8"]
 [ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://scripts/ui/fps_counter.gd" id="9_onjth"]
 [ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://scenes/ui/pause_menu.tscn" id="14_0wyf6"]
+[ext_resource type="PackedScene" uid="uid://cycrpyyqnlp8l" path="res://scenes/ui/quick_access.tscn" id="14_6p3nn"]
 [ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://scripts/ui/depth_counter.gd" id="17_segjr"]
 [ext_resource type="PackedScene" uid="uid://noyk5n0awjav" path="res://scenes/ui/stats_display.tscn" id="18_beobj"]
 [ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/obstacles/wood_crate.tscn" id="19_267kh"]
@@ -166,6 +167,15 @@ mouse_force_pass_scroll_events = false
 metadata/_edit_use_anchors_ = true
 
 [node name="PlayerMenu" parent="UI" instance=ExtResource("19_pgk25")]
+
+[node name="QuickAccess" parent="UI" instance=ExtResource("14_6p3nn")]
+anchors_preset = 12
+anchor_left = 0.0
+anchor_right = 1.0
+offset_left = 404.0
+offset_top = -96.0
+offset_right = -348.0
+offset_bottom = -16.0
 
 [node name="WoodCrates" type="Node" parent="."]
 

@@ -4,7 +4,7 @@ extends Node2D
 # Handles coordination between game systems and UI
 
 @onready var ui_layer: CanvasLayer = $UI
-#@onready var hotbar = $UI/Hotbar
+@onready var quick_access = $UI/QuickAccess
 @onready var player_menu = $UI/PlayerMenu
 @onready var player: CharacterBody2D = $Player
 @onready var pause_menu = $UI/PauseMenu

@@ -14,7 +14,7 @@ func open_object_menu(object: Node2D, title: String, slot_count: int):
 	
 	# Get the main InventoryUI
 	var main_scene = get_tree().current_scene
-	var inventory_ui = main_scene.get_node("UI/InventoryUI")
+	var inventory_ui = main_scene.get_node("UI/PlayerMenu")
 	
 	if inventory_ui:
 		# Set object interaction context
@@ -35,7 +35,7 @@ func open_object_menu(object: Node2D, title: String, slot_count: int):
 func close_inventory():
 	# Clear object interaction context
 	var main_scene = get_tree().current_scene
-	var inventory_ui = main_scene.get_node("UI/InventoryUI")
+	var inventory_ui = main_scene.get_node("UI/PlayerMenu")
 	
 	if inventory_ui:
 		inventory_ui.remove_meta("interacting_with_object")

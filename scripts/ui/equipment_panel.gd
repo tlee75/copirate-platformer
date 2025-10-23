@@ -23,7 +23,7 @@ func _ready():
 	for i in slot_count:
 		if equipment_slots[i]:
 			equipment_slots[i].slot_index = i
-			equipment_slots[i].is_hotbar_slot = false
+			equipment_slots[i].is_quick_access_slot = false
 			equipment_slots[i].is_weapon_slot = false
 			equipment_slots[i].is_equipment_slot = true
 			

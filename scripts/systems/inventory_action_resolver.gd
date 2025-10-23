@@ -11,9 +11,9 @@ enum InputMethod {
 }
 
 enum ActionType {
-	USE,           # Context-dependent primary action
+	USE,           # Context-dependent primary activar hotbar_actions = _get_hotbar_actions(stack, input_method)n
 	EQUIP,         # Force equip/unequip
-	QUICK_MOVE,    # Move to hotbar
+	QUICK_ACCESS,  # Add to quick access
 	DROP,          # Drop item in world
 	LOCK,          # Lock/unlock item
 	INSPECT        # Show item details
@@ -54,9 +54,9 @@ func get_available_actions(
 	var equip_actions = _get_equipment_actions(stack, input_method)
 	actions.append_array(equip_actions)
 	
-	# Hotbar actions
-	var hotbar_actions = _get_hotbar_actions(stack, input_method)
-	actions.append_array(hotbar_actions)
+	# Quick access actions
+	var quick_access_actions = _get_quick_access_actions(stack, input_method)
+	actions.append_array(quick_access_actions)
 	
 	# Item management actions
 	var management_actions = _get_management_actions(stack, input_method)
@@ -96,7 +96,7 @@ func _get_context_use_action(stack: InventoryManager.ItemStack, context: Diction
 				return ActionData.new(ActionType.USE, "Equip", "E/A", true)
 				
 		"tool":
-			return ActionData.new(ActionType.USE, "Move to Hotbar", "E/A", true)
+			return ActionData.new(ActionType.USE, "Add to Quick Access", "E/A", true)
 		
 		"armor", "helmet", "chest", "legs", "hands", "feet", "shield", "accessory":
 			if stack.is_equipped():
@@ -105,10 +105,10 @@ func _get_context_use_action(stack: InventoryManager.ItemStack, context: Diction
 				return ActionData.new(ActionType.USE, "Equip", "E/A", true)
 		
 		"fuel":
-			return ActionData.new(ActionType.USE, "Move to Hotbar", "E/A", true)
+			return ActionData.new(ActionType.USE, "Add to Quick Access", "E/A", true)
 		
 		"material", "resource":
-			return ActionData.new(ActionType.USE, "Move to Hotbar", "E/A", true)
+			return ActionData.new(ActionType.USE, "Add to Quick Access", "E/A", true)
 		
 		_:
 			return ActionData.new(ActionType.USE, "Use", "E/A", true)
@@ -129,19 +129,18 @@ func _get_equipment_actions(stack: InventoryManager.ItemStack, input_method: Inp
 		
 	return actions
 
-# Get hotbar-related actions
-func _get_hotbar_actions(stack: InventoryManager.ItemStack, input_method: InputMethod) -> Array[ActionData]:
+# Get quick access related actions  
+func _get_quick_access_actions(stack: InventoryManager.ItemStack, input_method: InputMethod) -> Array[ActionData]:
 	var actions: Array[ActionData] = []
 	
-	if stack.is_on_hotbar():
-		actions.append(ActionData.new(ActionType.QUICK_MOVE, "Remove from Hotbar", "Q/L3"))
+	if stack.is_in_quick_access():
+		actions.append(ActionData.new(ActionType.QUICK_ACCESS, "Remove from Quick Access", "Q/L3"))
 	else:
-		# Check if hotbar has space
-		if _has_hotbar_space():
-			actions.append(ActionData.new(ActionType.QUICK_MOVE, "Add to Hotbar", "Q/L3"))
+		# Check if quick access has space
+		if _has_quick_access_space():
+			actions.append(ActionData.new(ActionType.QUICK_ACCESS, "Add to Quick Access", "Q/L3"))
 		else:
-			actions.append(ActionData.new(ActionType.QUICK_MOVE, "Replace Hotbar Item", "Q/L3"))
-	
+			actions.append(ActionData.new(ActionType.QUICK_ACCESS, "Replace Quick Access Item", "Q/L3"))
 	return actions
 
 # Get item management actions
@@ -164,7 +163,15 @@ func _get_management_actions(stack: InventoryManager.ItemStack, input_method: In
 	return actions
 
 # Execute an action on an ItemStack
-func execute_action(action_type: ActionType, stack: InventoryManager.ItemStack) -> bool:
+func execute_action(action_type: ActionType, stack: InventoryManager.ItemStack, data = null) -> bool:
+	print("DEBUG: execute_action called")
+	print("  action_type:", action_type)
+	print("  stack:", stack)
+	print("  data:", data)
+	if typeof(data) == TYPE_DICTIONARY and data.has("tree"):
+		print("  data.tree:", data["tree"])
+	else:
+		print("  data.tree: (missing or null)")
 	if not stack:
 		return false
 	
@@ -175,8 +182,8 @@ func execute_action(action_type: ActionType, stack: InventoryManager.ItemStack) 
 		ActionType.EQUIP:
 			return _execute_equip_action(stack)
 		
-		ActionType.QUICK_MOVE:
-			return _execute_quick_move_action(stack)
+		ActionType.QUICK_ACCESS:
+			return _execute_quick_access_action(stack)
 		
 		ActionType.DROP:
 			return _execute_drop_action(stack)
@@ -193,6 +200,8 @@ func execute_action(action_type: ActionType, stack: InventoryManager.ItemStack) 
 
 # Execute the context-dependent use action
 func _execute_use_action(stack: InventoryManager.ItemStack) -> bool:
+	print("DEBUG: _execute_use_action called")
+	print("  stack:", stack)
 	# Handle object interaction first
 	var scene_tree = get_tree()
 	if scene_tree == null:
@@ -201,16 +210,16 @@ func _execute_use_action(stack: InventoryManager.ItemStack) -> bool:
 		# Skip to the item logic below
 	else:
 		var main_scene = scene_tree.current_scene
-		if main_scene:
-			var inventory_ui = main_scene.get_node("UI/InventoryUI")
-			if inventory_ui and inventory_ui.has_meta("interacting_with_object"):
-				var object_menu = scene_tree.get_first_node_in_group("object_menu")
-				if object_menu and object_menu.can_object_accept_item(stack.item):
-					var object_title = inventory_ui.get_meta("object_title", "Object")
-					print("Adding ", stack.item.name, " to ", object_title)
-					# Remove one item from inventory
-					InventoryManager.remove_items_by_name(stack.item.name, 1)
-					return true
+		#if main_scene:
+			#var player_menu = main_scene.get_node("UI/PlayerMenu")  
+			#if player_menu and player_menu.has_meta("interacting_with_object"):
+				#var object_menu = scene_tree.get_first_node_in_group("object_menu")
+				#if object_menu and object_menu.can_object_accept_item(stack.item):
+					#var object_title = player_menu.get_meta("object_title", "Object")
+					#print("Adding ", stack.item.name, " to ", object_title)
+					## Remove one item from inventory
+					#InventoryManager.remove_items_by_name(stack.item.name, 1)
+					#return true
 
 	var item = stack.item
 	
@@ -222,34 +231,34 @@ func _execute_use_action(stack: InventoryManager.ItemStack) -> bool:
 			return InventoryManager.toggle_equip_item_stack(stack)
 		
 		"tool":
-			# Tools just move to hotbar for easy access
-			return InventoryManager.quick_move_to_hotbar(stack)
+			# Tools just move to quick access
+			return InventoryManager.assign_to_next_quick_access_slot(stack)
 		
 		"fuel":
 			# Try to add to nearby firepit first
 			if _try_add_to_firepit(stack):
 				return true
 			else:
-				return InventoryManager.quick_move_to_hotbar(stack)
+				return InventoryManager.assign_to_next_quick_access_slot(stack)
 		
 		"material", "resource":
-			return InventoryManager.quick_move_to_hotbar(stack)
+			return InventoryManager.assign_to_next_quick_access_slot(stack)
 		
 		_:
 			# Default: try to use as consumable, otherwise move to hotbar
 			if item.is_consumable():
 				return InventoryManager.use_item_stack(stack)
 			else:
-				return InventoryManager.quick_move_to_hotbar(stack)
+				return InventoryManager.assign_to_next_quick_access_slot(stack)
 
 func _execute_equip_action(stack: InventoryManager.ItemStack) -> bool:
 	return InventoryManager.toggle_equip_item_stack(stack)
 
-func _execute_quick_move_action(stack: InventoryManager.ItemStack) -> bool:
-	if stack.is_on_hotbar():
-		return InventoryManager.remove_from_hotbar(stack.hotbar_slot)
+func _execute_quick_access_action(stack: InventoryManager.ItemStack) -> bool:
+	if stack.is_in_quick_access():
+		return InventoryManager.remove_from_quick_access(stack.quick_access_slot)
 	else:
-		return InventoryManager.quick_move_to_hotbar(stack)
+		return InventoryManager.assign_to_next_quick_access_slot(stack)
 
 func _execute_drop_action(stack: InventoryManager.ItemStack) -> bool:
 	return InventoryManager.drop_item_stack(stack, 1)
@@ -264,7 +273,7 @@ func _execute_inspect_action(stack: InventoryManager.ItemStack) -> bool:
 	print("  Quantity: ", stack.quantity)
 	print("  Stack Size: ", stack.item.stack_size)
 	print("  Equipped: ", stack.is_equipped())
-	print("  On Hotbar: ", stack.is_on_hotbar())
+	print("  In Quick Access: ", stack.is_in_quick_access())
 	print("  Locked: ", stack.is_locked)
 	return true
 
@@ -276,9 +285,9 @@ func _is_equipable_item(item: GameItem) -> bool:
 	]
 	return item.category in equipable_categories
 
-func _has_hotbar_space() -> bool:
-	for i in range(InventoryManager.hotbar_assignments.size()):
-		if InventoryManager.hotbar_assignments[i] == null:
+func _has_quick_access_space() -> bool:
+	for i in range(InventoryManager.quick_access_assignments.size()):
+		if InventoryManager.quick_access_assignments[i] == null:
 			return true
 	return false
 
@@ -317,7 +326,7 @@ func get_action_for_input(input_action: String, stack: InventoryManager.ItemStac
 		
 		"inventory_quick_move":
 			for action in actions:
-				if action.type == ActionType.QUICK_MOVE:
+				if action.type == ActionType.QUICK_ACCESS:
 					return action
 		
 		"inventory_drop":
@@ -350,8 +359,8 @@ func _get_default_item_action(item: GameItem) -> ActionData:
 		"weapon", "armor", "helmet", "chest", "legs", "hands", "feet", "shield", "accessory":
 			return ActionData.new(ActionType.USE, "Equip", "E/A", true)
 		"tool":
-			return ActionData.new(ActionType.USE, "Move to Hotbar", "E/A", true)
+			return ActionData.new(ActionType.USE, "Add to Quick Access", "E/A", true)
 		"fuel", "material", "resource":
-			return ActionData.new(ActionType.USE, "Move to Hotbar", "E/A", true)
+			return ActionData.new(ActionType.USE, "Add to Quick Access", "E/A", true)
 		_:
 			return ActionData.new(ActionType.USE, "Use", "E/A", true)

@@ -1,7 +1,8 @@
 extends Node
 
-# Unified input handler for inventory actions across all device types
-# Processes mouse/keyboard, controller, and touch input uniformly
+# Unified input handler for inventory and quick access across all device types
+# Processes mouse/keyboard, controller, and touch input uniformly  
+# Handles both menu navigation and quick access cycling
 
 signal action_executed(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack, success: bool)
 signal input_mode_changed(new_mode: InventoryActionResolver.InputMethod)
@@ -10,6 +11,10 @@ var action_resolver: InventoryActionResolver
 var current_input_mode: InventoryActionResolver.InputMethod = InventoryActionResolver.InputMethod.MOUSE_KEYBOARD
 var selected_stack: InventoryManager.ItemStack = null
 var is_player_menu_open: bool = false
+
+# Quick access state
+var selected_quick_access_slot: int = 0
+var quick_access_items: Array[InventoryManager.ItemStack] = []
 
 # Touch/controller navigation state
 var selected_category: String = "all"
@@ -20,7 +25,7 @@ func _ready():
 	action_resolver = InventoryActionResolver.new()
 	_detect_initial_input_mode()
 	set_process_unhandled_input(true)
-	print("DEBUG: PlayerMenuInputHandler singleton initialized")
+	print("DEBUG: PlayerInputHandler singleton initialized")
 
 func _input(event):
 	if event.is_action_pressed("player_menu_toggle"):
@@ -29,25 +34,26 @@ func _input(event):
 			inventory_ui.toggle_player_menu()
 			get_viewport().set_input_as_handled()
 	
-	# Don't process other inputs when inventory is closed
-	if not is_player_menu_open:
-		return
+	if is_player_menu_open:
+		_handle_menu_input(event)  # Existing functionality
+	else:
+		_handle_quick_access_input(event)  # New functionality
 	
-	# Handle mouse wheel scrolling when inventory is open
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			var player_menu = get_tree().get_first_node_in_group("player_menu")
-			if player_menu:
-				var item_list = player_menu.item_list
-				if item_list:
-					if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-						if item_list.has_method("scroll_up"):
-							item_list.scroll_up()
-					else:
-						if item_list.has_method("scroll_down"):
-							item_list.scroll_down()
-			get_viewport().set_input_as_handled()
-			return
+	## Handle mouse wheel scrolling when inventory is open
+	#if event is InputEventMouseButton and event.pressed:
+		#if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			#var player_menu = get_tree().get_first_node_in_group("player_menu")
+			#if player_menu:
+				#var item_list = player_menu.item_list
+				#if item_list:
+					#if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+						#if item_list.has_method("scroll_up"):
+							#item_list.scroll_up()
+					#else:
+						#if item_list.has_method("scroll_down"):
+							#item_list.scroll_down()
+			#get_viewport().set_input_as_handled()
+			#return
 
 #func _unhandled_input(event):
 	## Only detect input mode changes for controller/keyboard input
@@ -179,6 +185,101 @@ func _handle_touch_input(event):
 			# Touch release - execute primary action on selected item
 			if selected_stack:
 				_execute_primary_action(selected_stack)
+
+func _handle_menu_input(event):
+	# Handle mouse wheel scrolling when inventory is open
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			var player_menu = get_tree().get_first_node_in_group("player_menu")
+			if player_menu:
+				var item_list = player_menu.item_list
+				if item_list:
+					if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+						if item_list.has_method("scroll_up"):
+							item_list.scroll_up()
+					else:
+						if item_list.has_method("scroll_down"):
+							item_list.scroll_down()
+			get_viewport().set_input_as_handled()
+			return
+
+func _handle_quick_access_input(event):
+	"""Handle input when PlayerMenu is closed"""
+	if event.is_action_pressed("quick_access_next"):
+		_cycle_quick_access_next()
+	elif event.is_action_pressed("quick_access_previous"):
+		_cycle_quick_access_previous()
+	elif event.is_action_pressed("quick_access_select_1"):
+		_select_quick_access_slot(0)
+	elif event.is_action_pressed("quick_access_select_2"):
+		_select_quick_access_slot(1)
+	elif event.is_action_pressed("quick_access_select_3"):
+		_select_quick_access_slot(2)
+	elif event.is_action_pressed("quick_access_select_4"):
+		_select_quick_access_slot(3)
+	elif event.is_action_pressed("quick_access_select_5"):
+		_select_quick_access_slot(4)
+	elif event.is_action_pressed("quick_access_select_6"):
+		_select_quick_access_slot(5)
+	elif event.is_action_pressed("quick_access_select_7"):
+		_select_quick_access_slot(6)
+	elif event.is_action_pressed("quick_access_select_8"):
+		_select_quick_access_slot(7)
+	elif event.is_action_pressed("interact"):
+		_use_selected_quick_access_item()
+
+func _cycle_quick_access_next():
+	"""Cycle to next non-empty quick access slot"""
+	_refresh_quick_access_items()
+	var start_slot = selected_quick_access_slot
+	
+	for i in range(8):
+		selected_quick_access_slot = (selected_quick_access_slot + 1) % 8
+		if quick_access_items[selected_quick_access_slot] != null:
+			print("Cycled to quick access slot ", selected_quick_access_slot)
+			return
+		if selected_quick_access_slot == start_slot:
+			break
+	
+	print("No quick access items to cycle through")
+
+func _cycle_quick_access_previous():
+	"""Cycle to previous non-empty quick access slot"""
+	_refresh_quick_access_items()
+	var start_slot = selected_quick_access_slot
+	
+	for i in range(8):
+		selected_quick_access_slot = (selected_quick_access_slot - 1 + 8) % 8
+		if quick_access_items[selected_quick_access_slot] != null:
+			print("Cycled to quick access slot ", selected_quick_access_slot)
+			return
+		if selected_quick_access_slot == start_slot:
+			break
+	
+	print("No quick access items to cycle through")
+
+func _select_quick_access_slot(slot: int):
+	"""Directly select specific quick access slot"""
+	if slot >= 0 and slot < 8:
+		selected_quick_access_slot = slot
+		print("Selected quick access slot ", slot)
+
+func _use_selected_quick_access_item():
+	"""Use item in currently selected quick access slot"""
+	_refresh_quick_access_items()
+	var stack = quick_access_items[selected_quick_access_slot]
+	if stack:
+		_execute_primary_action(stack)
+	else:
+		print("No item in quick access slot ", selected_quick_access_slot)
+
+func _refresh_quick_access_items():
+	"""Update cached quick access items array"""
+	quick_access_items.clear()
+	quick_access_items.resize(8)
+	
+	for i in range(8):
+		quick_access_items[i] = InventoryManager.get_quick_access_stack(i)
 
 func _navigate_items(direction: int):
 	if available_items.size() == 0:

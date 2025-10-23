@@ -11,7 +11,7 @@ var status_label: Label
 var description_text: RichTextLabel
 
 var current_stack: InventoryManager.ItemStack
-var input_handler: PlayerMenuInputHandler
+var input_handler: PlayerInputHandler
 
 func _ready():
 	_setup_ui_references()
@@ -29,7 +29,7 @@ func _setup_ui_references():
 func _setup_empty_state():
 	_clear_display()
 
-func set_input_handler(handler: PlayerMenuInputHandler):
+func set_input_handler(handler: PlayerInputHandler):
 	input_handler = handler
 
 func display_item(stack: InventoryManager.ItemStack):
@@ -65,8 +65,8 @@ func display_item(stack: InventoryManager.ItemStack):
 	var status_parts = []
 	if stack.is_equipped():
 		status_parts.append("Equipped (" + stack.equipped_as.replace("_", " ").capitalize() + ")")
-	if stack.is_on_hotbar():
-		status_parts.append("Hotbar Slot " + str(stack.hotbar_slot + 1))
+	if stack.is_in_quick_access():
+		status_parts.append("Quick Access Slot " + str(stack.quick_access_slot + 1))
 	if stack.is_locked:
 		status_parts.append("🔒 Locked")
 	

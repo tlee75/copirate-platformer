@@ -3,14 +3,14 @@ extends Node
 # Slot-free inventory system with ItemStack-based storage
 
 signal inventory_changed
-signal hotbar_changed  
+signal quick_access_changed  
 signal equipment_changed
 signal item_equipped(item: GameItem, slot_type: String)
 signal item_unequipped(item: GameItem, slot_type: String)
 
 # Core item storage - item stacks
 var inventory_items: Array[ItemStack] = []
-var hotbar_assignments: Array[ItemStack] = []  # Fixed size array of ItemStack references
+var quick_access_assignments: Array[ItemStack] = []  # Fixed size array of ItemStack references
 
 
 # Compatibility for old object inventory references
@@ -61,7 +61,7 @@ class ItemStack:
 	var quantity: int
 	var equipped_as: String = ""           # Which equipment slot (empty = not equipped)
 	var is_locked: bool = false            # Prevent accidental actions
-	var hotbar_slot: int = -1             # Which hotbar slot (-1 = not on hotbar)
+	var quick_access_slot: int = -1       # Which quick access slot (-1 = not in quick access)
 	var date_acquired: float = 0.0        # For sorting by recent
 	
 	func _init(game_item: GameItem, amount: int = 1):
@@ -72,8 +72,8 @@ class ItemStack:
 	func is_equipped() -> bool:
 		return equipped_as != ""
 	
-	func is_on_hotbar() -> bool:
-		return hotbar_slot != -1
+	func is_in_quick_access() -> bool:
+		return quick_access_slot != -1
 	
 	func get_display_name() -> String:
 		var name = item.name
@@ -86,10 +86,10 @@ class ItemStack:
 func _ready():
 	print("New ItemStack-based InventoryManager initialized")
 	
-	# Initialize hotbar with 8 empty slots
-	hotbar_assignments.resize(8)
+	# Initialize quick access with 8 empty slots
+	quick_access_assignments.resize(8)
 	for i in range(8):
-		hotbar_assignments[i] = null
+		quick_access_assignments[i] = null
 
 # ============================================================================
 # CORE INVENTORY OPERATIONS
@@ -143,8 +143,8 @@ func remove_items_by_name(item_name: String, amount: int = 1) -> bool:
 			
 			if remaining <= 0:
 				inventory_changed.emit()
-				if stack.is_on_hotbar():
-					hotbar_changed.emit()
+				if stack.is_in_quick_access():
+					quick_access_changed.emit()
 				return true
 	
 	if remaining > 0:
@@ -162,11 +162,11 @@ func _cleanup_depleted_stack(stack: ItemStack, index: int):
 		equipped_items[stack.equipped_as] = null
 		equipment_changed.emit()
 	
-	# Handle hotbar assignments
-	if stack.is_on_hotbar():
-		print("  Removing depleted item from hotbar slot ", stack.hotbar_slot)
-		hotbar_assignments[stack.hotbar_slot] = null
-		hotbar_changed.emit()
+	# Handle quick access assignments
+	if stack.is_in_quick_access():
+		print("  Removing depleted item from quick access slot ", stack.quick_access_slot)
+		quick_access_assignments[stack.quick_access_slot] = null
+		quick_access_changed.emit()
 	
 	# Remove from inventory
 	inventory_items.remove_at(index)
@@ -260,62 +260,62 @@ func is_item_equipped(item: GameItem) -> bool:
 	return false
 
 # ============================================================================
-# HOTBAR SYSTEM  
+# QUICK ACCESS SYSTEM  
 # ============================================================================
 
-func assign_to_hotbar(stack: ItemStack, hotbar_slot: int) -> bool:
-	if hotbar_slot < 0 or hotbar_slot >= hotbar_assignments.size():
-		print("Invalid hotbar slot: ", hotbar_slot)
+func assign_to_quick_access(stack: ItemStack, slot: int) -> bool:
+	if slot < 0 or slot >= quick_access_assignments.size():
+		print("Invalid quick access slot: ", slot)
 		return false
 	
-	# Remove from previous hotbar slot if assigned
-	if stack.is_on_hotbar():
-		hotbar_assignments[stack.hotbar_slot] = null
-		print("Removed ", stack.item.name, " from hotbar slot ", stack.hotbar_slot)
+	# Remove from previous quick access slot if assigned
+	if stack.is_in_quick_access():
+		quick_access_assignments[stack.quick_access_slot] = null
+		print("Removed ", stack.item.name, " from quick access slot ", stack.quick_access_slot)
 	
 	# Clear target slot if occupied
-	if hotbar_assignments[hotbar_slot]:
-		hotbar_assignments[hotbar_slot].hotbar_slot = -1
-		print("Cleared hotbar slot ", hotbar_slot)
+	if quick_access_assignments[slot]:
+		quick_access_assignments[slot].quick_access_slot = -1
+		print("Cleared quick access slot ", slot)
 	
 	# Assign to new slot
-	hotbar_assignments[hotbar_slot] = stack
-	stack.hotbar_slot = hotbar_slot
+	quick_access_assignments[slot] = stack
+	stack.quick_access_slot = slot
 	
-	print("Assigned ", stack.item.name, " to hotbar slot ", hotbar_slot)
-	hotbar_changed.emit()
+	print("Assigned ", stack.item.name, " to quick access slot ", slot)
+	quick_access_changed.emit()
 	return true
 
-func remove_from_hotbar(hotbar_slot: int) -> bool:
-	if hotbar_slot < 0 or hotbar_slot >= hotbar_assignments.size():
+func remove_from_quick_access(slot: int) -> bool:
+	if slot < 0 or slot >= quick_access_assignments.size():
 		return false
 	
-	var stack = hotbar_assignments[hotbar_slot]
+	var stack = quick_access_assignments[slot]
 	if stack:
-		stack.hotbar_slot = -1
-		hotbar_assignments[hotbar_slot] = null
-		print("Removed item from hotbar slot ", hotbar_slot)
-		hotbar_changed.emit()
+		stack.quick_access_slot = -1
+		quick_access_assignments[slot] = null
+		print("Removed item from quick access slot ", slot)
+		quick_access_changed.emit()
 		return true
 	
 	return false
 
-func get_hotbar_item(slot: int) -> GameItem:
-	var stack = get_hotbar_stack(slot)
+func get_quick_access_item(slot: int) -> GameItem:
+	var stack = get_quick_access_stack(slot)
 	return stack.item if stack else null
 
-func get_hotbar_stack(slot: int) -> ItemStack:
-	if slot >= 0 and slot < hotbar_assignments.size():
-		return hotbar_assignments[slot]
+func get_quick_access_stack(slot: int) -> ItemStack:
+	if slot >= 0 and slot < quick_access_assignments.size():
+		return quick_access_assignments[slot]
 	return null
 
-func quick_move_to_hotbar(stack: ItemStack) -> bool:
-	# Find first empty hotbar slot
-	for i in range(hotbar_assignments.size()):
-		if hotbar_assignments[i] == null:
-			return assign_to_hotbar(stack, i)
+func assign_to_next_quick_access_slot(stack: ItemStack) -> bool:
+	# Find first empty quick access slot
+	for i in range(quick_access_assignments.size()):
+		if quick_access_assignments[i] == null:
+			return assign_to_quick_access(stack, i)
 	
-	print("Hotbar is full")
+	print("Quick access is full")
 	return false
 
 # ============================================================================
@@ -473,14 +473,6 @@ func initialize_inventory_slots(count: int):
 	print("Backward compatibility: initialize_inventory_slots called with ", count)
 	# New system doesn't need pre-allocated slots
 
-func get_hotbar_slot(index: int):
-	# Return a compatibility object that mimics the old InventorySlotData
-	var stack = get_hotbar_stack(index)
-	if stack:
-		return CompatibilitySlotData.new(stack)
-	else:
-		return CompatibilitySlotData.new(null)
-
 func get_inventory_slot(index: int):
 	# For compatibility, treat this as getting the nth item in inventory
 	if index >= 0 and index < inventory_items.size():
@@ -520,16 +512,16 @@ func print_inventory():
 		var status = ""
 		if stack.is_equipped():
 			status += " [EQUIPPED:" + stack.equipped_as + "]"
-		if stack.is_on_hotbar():
-			status += " [HOTBAR:" + str(stack.hotbar_slot) + "]"
+		if stack.is_in_quick_access():
+			status += " [QUICK ACCESS:" + str(stack.quick_access_slot) + "]"
 		if stack.is_locked:
 			status += " [LOCKED]"
 		
 		print("  ", i, ": ", stack.item.name, " x", stack.quantity, status)
 	
-	print("=== HOTBAR ===")
-	for i in range(hotbar_assignments.size()):
-		var stack = hotbar_assignments[i]
+	print("=== QUICK ACCESS ===")
+	for i in range(quick_access_assignments.size()):
+		var stack = quick_access_assignments[i]
 		if stack:
 			print("  ", i, ": ", stack.item.name, " x", stack.quantity)
 		else:

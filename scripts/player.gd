@@ -103,7 +103,7 @@ func _physics_process(delta):
 	var tile_pos = tilemap.local_to_map(global_position)
 	
 	# Skip input handling if inventory or object menu is open
-	if PlayerMenuInputHandler.is_player_menu_open or object_menu_is_open:
+	if PlayerInputHandler.is_player_menu_open or object_menu_is_open:
 		# Still apply gravity when inventory is open
 		if not is_on_floor() and not is_underwater:
 			vel.y += gravity * delta
@@ -256,7 +256,7 @@ func _physics_process(delta):
 
 func handle_interact_or_use_action():
 	# Interact/Use Action
-	if Input.is_action_just_pressed("interact") and not PlayerMenuInputHandler.is_player_menu_open:
+	if Input.is_action_just_pressed("interact") and not PlayerInputHandler.is_player_menu_open:
 		if not is_interacting:
 			if is_interact_target():
 				is_interacting = true
@@ -270,17 +270,16 @@ func handle_interact_or_use_action():
 					$AnimatedSprite2D.frame_changed.disconnect(_on_interact_animation_finished)
 				$AnimatedSprite2D.animation_finished.connect(_on_interact_animation_finished)
 			elif not is_trigger_action:
-				print("Using hotbar item")
-				var selected_result = get_selected_hotbar_slot_and_item()
-				var selected_item = selected_result[1]
-				if selected_item:
-					if not can_use_item_in_current_environment(selected_item):
-						var item_name = selected_item.name if selected_item.has_method("get_name") else str(selected_item)
+				print("Using quick access item")
+				var selected_stack = get_selected_quick_access_item()
+				if selected_stack and selected_stack.item:
+					if not can_use_item_in_current_environment(selected_stack.item):
+						var item_name = selected_stack.item.name if selected_stack.item.has_method("get_name") else str(selected_stack.item)
 						var environment_msg = "underwater" if is_underwater else "on land"
 						print("Cannot use ", item_name, " ", environment_msg, "!")
 						return
 					tool_target = get_tool_target()
-					handle_hotbar_action(selected_result, tool_target)
+					handle_quick_access_action(selected_stack, tool_target)
 				else:
 					print("Cannot interact or use an item")
 
@@ -289,7 +288,7 @@ func handle_attack_action():
 		return # Placement manager handles input
 	
 	# Main Hand Action - left mouse button (but not when clicking on UI)
-	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_hotbar() and not is_mouse_over_combined_menu() and not is_mouse_over_inventory():
+	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_quick_access() and not is_mouse_over_combined_menu() and not is_mouse_over_inventory():
 		print("left click")
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
@@ -326,10 +325,9 @@ func handle_mainhand_action(item, target):
 	else:
 		item.attack(self, null)
 
-func handle_hotbar_action(selected_result, target):
-	var slot_data = selected_result[0]
-	var item = selected_result[1]
-	item.use(self, target, slot_data)
+func handle_quick_access_action(selected_stack, target):
+	var item = selected_stack.item
+	item.use(self, target, selected_stack)
 
 func handle_animations():
 	# Don't change animations while in the middle of an action or dead
@@ -473,7 +471,7 @@ func create_highlight_texture():
 
 func update_tile_highlights():
 	# Don't show tile highlights when inventory is open
-	if PlayerMenuInputHandler.is_player_menu_open:
+	if PlayerInputHandler.is_player_menu_open:
 		clear_tile_highlights()
 		return
 		
@@ -549,8 +547,8 @@ func _on_inventory_action_executed(action_type: InventoryActionResolver.ActionTy
 				print("Item equipped: ", stack.item.name)
 			InventoryActionResolver.ActionType.USE:
 				print("Item used: ", stack.item.name)
-			InventoryActionResolver.ActionType.QUICK_MOVE:
-				print("Item moved to hotbar: ", stack.item.name)
+			InventoryActionResolver.ActionType.QUICK_ACCESS:
+				print("Item moved to quick access: ", stack.item.name)
 
 func _on_inventory_input_mode_changed(new_mode: InventoryActionResolver.InputMethod):
 	var mode_name = ""
@@ -593,44 +591,40 @@ func is_mouse_over_combined_menu() -> bool:
 
 	return false
 
-func is_mouse_over_hotbar() -> bool:
-	# Check if mouse is over the hotbar
+func is_mouse_over_quick_access() -> bool:
+	# Check if mouse is over the quick access display
 	var ui_layer = get_parent().get_node_or_null("UI")
 	if not ui_layer:
 		return false
 	
-	var hotbar = ui_layer.get_node_or_null("Hotbar")
-	if not hotbar or not hotbar.visible:
+	var quick_access = ui_layer.get_node_or_null("QuickAccess")
+	if not quick_access or not quick_access.visible:
 		return false
 	
 	var mouse_pos = get_viewport().get_mouse_position()
-	var hotbar_rect = Rect2(hotbar.global_position, hotbar.size)
-	return hotbar_rect.has_point(mouse_pos)
+	var quick_access_rect = Rect2(quick_access.global_position, quick_access.size)
+	return quick_access_rect.has_point(mouse_pos)
 
-func get_selected_hotbar_slot_and_item():
+func get_selected_quick_access_item():
 	var ui_layer = get_parent().get_node_or_null("UI")
 	if not ui_layer:
-		return [null, null]
-	var hotbar = ui_layer.get_node_or_null("Hotbar")
-	if not hotbar:
-		return [null, null]
-	var slot_index = hotbar.selected_slot
-	var slot_data = InventoryManager.get_hotbar_slot(slot_index)
-	if slot_data and not (slot_data.item == null or slot_data.quantity <= 0):
-		return [slot_data, slot_data.item]
-	return [null, null]
+		return null
+	var quick_access = ui_layer.get_node_or_null("QuickAccess")
+	if not quick_access:
+		return null
+	return quick_access.get_selected_stack()
 
-func execute_hotbar_action_with_resolver(slot_index: int):
-	# Use the new action resolver system for hotbar actions
-	var hotbar_stack = InventoryManager.get_hotbar_stack(slot_index)
-	if hotbar_stack:
+func execute_quick_access_action_with_resolver(slot_index: int):
+	# Use the new action resolver system for quick access actions
+	var quick_access_stack = InventoryManager.get_quick_access_stack(slot_index)
+	if quick_access_stack:
 		# Find the InventoryUI's input handler
 		var inventory_ui = get_tree().get_first_node_in_group("inventory_ui")
 		if inventory_ui and inventory_ui.input_handler:
-			# Execute the primary action on the hotbar item
-			var action = inventory_ui.input_handler.action_resolver.get_action_for_input("inventory_use", hotbar_stack)
+			# Execute the primary action on the quick access item
+			var action = inventory_ui.input_handler.action_resolver.get_action_for_input("inventory_use", quick_access_stack)
 			if action:
-				return inventory_ui.input_handler.execute_action_on_stack(action.type, hotbar_stack)
+				return inventory_ui.input_handler.execute_action_on_stack(action.type, quick_access_stack)
 	return false
 
 func is_on_water_tile() -> bool:
@@ -774,10 +768,10 @@ func add_loot(item_name: String, amount: int):
 		return false
 
 func _connect_to_inventory_ui():
-	# Connect to the singleton PlayerMenuInputHandler
-	PlayerMenuInputHandler.action_executed.connect(_on_inventory_action_executed)
-	PlayerMenuInputHandler.input_mode_changed.connect(_on_inventory_input_mode_changed)
-	print("Player connected to PlayerMenuInputHandler singleton")
+	# Connect to the singleton PlayerInputHandler
+	PlayerInputHandler.action_executed.connect(_on_inventory_action_executed)
+	PlayerInputHandler.input_mode_changed.connect(_on_inventory_input_mode_changed)
+	print("Player connected to PlayerInputHandler singleton")
 
 func is_mouse_over_inventory() -> bool:
 	# Check if mouse is over the inventory UI
