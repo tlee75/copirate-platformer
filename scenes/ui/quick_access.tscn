@@ -19,9 +19,13 @@ script = ExtResource("1_3oxhw")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
+anchors_preset = -1
+anchor_left = -0.23700002
+anchor_right = 1.2650001
 anchor_bottom = 1.0
+offset_left = 0.08400726
+offset_right = 0.019958496
+offset_bottom = -1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.30588236)

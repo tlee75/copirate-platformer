@@ -40,26 +40,31 @@ func _ready():
 	_update_selection_visual()
 
 func refresh_display():
-	"""Update display based on current quick access assignments"""
-	# Clear existing buttons
-	for button in slot_buttons:
-		if button:
-			button.queue_free()
+	# Clear existing buttons and separators
+	for child in item_container.get_children():
+		child.queue_free()
 	slot_buttons.clear()
-	
+
 	# Get current quick access items
 	quick_access_items.clear()
 	quick_access_items.resize(8)
-	
+
 	for i in range(8):
 		quick_access_items[i] = InventoryManager.get_quick_access_stack(i)
-	
-	# Create buttons for all 8 slots
+
+	# Create buttons and separators
 	for i in range(8):
 		var button = _create_slot_button(i)
 		slot_buttons.append(button)
 		item_container.add_child(button)
 		_update_slot_button(button, quick_access_items[i], i)
+
+		# Add separator after each button except the last
+		if i < 7:
+			var sep = ColorRect.new()
+			sep.color = Color(0.5, 0.5, 0.5, 0.5) # semi-transparent gray
+			sep.custom_minimum_size = Vector2(2, 60) # 2px wide, match button height
+			item_container.add_child(sep)
 
 func _create_slot_button(slot_index: int) -> Button:
 	"""Create individual slot button following dynamic paradigm"""
