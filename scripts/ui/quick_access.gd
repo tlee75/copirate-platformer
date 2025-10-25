@@ -85,24 +85,24 @@ func _create_slot_button(slot_index: int) -> Button:
 	return button
 
 func _update_slot_button(button: Button, stack: InventoryManager.ItemStack, slot_index: int):
-	"""Update button appearance and content"""
 	if not button:
 		return
-	
+
 	if stack and stack.item:
-		# Show item
-		button.text = stack.item.name
+		# Show item icon instead of name
+		if "icon" in stack.item and stack.item.icon:
+			button.icon = stack.item.icon
+			button.text = ""  # Remove text
+		else:
+			button.text = stack.item.name  # Fallback if no icon
 		button.tooltip_text = stack.item.name + " x" + str(stack.quantity)
-		
-		# TODO: Set item icon when available
-		# button.icon = stack.item.icon
-		
 		button.modulate = Color.WHITE
 	else:
 		# Empty slot
-		button.text = str(slot_index + 1)  # Show slot number
+		button.text = str(slot_index + 1)
+		button.icon = null
 		button.tooltip_text = "Quick Access Slot " + str(slot_index + 1)
-		button.modulate = Color(0.5, 0.5, 0.5, 0.7)  # Dimmed
+		button.modulate = Color(0.5, 0.5, 0.5, 0.7)
 
 func set_selected_slot(slot_index: int):
 	"""Update visual selection indicator"""

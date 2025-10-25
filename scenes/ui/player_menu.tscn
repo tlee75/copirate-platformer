@@ -13,9 +13,10 @@
 
 [node name="PlayerMenu" type="Control"]
 layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 0.85200006
-offset_bottom = -0.0960083
+anchor_bottom = 1.0
+offset_bottom = -71.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -26,7 +27,7 @@ script = ExtResource("1_bsps8")
 [node name="Background" type="ColorRect" parent="."]
 self_modulate = Color(0.09803922, 0.09803922, 0.09803922, 0.9019608)
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -38,18 +39,18 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_bottom = 4.0
 grow_horizontal = 2
 grow_vertical = 2
-current_tab = 2
+current_tab = 0
 
 [node name="Inventory" type="VBoxContainer" parent="TabContainer"]
-visible = false
 layout_mode = 2
 theme_override_constants/separation = 15
 metadata/_tab_index = 0
 
 [node name="HeaderSection" type="Control" parent="TabContainer/Inventory"]
-custom_minimum_size = Vector2(0, 80)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_filter = 1
@@ -70,9 +71,8 @@ layout_mode = 2
 script = ExtResource("6_erru2")
 
 [node name="FooterSection" type="Control" parent="TabContainer/Inventory"]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
-size_flags_vertical = 0
 mouse_filter = 1
 
 [node name="InventoryActionPanel" parent="TabContainer/Inventory/FooterSection" instance=ExtResource("4_xk7lq")]
@@ -146,6 +146,7 @@ layout_mode = 2
 text = "Craft"
 
 [node name="Equipment" type="VBoxContainer" parent="TabContainer"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 

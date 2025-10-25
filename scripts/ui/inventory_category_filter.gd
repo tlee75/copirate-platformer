@@ -12,21 +12,8 @@ var left_arrow: Button
 var right_arrow: Button
 
 func _ready():
-	_setup_ui_references()
-	_setup_navigation_arrows()
+	category_container = $CategoryContainer
 	refresh_categories()
-
-func _setup_ui_references():
-	scroll_container = $ScrollContainer
-	category_container = $ScrollContainer/CategoryContainer
-	left_arrow = $LeftArrow
-	right_arrow = $RightArrow
-
-func _setup_navigation_arrows():
-	left_arrow.text = "◀"
-	right_arrow.text = "▶"
-	left_arrow.pressed.connect(_scroll_left)
-	right_arrow.pressed.connect(_scroll_right)
 
 func refresh_categories():
 	# Clear existing buttons
@@ -49,20 +36,29 @@ func _create_category_button(category: String):
 	var button = Button.new()
 	button.text = _get_category_display_name(category)
 	button.toggle_mode = true
-	button.button_group = _get_or_create_button_group()
 	button.custom_minimum_size = Vector2(120, 40)
-	
-	# Style the button
-	button.add_theme_stylebox_override("normal", _create_category_button_style(false))
-	button.add_theme_stylebox_override("pressed", _create_category_button_style(true))
-	button.add_theme_stylebox_override("hover", _create_category_button_style(false, true))
-	
-	# Connect signals
 	button.pressed.connect(_on_category_button_pressed.bind(category))
-	
-	# Add to container and track
 	category_container.add_child(button)
 	category_buttons[category] = button
+
+#func _create_category_button(category: String):
+	#var button = Button.new()
+	#button.text = _get_category_display_name(category)
+	#button.toggle_mode = true
+	#button.button_group = _get_or_create_button_group()
+	#button.custom_minimum_size = Vector2(120, 40)
+	#
+	## Style the button
+	#button.add_theme_stylebox_override("normal", _create_category_button_style(false))
+	#button.add_theme_stylebox_override("pressed", _create_category_button_style(true))
+	#button.add_theme_stylebox_override("hover", _create_category_button_style(false, true))
+	#
+	## Connect signals
+	#button.pressed.connect(_on_category_button_pressed.bind(category))
+	#
+	## Add to container and track
+	#category_container.add_child(button)
+	#category_buttons[category] = button
 
 func _get_category_display_name(category: String) -> String:
 	var display_names = {
