@@ -4,7 +4,7 @@ class_name InventoryItemList
 
 signal item_selected(stack: InventoryManager.ItemStack)
 signal item_action_requested(stack: InventoryManager.ItemStack, action_type: InventoryActionResolver.ActionType)
-signal items_refreshed
+signal item_buttons_created
 
 var scroll_container: ScrollContainer
 var item_container: VBoxContainer

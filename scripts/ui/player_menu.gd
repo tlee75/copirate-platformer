@@ -197,7 +197,7 @@ func open_player_menu():
 	#if player and player.has_method("_on_inventory_state_changed"):
 		#player._on_inventory_state_changed(true)
 
-	## Refresh inventory categories
+	# Refresh inventory categories
 	if category_filter and category_filter.has_method("refresh_categories"):
 		category_filter.refresh_categories()
 	
