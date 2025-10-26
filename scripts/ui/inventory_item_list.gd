@@ -153,3 +153,6 @@ func debug_button_info():
 			print("  Position: ", btn.position)
 			print("  Visible: ", btn.visible)
 			print("  Disabled: ", btn.disabled)
+
+func get_items():
+	return current_items

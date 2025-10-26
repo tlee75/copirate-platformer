@@ -5,7 +5,7 @@ class_name PlayerMenu
 var equipment_category_filter
 var equipment_body_display  
 var equipment_item_list
-var equipment_item_detail
+var equipment_item_detail: InventoryItemDetail
 var equipment_action_panel
 
 var tab_container
@@ -13,7 +13,7 @@ var inventory_tab
 var crafting_tab
 var equipment_tab
 var category_filter
-var item_list
+var item_list: InventoryItemList
 var item_detail
 var action_panel
 var input_handler
@@ -32,6 +32,23 @@ func _ready():
 	# Add some test equipment items for testing
 	if InventoryManager:
 		InventoryManager.debug_add_test_items()
+
+
+func _on_tab_changed(tab_index: int):
+	print("Tab changed to index: ", tab_index)
+	var tab = get_current_tab()
+	if tab == "inventory":
+		if category_filter and category_filter.has_method("refresh_categories"):
+			category_filter.refresh_categories()
+		_refresh_current_view()
+		await get_tree().process_frame
+		_auto_select_first_item()
+	elif tab == "equipment":
+		_on_equipment_category_selected("all")
+		# Optionally, auto-select first equipment item here if needed
+	elif tab == "crafting":
+		# Add crafting refresh logic here if needed
+		pass
 
 #func _input(event):
 	#print("DEBUG: InventoryUI._input called, event: ", event.get_class(), ", is_open: ", is_open)
@@ -149,6 +166,9 @@ func _connect_signals():
 	InventoryManager.equipment_changed.connect(_refresh_current_view)
 	InventoryManager.quick_access_changed.connect(_refresh_current_view)
 
+	# Watch for tab changes
+	tab_container.tab_changed.connect(_on_tab_changed)
+
 func _initialize_ui():
 	print("DEBUG: InventoryUI._initialize_ui() called")
 	visible = false
@@ -177,21 +197,9 @@ func open_player_menu():
 	
 	# Update input handler
 	input_handler.set_player_menu_open(true)
-	
-	# Refresh all content
-	if category_filter and category_filter.has_method("refresh_categories"):
-		category_filter.refresh_categories()
-	_refresh_current_view()
-
-	# Also refresh equipment tab if it's the current tab
-	if get_current_tab() == "equipment":
-		_on_equipment_category_selected("all")
-
-	# Auto-select first item after refreshing
-	await get_tree().process_frame  # Wait for UI to update
-	_auto_select_first_item()
-
 		
+	tab_container.current_tab = tab_container.current_tab
+
 	print("Player Menu opened - Default tab: ", get_current_tab())
 
 func close_player_menu():
@@ -389,46 +397,40 @@ func handle_object_interaction() -> bool:
 
 func get_currently_selected_item():
 	# Get the currently selected item from the item list
-	var item_list = $MainLayout/ContentSection/InventoryItemList
 	if item_list and item_list.has_method("get_selected_item"):
 		return item_list.get_selected_item()
 	return null
 
 func _auto_select_first_item():
-	"""Automatically select the first item in the current category"""
 	print("DEBUG: _auto_select_first_item() called for category: ", current_category)
-	var items = InventoryManager.get_items_by_category(current_category)
-	
-	if items.size() > 0:
-		var first_item = items[0]
-		print("DEBUG: Auto-selecting first item: ", first_item.item.name)
-		
-		# Set the selection in the item list
-		if item_list and item_list.has_method("set_selected_index"):
+	if item_list and item_list.has_method("get_items"):
+		var items = item_list.get_items()  # Use the already-populated item list
+		if items.size() > 0:
+			var first_item = items[0]
+			print("DEBUG: Auto-selecting first item: ", first_item.item.name)
 			item_list.set_selected_index(0)
-		
-		# Directly update the details (bypass signal system)
-		_on_item_selected(first_item)
+			_on_item_selected(first_item)
+		else:
+			print("DEBUG: No items to auto-select in category: ", current_category)
+			if item_detail:
+				item_detail.display_item(null)
 	else:
-		print("DEBUG: No items to auto-select in category: ", current_category)
-		# Clear details when no items
-		if item_detail:
-			item_detail.display_item(null)
+		print("DEBUG: item_list does not have get_items()")
 
-# Tab management methods
-func switch_to_tab(tab_name: String):
-	if not tab_container:
-		return
-	
-	match tab_name.to_lower():
-		"inventory":
-			tab_container.current_tab = 0
-		"crafting":
-			tab_container.current_tab = 1
-		"equipment":
-			tab_container.current_tab = 2
-		_:
-			print("Unknown tab: ", tab_name)
+## Tab management methods
+#func switch_to_tab(tab_name: String):
+	#if not tab_container:
+		#return
+	#
+	#match tab_name.to_lower():
+		#"inventory":
+			#tab_container.current_tab = 0
+		#"crafting":
+			#tab_container.current_tab = 1
+		#"equipment":
+			#tab_container.current_tab = 2
+		#_:
+			#print("Unknown tab: ", tab_name)
 
 func get_current_tab() -> String:
 	if not tab_container:
@@ -444,10 +446,10 @@ func get_current_tab() -> String:
 		_:
 			return "inventory"
 
-func get_current_tab_index() -> int:
-	if not tab_container:
-		return 0
-	return tab_container.current_tab
+#func get_current_tab_index() -> int:
+	#if not tab_container:
+		#return 0
+	#return tab_container.current_tab
 	
 # Equipment tab event handlers
 func _on_equipment_category_selected(category: String):
