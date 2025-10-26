@@ -15,8 +15,7 @@ enum ActionType {
 	EQUIP,         # Force equip/unequip
 	QUICK_ACCESS,  # Add to quick access
 	DROP,          # Drop item in world
-	LOCK,          # Lock/unlock item
-	INSPECT        # Show item details
+	LOCK           # Lock/unlock item
 }
 
 # Action metadata for UI display
@@ -67,9 +66,6 @@ func get_available_actions(stack: InventoryManager.ItemStack) -> Array[ActionDat
 	else:
 		actions.append(ActionData.new(ActionType.LOCK, "Lock", "L/R3"))
 
-	# Inspect
-	actions.append(ActionData.new(ActionType.INSPECT, "Inspect", "Hold"))
-
 	return actions
 	
 # Execute an action on an ItemStack
@@ -100,9 +96,6 @@ func execute_action(action_type: ActionType, stack: InventoryManager.ItemStack, 
 		
 		ActionType.LOCK:
 			return _execute_lock_action(stack)
-		
-		ActionType.INSPECT:
-			return _execute_inspect_action(stack)
 		
 		_:
 			print("Unknown action type: ", action_type)
@@ -175,17 +168,6 @@ func _execute_drop_action(stack: InventoryManager.ItemStack) -> bool:
 
 func _execute_lock_action(stack: InventoryManager.ItemStack) -> bool:
 	return InventoryManager.toggle_lock_item_stack(stack)
-
-func _execute_inspect_action(stack: InventoryManager.ItemStack) -> bool:
-	# TODO: Show item details panel
-	print("Inspecting: ", stack.item.name)
-	print("  Category: ", stack.item.category)
-	print("  Quantity: ", stack.quantity)
-	print("  Stack Size: ", stack.item.stack_size)
-	print("  Equipped: ", stack.is_equipped())
-	print("  In Quick Access: ", stack.is_in_quick_access())
-	print("  Locked: ", stack.is_locked)
-	return true
 
 # Helper functions
 func _is_equipable_item(item: GameItem) -> bool:

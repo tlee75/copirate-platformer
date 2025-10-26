@@ -763,9 +763,21 @@ func add_loot(item_name: String, amount: int):
 	# Implement inventory logic
 	var game_item = GameObjectsDatabase.game_objects_database[item_name]
 	if InventoryManager.add_item(game_item, amount):
+		# Find the stack for this item
+		var stack = InventoryManager.find_item_stack(game_item.name)
+		if stack and not stack.is_in_quick_access():
+			InventoryManager.assign_to_next_quick_access_slot(stack)
 		return true
 	else:
 		return false
+
+#func add_loot(item_name: String, amount: int):
+	## Implement inventory logic
+	#var game_item = GameObjectsDatabase.game_objects_database[item_name]
+	#if InventoryManager.add_item(game_item, amount):
+		#return true
+	#else:
+		#return false
 
 func _connect_to_inventory_ui():
 	# Connect to the singleton PlayerInputHandler

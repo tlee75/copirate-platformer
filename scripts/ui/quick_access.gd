@@ -82,6 +82,16 @@ func _create_slot_button(slot_index: int) -> Button:
 	button.mouse_entered.connect(_on_slot_button_hover_enter.bind(slot_index))
 	button.mouse_exited.connect(_on_slot_button_hover_exit.bind(slot_index))
 	
+	var quantity_label = Label.new()
+	quantity_label.name = "QuantityLabel"
+	quantity_label.anchor_right = 1.0
+	quantity_label.anchor_bottom = 1.0
+	quantity_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	quantity_label.offset_left = -20 # Negative to move left from the right edge
+	quantity_label.offset_bottom = 0
+	quantity_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	button.add_child(quantity_label)
+	
 	return button
 
 func _update_slot_button(button: Button, stack: InventoryManager.ItemStack, slot_index: int):
@@ -104,17 +114,24 @@ func _update_slot_button(button: Button, stack: InventoryManager.ItemStack, slot
 					img.resize(new_w, new_h, Image.INTERPOLATE_LANCZOS)
 					icon_texture = ImageTexture.create_from_image(img)
 			button.icon = icon_texture
-			button.text = ""
+			button.text = "" 
 		else:
-			button.text = stack.item.name
-		button.tooltip_text = stack.item.name + " x" + str(stack.quantity)
-		button.modulate = Color.WHITE
+			button.text = ""
 	else:
 		# Empty slot
 		button.text = str(slot_index + 1)
 		button.icon = null
 		button.tooltip_text = "Quick Access Slot " + str(slot_index + 1)
 		button.modulate = Color(0.5, 0.5, 0.5, 0.7)
+
+	var quantity_label = button.get_node_or_null("QuantityLabel")
+	if quantity_label:
+		if stack and stack.item and stack.quantity > 1:
+			quantity_label.text = str(stack.quantity)
+			quantity_label.visible = true
+		else:
+			quantity_label.text = ""
+			quantity_label.visible = false
 
 func set_selected_slot(slot_index: int):
 	"""Update visual selection indicator"""
@@ -200,7 +217,6 @@ func _input(event):
 			get_viewport().set_input_as_handled()
 
 func _cycle_selection(direction: int):
-	print("cycle selection: ", direction)
 	var slot = selected_slot + direction
 
 	# Clamp to bounds
@@ -210,9 +226,3 @@ func _cycle_selection(direction: int):
 		slot = 7
 
 	set_selected_slot(slot)
-
-# Sync with PlayerInputHandler selection
-func sync_with_input_handler():
-	"""Sync selection with PlayerInputHandler"""
-	if PlayerInputHandler:
-		set_selected_slot(PlayerInputHandler.selected_quick_access_slot)
