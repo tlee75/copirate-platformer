@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bcbmqwa8ofwfq"]
+[gd_scene load_steps=16 format=3 uid="uid://bcbmqwa8ofwfq"]
 
 [ext_resource type="Script" uid="uid://bb2w6ivxttklu" path="res://scripts/ui/player_menu.gd" id="1_bsps8"]
 [ext_resource type="PackedScene" uid="uid://b8kgpkram46gn" path="res://scenes/ui/inventory_category_filter.tscn" id="1_nuief"]
@@ -9,7 +9,12 @@
 [ext_resource type="Script" uid="uid://btqfh7m2e4t0y" path="res://scripts/ui/inventory_item_detail.gd" id="6_erru2"]
 [ext_resource type="Script" uid="uid://co3v5kj4nyi1e" path="res://scripts/ui/inventory_action_panel.gd" id="8_7csag"]
 [ext_resource type="Script" uid="uid://b7gvqddq1nljk" path="res://scripts/ui/equipment_category_filter.gd" id="9_k8kjs"]
+[ext_resource type="Script" uid="uid://b3d8gi15t3w4n" path="res://scripts/ui/crafting_category_filter.gd" id="9_qxx8k"]
 [ext_resource type="Script" uid="uid://byh45c2rd0ahx" path="res://scripts/ui/equipment_body_display.gd" id="10_t0p05"]
+[ext_resource type="Script" uid="uid://bbte5qevypmem" path="res://scripts/ui/crafting_item_detail.gd" id="12_2drhy"]
+[ext_resource type="Script" uid="uid://cjwx4eefpedoh" path="res://scripts/ui/building_category_filter.gd" id="12_8rsko"]
+[ext_resource type="Script" uid="uid://c666a3ith77qq" path="res://scripts/ui/crafting_action_panel.gd" id="12_g7xmk"]
+[ext_resource type="Script" uid="uid://cu72nxdts8spt" path="res://scripts/ui/building_action_panel.gd" id="12_w17s6"]
 
 [node name="PlayerMenu" type="Control"]
 layout_mode = 3
@@ -79,76 +84,10 @@ mouse_filter = 1
 layout_mode = 1
 script = ExtResource("8_7csag")
 
-[node name="Crafting" type="Control" parent="TabContainer"]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/Crafting"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 13.0
-offset_top = 9.0
-offset_right = -11.0
-offset_bottom = -9.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Crafting/HBoxContainer"]
-layout_mode = 2
-
-[node name="ToolsButton" type="Button" parent="TabContainer/Crafting/HBoxContainer/VBoxContainer"]
-layout_mode = 2
-text = "Tools"
-
-[node name="WeaponsButton" type="Button" parent="TabContainer/Crafting/HBoxContainer/VBoxContainer"]
-layout_mode = 2
-text = "Weapons"
-
-[node name="StructuresButton" type="Button" parent="TabContainer/Crafting/HBoxContainer/VBoxContainer"]
-layout_mode = 2
-text = "Structures"
-
-[node name="ConsumablesButton" type="Button" parent="TabContainer/Crafting/HBoxContainer/VBoxContainer"]
-layout_mode = 2
-text = "Consumables"
-
-[node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/Crafting/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Crafting/HBoxContainer/ScrollContainer"]
-layout_mode = 2
-
-[node name="CraftDetailsPanel" type="Panel" parent="TabContainer/Crafting/HBoxContainer"]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Crafting/HBoxContainer/CraftDetailsPanel"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="ItemImage" type="TextureRect" parent="TabContainer/Crafting/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
-layout_mode = 2
-
-[node name="ItemNameLabel" type="Label" parent="TabContainer/Crafting/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
-layout_mode = 2
-
-[node name="RequirementsList" type="VBoxContainer" parent="TabContainer/Crafting/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
-layout_mode = 2
-
-[node name="CraftButton" type="Button" parent="TabContainer/Crafting/HBoxContainer/CraftDetailsPanel/VBoxContainer"]
-layout_mode = 2
-text = "Craft"
-
 [node name="Equipment" type="VBoxContainer" parent="TabContainer"]
 visible = false
 layout_mode = 2
-metadata/_tab_index = 2
+metadata/_tab_index = 1
 
 [node name="HeaderSection" type="Control" parent="TabContainer/Equipment"]
 custom_minimum_size = Vector2(0, 40)
@@ -210,3 +149,117 @@ layout_mode = 2
 [node name="EquipmentActionPanel" parent="TabContainer/Equipment/FooterSection" instance=ExtResource("4_xk7lq")]
 layout_mode = 1
 script = ExtResource("8_7csag")
+
+[node name="Crafting" type="VBoxContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="HeaderSection" type="Control" parent="TabContainer/Crafting"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="CraftingCategoryFilter" type="Control" parent="TabContainer/Crafting/HeaderSection"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_qxx8k")
+
+[node name="Background" type="ColorRect" parent="TabContainer/Crafting/HeaderSection/CraftingCategoryFilter"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 616.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CategoryContainer" type="HBoxContainer" parent="TabContainer/Crafting/HeaderSection/CraftingCategoryFilter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Crafting"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CraftingItemList" parent="TabContainer/Crafting/ContentSection" instance=ExtResource("2_bsps8")]
+layout_mode = 2
+script = ExtResource("4_hbcvs")
+
+[node name="CraftingItemDetail" parent="TabContainer/Crafting/ContentSection" instance=ExtResource("3_ldtye")]
+layout_mode = 2
+script = ExtResource("12_2drhy")
+
+[node name="FooterSection" type="Control" parent="TabContainer/Crafting"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+
+[node name="CraftingActionPanel" parent="TabContainer/Crafting/FooterSection" instance=ExtResource("4_xk7lq")]
+layout_mode = 1
+script = ExtResource("12_g7xmk")
+
+[node name="Building" type="VBoxContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="HeaderSection" type="Control" parent="TabContainer/Building"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="BuildingCategoryFilter" type="Control" parent="TabContainer/Building/HeaderSection"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("12_8rsko")
+
+[node name="Background" type="ColorRect" parent="TabContainer/Building/HeaderSection/BuildingCategoryFilter"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 616.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CategoryContainer" type="HBoxContainer" parent="TabContainer/Building/HeaderSection/BuildingCategoryFilter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Building"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BuildingItemList" parent="TabContainer/Building/ContentSection" instance=ExtResource("2_bsps8")]
+layout_mode = 2
+script = ExtResource("4_hbcvs")
+
+[node name="BuildingItemDetail" parent="TabContainer/Building/ContentSection" instance=ExtResource("3_ldtye")]
+layout_mode = 2
+script = ExtResource("6_erru2")
+
+[node name="FooterSection" type="Control" parent="TabContainer/Building"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+
+[node name="BuildingActionPanel" parent="TabContainer/Building/FooterSection" instance=ExtResource("4_xk7lq")]
+layout_mode = 1
+script = ExtResource("12_w17s6")

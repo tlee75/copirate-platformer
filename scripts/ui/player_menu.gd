@@ -1,6 +1,19 @@
 extends Control
 class_name PlayerMenu
 
+# Crafting tab components
+var crafting_category_filter
+var crafting_item_list
+var crafting_item_detail
+var crafting_action_panel
+
+# Building tab components
+var building_tab
+var building_category_filter
+var building_item_list
+var building_item_detail
+var building_action_panel
+
 # Equipment tab components
 var equipment_category_filter
 var equipment_body_display  
@@ -45,50 +58,10 @@ func _on_tab_changed(tab_index: int):
 		_auto_select_first_item()
 	elif tab == "equipment":
 		_on_equipment_category_selected("all")
-		# Optionally, auto-select first equipment item here if needed
 	elif tab == "crafting":
-		# Add crafting refresh logic here if needed
-		pass
-
-#func _input(event):
-	#print("DEBUG: InventoryUI._input called, event: ", event.get_class(), ", is_open: ", is_open)
-	#
-	#if not is_open:
-		## Handle TAB to open
-		#if event.is_action_pressed("inventory_toggle"):
-			#print("DEBUG: TAB detected, opening inventory")
-			#var player = get_tree().get_first_node_in_group("player")
-			#if player:
-				#print("DEBUG: Player found, on_floor: ", player.is_on_floor())
-				#if player.is_on_floor() or player.is_underwater():
-					#print("DEBUG: Calling open_inventory()")
-					#open_inventory()
-				#else:
-					#print("DEBUG: Player not on floor or underwater")
-			#else:
-				#print("DEBUG: No player found")
-			#get_viewport().set_input_as_handled()
-		#return
-	#else:
-		#print("is_open: ", is_open)
-	#
-	## Inventory is open - handle close and scrolling
-	#if event.is_action_pressed("inventory_toggle"):
-		#print("DEBUG: TAB detected, closing inventory")
-		#close_inventory()
-		#get_viewport().set_input_as_handled()
-		#return
-	#
-	## Mouse wheel scrolling
-	#if event is InputEventMouseButton and event.pressed:
-		#if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			#if item_list and item_list.has_method("scroll_up"):
-				#item_list.scroll_up()
-			#get_viewport().set_input_as_handled()
-		#elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			#if item_list and item_list.has_method("scroll_down"):
-				#item_list.scroll_down()
-			#get_viewport().set_input_as_handled()
+		_on_crafting_category_selected("all")
+	elif tab == "building":
+		_on_building_category_selected("all")
 
 func _setup_ui_references():
 	tab_container = $TabContainer
@@ -101,6 +74,18 @@ func _setup_ui_references():
 	item_list = $TabContainer/Inventory/ContentSection/InventoryItemList
 	item_detail = $TabContainer/Inventory/ContentSection/InventoryItemDetail
 	action_panel = $TabContainer/Inventory/FooterSection/InventoryActionPanel
+	
+	# Crafting tab components
+	crafting_category_filter = $TabContainer/Crafting/HeaderSection/CraftingCategoryFilter
+	crafting_item_list = $TabContainer/Crafting/ContentSection/CraftingItemList
+	crafting_item_detail = $TabContainer/Crafting/ContentSection/CraftingItemDetail
+	crafting_action_panel = $TabContainer/Crafting/FooterSection/CraftingActionPanel
+	
+	# Building tab components - Add these lines
+	building_category_filter = $TabContainer/Building/HeaderSection/BuildingCategoryFilter
+	building_item_list = $TabContainer/Building/ContentSection/BuildingItemList
+	building_item_detail = $TabContainer/Building/ContentSection/BuildingItemDetail
+	building_action_panel = $TabContainer/Building/FooterSection/BuildingActionPanel
 	
 	# Set up equipment tab components - ADD THESE LINES
 	equipment_category_filter = $TabContainer/Equipment/HeaderSection/EquipmentCategoryFilter
@@ -142,6 +127,12 @@ func _connect_signals():
 	if item_list and item_list.has_signal("item_buttons_created"):
 		item_list.item_buttons_created.connect(_auto_select_first_item)
 
+	# Crafting tab signals
+	if crafting_category_filter:
+		crafting_category_filter.category_selected.connect(_on_crafting_category_selected)
+	if crafting_item_list:
+		crafting_item_list.item_selected.connect(_on_crafting_item_selected)
+		
 	# Equipment tab signals
 	if equipment_category_filter:
 		equipment_category_filter.category_selected.connect(_on_equipment_category_selected)
@@ -154,6 +145,14 @@ func _connect_signals():
 	
 	if equipment_action_panel:
 		equipment_action_panel.action_requested.connect(_on_equipment_action_requested)	
+
+	# Building tab signals
+	if building_category_filter:
+		building_category_filter.category_selected.connect(_on_building_category_selected)
+	if building_item_list:
+		building_item_list.item_selected.connect(_on_building_item_selected)
+	if building_action_panel:
+		building_action_panel.action_requested.connect(_on_building_action_requested)
 
 	# Action panel signals
 	if action_panel and action_panel.has_signal("action_requested"):
@@ -191,11 +190,6 @@ func open_player_menu():
 	
 	is_open = true
 	visible = true
-	
-	## Notify player correctly (TRUE when opening)
-	#var player = get_tree().get_first_node_in_group("player")
-	#if player and player.has_method("_on_inventory_state_changed"):
-		#player._on_inventory_state_changed(true)
 
 	# Refresh inventory categories
 	if category_filter and category_filter.has_method("refresh_categories"):
@@ -214,11 +208,6 @@ func close_player_menu():
 	
 	is_open = false
 	visible = false
-	
-	# Notify player that player menu closed
-	#var player = get_tree().get_first_node_in_group("player")
-	#if player and player.has_method("_on_inventory_state_changed"):
-		#player._on_inventory_state_changed(false)  # FALSE when closing
 	
 	# Update input handler
 	input_handler.set_player_menu_open(false)
@@ -451,9 +440,11 @@ func get_current_tab() -> String:
 		0:
 			return "inventory"
 		1:
-			return "crafting"
-		2:
 			return "equipment"
+		2:
+			return "crafting"
+		3:
+			return "building"
 		_:
 			return "inventory"
 
@@ -507,3 +498,76 @@ func _on_equipment_action_requested(action_type: InventoryActionResolver.ActionT
 func _on_equipment_changed():
 	if get_current_tab() == "equipment":
 		_on_equipment_category_selected("all")
+
+func get_craftable_items_by_category(category: String) -> Array[InventoryManager.ItemStack]:
+	var craftable_items: Array[InventoryManager.ItemStack] = []
+	for item_key in GameObjectsDatabase.game_objects_database:
+		var item = GameObjectsDatabase.game_objects_database[item_key]
+		# Only include GameItems, exclude GameStructures
+		if item is GameItem and item.craftable:
+			if category == "all" or item.category == category:
+				var temp_stack = InventoryManager.ItemStack.new(item, 1)
+				craftable_items.append(temp_stack)
+	return craftable_items
+
+func _on_crafting_category_selected(category: String):
+	print("Crafting category selected: ", category)
+	
+	# Get filtered craftable items
+	var craftable_items = get_craftable_items_by_category(category)
+	
+	# Update crafting item list
+	var crafting_item_list = $TabContainer/Crafting/ContentSection/CraftingItemList
+	if crafting_item_list and crafting_item_list.has_method("refresh_items"):
+		crafting_item_list.refresh_items(craftable_items)
+		print("Updated crafting list with ", craftable_items.size(), " items")
+	
+	# Auto-select first craftable item
+	await get_tree().process_frame
+	if craftable_items.size() > 0:
+		var first_item = craftable_items[0]
+		if crafting_item_list and crafting_item_list.has_method("set_selected_index"):
+			crafting_item_list.set_selected_index(0)
+		_on_crafting_item_selected(first_item)
+
+func _on_crafting_item_selected(stack: InventoryManager.ItemStack):
+	print("Crafting item selected: ", stack.item.name)
+	# Update crafting item detail panel
+	var crafting_item_detail = $TabContainer/Crafting/ContentSection/CraftingItemDetail
+	if crafting_item_detail:
+		crafting_item_detail.display_item(stack)
+	
+	# Update crafting action panel (if you want craft buttons)
+	var crafting_action_panel = $TabContainer/Crafting/FooterSection/CraftingActionPanel
+	if crafting_action_panel:
+		crafting_action_panel.display_actions_for_item(stack, {"crafting_mode": true})
+
+func _on_building_category_selected(category: String):
+	print("Building category selected: ", category)
+	
+	var buildable_structures = BuildingManager.get_buildable_structures_by_category(category)
+	
+	if building_item_list and building_item_list.has_method("refresh_structures"):
+		building_item_list.refresh_structures(buildable_structures)
+		print("Updated building list with ", buildable_structures.size(), " structures")
+	
+	# Auto-select first structure
+	await get_tree().process_frame
+	if buildable_structures.size() > 0:
+		var first_structure = buildable_structures[0]
+		if building_item_list and building_item_list.has_method("set_selected_index"):
+			building_item_list.set_selected_index(0)
+		_on_building_item_selected(first_structure)
+
+func _on_building_item_selected(structure: GameStructure):
+	print("Building item selected: ", structure.name)
+	
+	if building_item_detail:
+		building_item_detail.display_structure(structure)
+	
+	if building_action_panel:
+		building_action_panel.display_build_action(structure)
+
+func _on_building_action_requested(structure):
+	BuildingManager.start_building(structure)
+	close_player_menu()

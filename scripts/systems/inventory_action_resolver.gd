@@ -15,7 +15,8 @@ enum ActionType {
 	EQUIP,         # Force equip/unequip
 	QUICK_ACCESS,  # Add to quick access
 	DROP,          # Drop item in world
-	LOCK           # Lock/unlock item
+	LOCK,          # Lock/unlock item
+	CRAFT
 }
 
 # Action metadata for UI display
@@ -97,6 +98,8 @@ func execute_action(action_type: ActionType, stack: InventoryManager.ItemStack, 
 		ActionType.LOCK:
 			return _execute_lock_action(stack)
 		
+		ActionType.CRAFT:
+			return _execute_craft_action(stack)
 		_:
 			print("Unknown action type: ", action_type)
 			return false
@@ -168,6 +171,9 @@ func _execute_drop_action(stack: InventoryManager.ItemStack) -> bool:
 
 func _execute_lock_action(stack: InventoryManager.ItemStack) -> bool:
 	return InventoryManager.toggle_lock_item_stack(stack)
+
+func _execute_craft_action(stack: InventoryManager.ItemStack) -> bool:
+	return CraftingManager.craft_item(stack.item)
 
 # Helper functions
 func _is_equipable_item(item: GameItem) -> bool:

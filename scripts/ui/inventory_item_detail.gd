@@ -32,52 +32,84 @@ func set_input_handler(handler: PlayerInputHandler):
 	input_handler = handler
 
 func display_item(stack: InventoryManager.ItemStack):
-	print("DEBUG: InventoryItemDetail.display_item called for: ", stack.item.name if stack else "null")
-	current_stack = stack
-	
-	if not stack:
-		_clear_display()
-		return
-	
 	if not stack or not stack.item:
-		_clear_display()
+		clear_display()
 		return
 	
-	var item = stack.item
+	display_item_or_structure(stack, false)
+
+func display_structure(structure):
+	# Use the existing display_item method but adapt for structures
+	# Create a temporary wrapper to make structure compatible
+	var temp_wrapper = StructureWrapper.new(structure)
+	display_item_or_structure(temp_wrapper, true)
+
+func display_item_or_structure(object, is_structure: bool = false):
+	clear_display()
 	
-	# Set item name and category
-	item_name.text = item.name
-	item_category.text = item.category.capitalize()
+	var display_obj = object
+	if object is InventoryManager.ItemStack:
+		display_obj = object.item
 	
-	# Set item icon (placeholder for now)
-	# TODO: item_icon.texture = item.icon when icons are available
+	# Basic info
+	$MainContainer/ItemHeader/IconNameContainer/ItemIcon.texture = display_obj.icon
+	$MainContainer/ItemHeader/IconNameContainer/NameContainer/ItemName.text = display_obj.name
+	$MainContainer/ItemHeader/IconNameContainer/NameContainer/ItemCategory.text = display_obj.category
 	
-	# Set quantity and stack info
-	quantity_label.text = "Quantity: " + str(stack.quantity)
-	if item.stack_size > 1:
-		stack_size_label.text = "Stack Size: " + str(stack.quantity) + "/" + str(item.stack_size)
-		stack_size_label.visible = true
+	if is_structure:
+		display_structure_stats(display_obj)
+		display_craft_requirements(display_obj)
 	else:
-		stack_size_label.visible = false
+		display_item_stats(object)
+		# ADD THIS: Check if item is craftable and show requirements
+		if display_obj.craftable and display_obj.craft_requirements.size() > 0:
+			display_craft_requirements(display_obj)
 	
-	# Set status information
-	var status_parts = []
-	if stack.is_equipped():
-		status_parts.append("Equipped (" + stack.equipped_as.replace("_", " ").capitalize() + ")")
-	if stack.is_in_quick_access():
-		status_parts.append("Quick Access Slot " + str(stack.quick_access_slot + 1))
-	if stack.is_locked:
-		status_parts.append("🔒 Locked")
+	visible = true
+
+func display_structure_stats(structure):
+	# If structure is a wrapper, get the real structure
+	var real_structure = structure
+	if structure is StructureWrapper:
+		real_structure = structure.structure
+
+	var can_build = BuildingManager.can_build_structure(real_structure) if BuildingManager else false
+	var status_text = "Ready to Build" if can_build else "Missing Materials"
+	$MainContainer/StatsContainer/StatusLabel.text = status_text
+	$MainContainer/StatsContainer/StatusLabel.visible = true
+
+func display_craft_requirements(item_or_structure):
+	var desc_text = ""
 	
-	if status_parts.size() > 0:
-		status_label.text = "Status: " + ", ".join(status_parts)
-		status_label.visible = true
-	else:
-		status_label.text = "Status: Available"
-		status_label.visible = true
+	# Show existing description if any
+	if item_or_structure.has_method("get_description"):
+		desc_text += item_or_structure.get_description() + "\n\n"
 	
-	# Set description
-	_set_item_description(item)
+	# Add craft requirements
+	desc_text += "Required Materials:\n"
+	for material_name in item_or_structure.craft_requirements:
+		var required = item_or_structure.craft_requirements[material_name]
+		var available = InventoryManager.get_total_item_count(material_name)
+		var status_icon = "✓" if available >= required else "✗"
+		desc_text += status_icon + " " + str(required) + "x " + material_name + " (" + str(available) + " available)\n"
+	
+	$MainContainer/DescriptionContainer/DescriptionText.text = desc_text
+
+# Helper wrapper class to make structures compatible with existing display logic
+class StructureWrapper:
+	var structure
+	
+	func _init(s):
+		structure = s
+	
+	var icon:
+		get: return structure.icon
+	var name:
+		get: return structure.name  
+	var category:
+		get: return structure.category
+	var craft_requirements:
+		get: return structure.craft_requirements
 
 func _set_item_description(item: GameItem):
 	var description = ""
@@ -136,3 +168,18 @@ func refresh_display():
 		display_item(current_stack)
 	else:
 		_clear_display()
+
+func clear_display():
+	# Reset all UI fields to blank/default
+	$MainContainer/ItemHeader/IconNameContainer/ItemIcon.texture = null
+	$MainContainer/ItemHeader/IconNameContainer/NameContainer/ItemName.text = ""
+	$MainContainer/ItemHeader/IconNameContainer/NameContainer/ItemCategory.text = ""
+	$MainContainer/StatsContainer/QuantityLabel.text = ""
+	$MainContainer/StatsContainer/StackSizeLabel.text = ""
+	$MainContainer/StatsContainer/StatusLabel.text = ""
+	$MainContainer/DescriptionContainer/DescriptionText.text = ""
+	visible = false
+
+func display_item_stats(object):
+	# Implement your item stats display logic here
+	pass

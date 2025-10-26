@@ -100,7 +100,7 @@ func _on_use_animation_finished(player):
 	
 	# Remove the consumable that was stored previously
 	if is_consumable() and pending_item_stack and pending_item_stack.quantity > 0 and pending_item_stack.item.name == self.name:
-		InventoryManager.consume_from_stack(pending_item_stack, 1)
+		InventoryManager.use_item_stack(pending_item_stack)
 		InventoryManager.quick_access_changed.emit()
 		pending_item_stack = null
 	cleanup_connections(player)

@@ -100,8 +100,14 @@ func is_placement_valid(instance) -> bool:
 
 	# Ground tile check - there must be ground below the structure
 	var tilemap = get_tree().current_scene.get_node("TileMap")
+
 	# Check the tile where the structure center is positioned
 	var structure_cell = tilemap.local_to_map(instance.position)
+
+	# Don't allow placement if there's a ground tile at the structure position
+	var current_tile_id = tilemap.get_cell_source_id(0, structure_cell)
+	if current_tile_id == GROUND_TILE_ID:
+		return false
 	
 	# Check if there's ground in the tile below the structure
 	var ground_check_cell = Vector2i(structure_cell.x, structure_cell.y + 1)
@@ -110,6 +116,32 @@ func is_placement_valid(instance) -> bool:
 	if ground_tile_id != GROUND_TILE_ID:
 		return false
 	return true
+
+#func is_placement_valid(instance) -> bool:
+	#if not instance.has_node("Area2D"):
+		#return false
+	#var area = instance.get_node("Area2D")
+	#var overlapping = area.get_overlapping_areas() + area.get_overlapping_bodies()
+	#for obj in overlapping:
+		#if obj != instance:
+			#var cat = get_category(obj)
+			#if cat == "structure" or cat == "terrain":
+				#return false
+			#if obj is PhysicsBody2D and not obj.is_in_group("player"):
+				#return false
+#
+	## Ground tile check - there must be ground below the structure
+	#var tilemap = get_tree().current_scene.get_node("TileMap")
+	## Check the tile where the structure center is positioned
+	#var structure_cell = tilemap.local_to_map(instance.position)
+	#
+	## Check if there's ground in the tile below the structure
+	#var ground_check_cell = Vector2i(structure_cell.x, structure_cell.y + 1)
+	#var ground_tile_id = tilemap.get_cell_source_id(0, ground_check_cell)
+	#
+	#if ground_tile_id != GROUND_TILE_ID:
+		#return false
+	#return true
 
 func get_category(obj):
 	if "category" in obj:

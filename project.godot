@@ -23,6 +23,8 @@ PlacementManager="*res://scripts/systems/placement_manager.gd"
 ResourceManager="*res://scripts/systems/resource_manager.gd"
 InventoryManager="*res://scripts/systems/inventory_manager.gd"
 PlayerInputHandler="*res://scripts/systems/player_input_handler.gd"
+BuildingManager="*res://scripts/systems/building_manager.gd"
+CraftingManager="*res://scripts/systems/crafting_manager.gd"
 
 [display]
 
