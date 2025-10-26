@@ -45,6 +45,15 @@ func _ready():
 	# Create UI manager group
 	add_to_group("ui_manager")
 
+func _input(event):
+	if event.is_action_pressed("ui_cancel"):  # "ui_cancel" is Escape by default
+		var ui_layer = get_node("UI")
+		if ui_layer:
+			var pause_menu = ui_layer.get_node_or_null("PauseMenu")
+			if pause_menu:
+				pause_menu.show()
+				get_tree().paused = true
+
 func _on_tile_flooded(_tile_pos: Vector2i, _water_type: int):
 	# You could add particle effects, sounds, etc. here
 	pass
