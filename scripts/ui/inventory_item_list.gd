@@ -4,6 +4,7 @@ class_name InventoryItemList
 
 signal item_selected(stack: InventoryManager.ItemStack)
 signal item_action_requested(stack: InventoryManager.ItemStack, action_type: InventoryActionResolver.ActionType)
+signal items_refreshed
 
 var scroll_container: ScrollContainer
 var item_container: VBoxContainer
@@ -41,6 +42,7 @@ func set_input_handler(handler: PlayerInputHandler):
 	input_handler = handler
 
 func refresh_items(items: Array[InventoryManager.ItemStack]):
+	print("DEBUG: refresh_items called with items: ", items.size())
 	current_items = items
 	_clear_item_list()
 	
@@ -72,9 +74,11 @@ func _create_item_buttons():
 		item_container.add_child(item_button)
 		item_buttons.append(item_button)
 	
-	# CRITICAL: Ensure the container layout is updated
+	# Ensure the container layout is updated
 	await get_tree().process_frame
 	item_container.queue_redraw()
+	
+	emit_signal("item_buttons_created")
 
 
 func _create_item_button(stack: InventoryManager.ItemStack, index: int) -> Control:
@@ -93,6 +97,7 @@ func _create_item_button(stack: InventoryManager.ItemStack, index: int) -> Contr
 
 
 func set_selected_index(index: int):
+	print("DEBUG: set_selected_index called with index: ", index)
 	if index >= -1 and index < current_items.size():
 		selected_index = index
 		

@@ -12,11 +12,11 @@ var tab_container
 var inventory_tab
 var crafting_tab
 var equipment_tab
-var category_filter
+var category_filter: InventoryCategoryFilter
 var item_list: InventoryItemList
 var item_detail
 var action_panel
-var input_handler
+var input_handler: PlayerInputHandler
 
 var current_category: String = "all"
 var is_open: bool = false
@@ -139,6 +139,8 @@ func _connect_signals():
 		item_list.item_selected.connect(_on_item_selected)
 	if item_list and item_list.has_signal("item_action_requested"):
 		item_list.item_action_requested.connect(_on_item_action_requested)
+	if item_list and item_list.has_signal("item_buttons_created"):
+		item_list.item_buttons_created.connect(_auto_select_first_item)
 
 	# Equipment tab signals
 	if equipment_category_filter:
@@ -194,10 +196,14 @@ func open_player_menu():
 	#var player = get_tree().get_first_node_in_group("player")
 	#if player and player.has_method("_on_inventory_state_changed"):
 		#player._on_inventory_state_changed(true)
+
+	## Refresh inventory categories
+	if category_filter and category_filter.has_method("refresh_categories"):
+		category_filter.refresh_categories()
 	
 	# Update input handler
 	input_handler.set_player_menu_open(true)
-		
+	
 	tab_container.current_tab = tab_container.current_tab
 
 	print("Player Menu opened - Default tab: ", get_current_tab())
@@ -404,12 +410,15 @@ func get_currently_selected_item():
 func _auto_select_first_item():
 	print("DEBUG: _auto_select_first_item() called for category: ", current_category)
 	if item_list and item_list.has_method("get_items"):
-		var items = item_list.get_items()  # Use the already-populated item list
+		var items = item_list.get_items()
+		print("DEBUG: Items in item_list: ", items.size())
 		if items.size() > 0:
-			var first_item = items[0]
-			print("DEBUG: Auto-selecting first item: ", first_item.item.name)
-			item_list.set_selected_index(0)
-			_on_item_selected(first_item)
+			# Only select if nothing is currently selected
+			if item_list.get_selected_stack() == null: 
+				var first_item = items[0]
+				print("DEBUG: Auto-selecting first item: ", first_item.item.name)
+				item_list.set_selected_index(0)
+				_on_item_selected(first_item)
 		else:
 			print("DEBUG: No items to auto-select in category: ", current_category)
 			if item_detail:
