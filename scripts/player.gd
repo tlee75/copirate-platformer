@@ -293,27 +293,21 @@ func handle_attack_action():
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
 			print("not trigger action")
-			if equipment_panel:
-				print("equipment panel")
-				var main_hand_slot_index = equipment_panel.get_equipment_slot_index_by_node_name("MainHand")
-				if main_hand_slot_index != -1:
-					var main_hand_slot = InventoryManager.get_equipment_slot(main_hand_slot_index)
-					if main_hand_slot and not main_hand_slot.is_empty() and main_hand_slot.item:
-						var item = main_hand_slot.item
-						if not can_use_item_in_current_environment(item):
-							var environment_msg = "underwater" if is_underwater else "on land"
-							print("Cannot use ", item.name, " ", environment_msg, "!")
-							return
-						# Detect targets
-						attack_target = get_attack_target()
-						handle_mainhand_action(item, attack_target)
-					else:
-						# Fallback to melee item attack
-						var melee_item = GameObjectsDatabase.game_objects_database["melee"]
-						attack_target = get_attack_target()
-						melee_item.attack(self, attack_target)
+
+			var main_hand_item = InventoryManager.get_equipped_item("main_hand")
+			if main_hand_item:
+				if not can_use_item_in_current_environment(main_hand_item):
+					var environment_msg = "underwater" if is_underwater else "on land"
+					print("Cannot use ", main_hand_item.name, " ", environment_msg, "!")
+					return
+				# Detect targets
+				attack_target = get_attack_target()
+				handle_mainhand_action(main_hand_item, attack_target)
 			else:
-				print("else equipment panel")
+				# Fallback to melee item attack
+				var melee_item = GameObjectsDatabase.game_objects_database["melee"]
+				attack_target = get_attack_target()
+				melee_item.attack(self, attack_target)
 				
 func handle_mainhand_action(item, target):
 	if not item.has_method("attack"):

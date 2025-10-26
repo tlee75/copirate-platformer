@@ -226,6 +226,7 @@ func unequip_item(equipment_slot: String) -> bool:
 	return _unequip_stack(stack)
 
 func _unequip_stack(stack: ItemStack) -> bool:
+	print("Unequipping stack:", stack.item.name, "from", stack.equipped_as)
 	if not stack.is_equipped():
 		print("Item not equipped: ", stack.item.name)
 		return false
