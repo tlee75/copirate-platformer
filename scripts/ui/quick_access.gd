@@ -89,12 +89,24 @@ func _update_slot_button(button: Button, stack: InventoryManager.ItemStack, slot
 		return
 
 	if stack and stack.item:
-		# Show item icon instead of name
 		if "icon" in stack.item and stack.item.icon:
-			button.icon = stack.item.icon
-			button.text = ""  # Remove text
+			var icon_texture = stack.item.icon
+			if icon_texture is Texture2D:
+				var img = icon_texture.get_image()
+				var max_dim = 48
+				var w = img.get_width()
+				var h = img.get_height()
+				# Resize icon if too big, retain aspect ratio
+				if w > max_dim or h > max_dim:
+					var img_scale = min(max_dim / float(w), max_dim / float(h))
+					var new_w = int(w * img_scale)
+					var new_h = int(h * img_scale)
+					img.resize(new_w, new_h, Image.INTERPOLATE_LANCZOS)
+					icon_texture = ImageTexture.create_from_image(img)
+			button.icon = icon_texture
+			button.text = ""
 		else:
-			button.text = stack.item.name  # Fallback if no icon
+			button.text = stack.item.name
 		button.tooltip_text = stack.item.name + " x" + str(stack.quantity)
 		button.modulate = Color.WHITE
 	else:
@@ -144,6 +156,7 @@ func _update_selection_visual():
 			if i == selected_slot:
 				# Selected appearance
 				button.add_theme_color_override("font_color", Color.YELLOW)
+				button.grab_focus()  
 				# TODO: Add border or background highlight
 			else:
 				# Normal appearance
@@ -172,9 +185,13 @@ func _on_action_executed(action_type: InventoryActionResolver.ActionType, stack:
 func _input(event):
 	if not visible:
 		return
+		
+	var player_menu = get_tree().get_root().get_node("Platformer/UI/PlayerMenu")
+	if player_menu and player_menu.is_open:
+		return
 	
 	# Handle mouse wheel scrolling over quick access
-	if event is InputEventMouseButton and get_global_rect().has_point(get_global_mouse_position()):
+	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
 			_cycle_selection(-1)
 			get_viewport().set_input_as_handled()
@@ -183,20 +200,16 @@ func _input(event):
 			get_viewport().set_input_as_handled()
 
 func _cycle_selection(direction: int):
-	"""Cycle selection to next/previous non-empty slot"""
-	var start_slot = selected_slot
-	
-	for i in range(8):
-		selected_slot = (selected_slot + direction) % 8
-		if selected_slot < 0:
-			selected_slot = 7
-		
-		if quick_access_items[selected_slot] != null:
-			_update_selection_visual()
-			return
-		
-		if selected_slot == start_slot:
-			break
+	print("cycle selection: ", direction)
+	var slot = selected_slot + direction
+
+	# Clamp to bounds
+	if slot < 0:
+		slot = 0
+	elif slot > 7:
+		slot = 7
+
+	set_selected_slot(slot)
 
 # Sync with PlayerInputHandler selection
 func sync_with_input_handler():
