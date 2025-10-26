@@ -319,6 +319,8 @@ func _refresh_current_view():
 	_refresh_item_list()
 	_refresh_detail_panel()
 	_refresh_action_panel()
+	if get_current_tab() == "equipment":
+		_on_equipment_category_selected("all")
 
 func _refresh_item_list():
 	var items = InventoryManager.get_items_by_category(current_category)
@@ -501,3 +503,7 @@ func _on_equipment_action_requested(action_type: InventoryActionResolver.ActionT
 	var selected_stack = equipment_item_list.get_selected_stack() if equipment_item_list else null
 	if selected_stack:
 		_execute_action(action_type, selected_stack)
+
+func _on_equipment_changed():
+	if get_current_tab() == "equipment":
+		_on_equipment_category_selected("all")
