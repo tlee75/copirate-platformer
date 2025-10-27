@@ -40,7 +40,7 @@ func _ready():
 	_setup_input_handler()
 	_connect_signals()
 	_initialize_ui()
-	print("DEBUG: InventoryUI._ready() completed")
+	print("DEBUG: PlayerMenu._ready() completed")
 
 	# Add some test equipment items for testing
 	if InventoryManager:
@@ -171,7 +171,7 @@ func _connect_signals():
 	tab_container.tab_changed.connect(_on_tab_changed)
 
 func _initialize_ui():
-	print("DEBUG: InventoryUI._initialize_ui() called")
+	print("DEBUG: PlayerMenu._initialize_ui() called")
 	visible = false
 	
 	# Ensure all components have proper default states
@@ -252,7 +252,7 @@ func _on_category_selected(category: String):
 	print("Category selected: ", category)
 
 func _on_item_selected(stack: InventoryManager.ItemStack):
-	print("DEBUG: InventoryUI._on_item_selected called for: ", stack.item.name)
+	print("DEBUG: PlayerMenu._on_item_selected called for: ", stack.item.name)
 	
 	# Update detail panel
 	if item_detail:
@@ -417,21 +417,6 @@ func _auto_select_first_item():
 	else:
 		print("DEBUG: item_list does not have get_items()")
 
-## Tab management methods
-#func switch_to_tab(tab_name: String):
-	#if not tab_container:
-		#return
-	#
-	#match tab_name.to_lower():
-		#"inventory":
-			#tab_container.current_tab = 0
-		#"crafting":
-			#tab_container.current_tab = 1
-		#"equipment":
-			#tab_container.current_tab = 2
-		#_:
-			#print("Unknown tab: ", tab_name)
-
 func get_current_tab() -> String:
 	if not tab_container:
 		return "inventory"
@@ -447,11 +432,6 @@ func get_current_tab() -> String:
 			return "building"
 		_:
 			return "inventory"
-
-#func get_current_tab_index() -> int:
-	#if not tab_container:
-		#return 0
-	#return tab_container.current_tab
 	
 # Equipment tab event handlers
 func _on_equipment_category_selected(category: String):

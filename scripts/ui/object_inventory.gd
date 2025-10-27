@@ -12,7 +12,7 @@ func _ready():
 func open_object_menu(object: Node2D, title: String, slot_count: int):
 	current_object = object
 	
-	# Get the main InventoryUI
+	# Get the main PlayerMenu
 	var main_scene = get_tree().current_scene
 	var inventory_ui = main_scene.get_node("UI/PlayerMenu")
 	
@@ -23,7 +23,7 @@ func open_object_menu(object: Node2D, title: String, slot_count: int):
 		
 		# Open the inventory if it's not already open
 		if not inventory_ui.visible:
-			inventory_ui.toggle_inventory()
+			inventory_ui.toggle_player_menu()
 		
 		print("Opened main inventory for interacting with ", title)
 	

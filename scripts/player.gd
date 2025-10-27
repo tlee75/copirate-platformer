@@ -92,7 +92,7 @@ func _ready():
 	add_child(player_stats)
 	player_stats.stat_depleted.connect(_on_stat_depleted)
 
-	# Connect to InventoryUI's input handler once the scene is ready
+	# Connect to PlayerMenu's input handler once the scene is ready
 	call_deferred("_connect_to_inventory_ui")
 
 func _physics_process(delta):	
@@ -612,7 +612,7 @@ func execute_quick_access_action_with_resolver(slot_index: int):
 	# Use the new action resolver system for quick access actions
 	var quick_access_stack = InventoryManager.get_quick_access_stack(slot_index)
 	if quick_access_stack:
-		# Find the InventoryUI's input handler
+		# Find the PlayerMenu's input handler
 		var inventory_ui = get_tree().get_first_node_in_group("inventory_ui")
 		if inventory_ui and inventory_ui.input_handler:
 			# Execute the primary action on the quick access item
@@ -765,14 +765,6 @@ func add_loot(item_name: String, amount: int):
 	else:
 		return false
 
-#func add_loot(item_name: String, amount: int):
-	## Implement inventory logic
-	#var game_item = GameObjectsDatabase.game_objects_database[item_name]
-	#if InventoryManager.add_item(game_item, amount):
-		#return true
-	#else:
-		#return false
-
 func _connect_to_inventory_ui():
 	# Connect to the singleton PlayerInputHandler
 	PlayerInputHandler.action_executed.connect(_on_inventory_action_executed)
@@ -785,7 +777,7 @@ func is_mouse_over_inventory() -> bool:
 	if not ui_layer:
 		return false
 	
-	var inventory_ui = ui_layer.get_node_or_null("InventoryUI")
+	var inventory_ui = ui_layer.get_node_or_null("PlayerMenu")
 	if not inventory_ui or not inventory_ui.visible:
 		return false
 	
