@@ -8,7 +8,7 @@ var hit_frames = {
 
 func _init():
 	name = "Sword"
-	icon = load("res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 01.png")
+	icon = load("res://assets/sprite-man/short_sword_icon_64x18.png")
 	stack_size = 1
 	craftable = true
 	category = "weapon"

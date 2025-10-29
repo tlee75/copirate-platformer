@@ -1,4 +1,3 @@
-@tool
 extends Control
 class_name InventoryItemList
 
@@ -85,6 +84,7 @@ func _create_item_button(stack: InventoryManager.ItemStack, index: int) -> Contr
 	var button = Button.new()
 	button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS  # ADD THIS LINE
 	button.text = stack.get_display_name() + " (x" + str(stack.quantity) + ")"
+	button.custom_minimum_size = Vector2(0, 64)  # or whatever height you want
 	if stack.item.icon:
 		button.icon = stack.item.icon
 	

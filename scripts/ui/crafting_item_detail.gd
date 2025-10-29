@@ -73,7 +73,7 @@ func display_structure_stats(structure):
 	if structure is StructureWrapper:
 		real_structure = structure.structure
 
-	var can_build = BuildingManager.can_build_structure(real_structure) if BuildingManager else false
+	var can_build = BuildingManager.has_build_materials(real_structure) if BuildingManager else false
 	var status_text = "Ready to Build" if can_build else "Missing Materials"
 	$MainContainer/StatsContainer/StatusLabel.text = status_text
 	$MainContainer/StatsContainer/StatusLabel.visible = true

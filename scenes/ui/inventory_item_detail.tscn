@@ -45,8 +45,8 @@ theme_override_constants/separation = 15
 [node name="ItemIcon" type="TextureRect" parent="MainContainer/ItemHeader/IconNameContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
-size_flags_horizontal = 0
 size_flags_vertical = 0
+stretch_mode = 5
 
 [node name="NameContainer" type="VBoxContainer" parent="MainContainer/ItemHeader/IconNameContainer"]
 layout_mode = 2

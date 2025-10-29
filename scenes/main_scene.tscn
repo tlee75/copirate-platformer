@@ -238,3 +238,6 @@ position = Vector2(-442, 2175)
 
 [node name="CoconutTree" parent="." instance=ExtResource("30_02d50")]
 position = Vector2(-261, 2064)
+
+[node name="BerryBush" parent="." instance=ExtResource("23_j4epa")]
+position = Vector2(577, 2282)

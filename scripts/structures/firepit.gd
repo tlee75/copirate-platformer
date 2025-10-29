@@ -18,7 +18,7 @@ func _init():
 	name = "Firepit"
 	category = "structure"
 	craftable = true
-	icon = load("res://assets/structures/firepit_unlit_01.png")
+	icon = load("res://assets/structures/firepit_unlit_01_64x64.png")
 	craft_requirements = {"Simple Rock": 1}
 	scene_path = "res://scenes/structures/firepit.tscn"
 	placement_bottom_padding = -4.0  # Pixels to adjust bottom alignment

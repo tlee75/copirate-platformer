@@ -8,7 +8,7 @@ var hit_frames = {
 
 func _init():
 	name = "Wood Axe"
-	icon = load("res://assets/sprite-man/wood_axe_icon_01.png")
+	icon = load("res://assets/sprite-man/wood_axe_idle_02-64x64.png")
 	stack_size = 1
 	craftable = true
 	category = "tool"

@@ -20,7 +20,7 @@ func get_buildable_structures_by_category(category: String) -> Array[GameStructu
 				buildable_structures.append(item)
 	return buildable_structures
 
-func can_build_structure(structure: GameStructure) -> bool:
+func has_build_materials(structure: GameStructure) -> bool:
 	for material_name in structure.craft_requirements:
 		var required_amount = structure.craft_requirements[material_name]
 		var available_amount = InventoryManager.get_total_item_count(material_name)
@@ -29,7 +29,7 @@ func can_build_structure(structure: GameStructure) -> bool:
 	return true
 
 func start_building(structure: GameStructure) -> bool:
-	if not can_build_structure(structure):
+	if not has_build_materials(structure):
 		print("Cannot build ", structure.name, " - insufficient materials")
 		return false
 	
