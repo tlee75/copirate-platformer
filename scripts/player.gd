@@ -98,7 +98,11 @@ func _ready():
 func _physics_process(delta):	
 	if is_dead:
 		return
-	
+
+	# Do not allow movement while in the middle of an animation
+	if is_trigger_action or is_interacting:
+		return
+
 	var vel: Vector2 = velocity
 	var tile_pos = tilemap.local_to_map(global_position)
 	
