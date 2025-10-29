@@ -118,8 +118,8 @@ func _physics_process(delta):
 			$AnimatedSprite2D.play(target_animation)
 		
 		# Clear action states
-		is_trigger_action = false
-		is_interacting = false
+		#is_trigger_action = false
+		#is_interacting = false
 		
 		# Don't process any other input when menus are open
 		return

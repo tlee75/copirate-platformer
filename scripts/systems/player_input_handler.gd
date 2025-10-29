@@ -11,6 +11,7 @@ var action_resolver: InventoryActionResolver
 var current_input_mode: InventoryActionResolver.InputMethod = InventoryActionResolver.InputMethod.MOUSE_KEYBOARD
 var selected_stack: InventoryManager.ItemStack = null
 var is_player_menu_open: bool = false
+var player: Player = null
 
 # Quick access state
 var selected_quick_access_slot: int = 0
@@ -23,12 +24,16 @@ var available_items: Array[InventoryManager.ItemStack] = []
 
 func _ready():
 	action_resolver = InventoryActionResolver.new()
+	player = get_tree().get_first_node_in_group("player")
 	_detect_initial_input_mode()
 	set_process_unhandled_input(true)
 	print("DEBUG: PlayerInputHandler singleton initialized")
 
 func _input(event):
 	if event.is_action_pressed("player_menu_toggle"):
+		# Do not allow the player menu to interrupt an animation
+		if player and (player.is_trigger_action or player.is_interacting or (not player.is_on_floor() and not player.is_underwater)):
+			return
 		var inventory_ui = get_tree().get_first_node_in_group("player_menu")
 		if inventory_ui and inventory_ui.has_method("toggle_player_menu"):
 			inventory_ui.toggle_player_menu()
