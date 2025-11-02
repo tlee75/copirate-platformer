@@ -16,6 +16,7 @@ var cooking_slots: Array[Dictionary] = []  # Track what's cooking in each slot
 
 func _init():
 	name = "Firepit"
+	description = "Simple stone firepit"
 	category = "structure"
 	craftable = true
 	icon = load("res://assets/structures/firepit_unlit_01_64x64.png")

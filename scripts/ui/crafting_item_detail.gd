@@ -50,6 +50,7 @@ func display_item_or_structure(object, is_structure: bool = false):
 	var display_obj = object
 	if object is InventoryManager.ItemStack:
 		display_obj = object.item
+		current_stack = object  # Store the stack reference
 	
 	# Basic info
 	$MainContainer/ItemHeader/IconNameContainer/ItemIcon.texture = display_obj.icon
@@ -61,9 +62,12 @@ func display_item_or_structure(object, is_structure: bool = false):
 		display_craft_requirements(display_obj)
 	else:
 		display_item_stats(object)
-		# ADD THIS: Check if item is craftable and show requirements
+		# Check if item is craftable and show requirements
 		if display_obj.craftable and display_obj.craft_requirements.size() > 0:
 			display_craft_requirements(display_obj)
+		else:
+			# For non-craftable items, use the existing _set_item_description method
+			_set_item_description(display_obj)
 	
 	visible = true
 
@@ -81,12 +85,38 @@ func display_structure_stats(structure):
 func display_craft_requirements(item_or_structure):
 	var desc_text = ""
 	
-	# Show existing description if any
-	if item_or_structure.has_method("get_description"):
-		desc_text += item_or_structure.get_description() + "\n\n"
+	# First, show the item's own description (only for GameItems, not structures)
+	if item_or_structure is GameItem:
+		if item_or_structure.description != "":
+			desc_text += item_or_structure.description + "\n\n"
+		elif item_or_structure.has_method("get_description"):
+			desc_text += item_or_structure.get_description() + "\n\n"
+		
+		# Add technical details for GameItems
+		desc_text += "[b]Technical Details:[/b]\n"
+		desc_text += "• Stack Size: " + str(item_or_structure.stack_size) + "\n"
+		
+		if "damage" in item_or_structure and item_or_structure.damage > 0:
+			desc_text += "• Damage: " + str(item_or_structure.damage) + "\n"
+		
+		if "underwater_compatible" in item_or_structure:
+			desc_text += "• Underwater Use: " + ("Yes" if item_or_structure.underwater_compatible else "No") + "\n"
+		
+		if "land_compatible" in item_or_structure:
+			desc_text += "• Land Use: " + ("Yes" if item_or_structure.land_compatible else "No") + "\n"
+		
+		desc_text += "\n"
+	else:
+		# For structures (StructureWrapper), show basic info
+		if item_or_structure.has_method("get_description"):
+			desc_text += item_or_structure.get_description() + "\n\n"
+		elif "description" in item_or_structure and item_or_structure.description != "":
+			desc_text += item_or_structure.description + "\n\n"
+		else:
+			desc_text += "A buildable structure.\n\n"
 	
-	# Add craft requirements
-	desc_text += "Required Materials:\n"
+	# Add craft requirements (works for both GameItems and structures)
+	desc_text += "[b]Required Materials:[/b]\n"
 	for material_name in item_or_structure.craft_requirements:
 		var required = item_or_structure.craft_requirements[material_name]
 		var available = InventoryManager.get_total_item_count(material_name)
@@ -106,6 +136,8 @@ class StructureWrapper:
 		get: return structure.icon
 	var name:
 		get: return structure.name  
+	var description:
+		get: return structure.description
 	var category:
 		get: return structure.category
 	var craft_requirements:
@@ -114,20 +146,16 @@ class StructureWrapper:
 func _set_item_description(item: GameItem):
 	var description = ""
 	
-	# Add basic item info
-	description += "[b]Category:[/b] " + item.category.capitalize() + "\n"
-	
-	# Add item-specific properties
-	if item.has_method("get_description"):
-		description += "\n" + item.get_description()
+	# Add the item's own description first
+	if item.description != "":
+		description += item.description + "\n\n"
 	else:
-		description += "\n[i]A " + item.category + " item.[/i]"
+		description += "[i]A " + item.category + " item.[/i]\n\n"
 	
 	# Add technical details
-	description += "\n\n[b]Technical Details:[/b]\n"
+	description += "[b]Technical Details:[/b]\n"
 	description += "• Stack Size: " + str(item.stack_size) + "\n"
 	
-	# ✅ FIXED: Use safe property access instead of has_property()
 	if "damage" in item and item.damage > 0:
 		description += "• Damage: " + str(item.damage) + "\n"
 	

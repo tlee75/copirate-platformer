@@ -12,6 +12,7 @@ class_name GameItem
 @export var is_tool = false
 @export var is_weapon: bool = false
 @export var damage: int = 0
+@export var description: String = ""  # Item description - set by individual item scripts
 
 var category: String = ""
 var icon: Texture2D

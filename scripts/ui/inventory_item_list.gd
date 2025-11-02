@@ -5,6 +5,8 @@ signal item_selected(stack: InventoryManager.ItemStack)
 signal item_action_requested(stack: InventoryManager.ItemStack, action_type: InventoryActionResolver.ActionType)
 signal item_buttons_created
 
+signal structure_selected(structure: GameStructure)
+
 var scroll_container: ScrollContainer
 var item_container: VBoxContainer
 var empty_label: Label
@@ -51,6 +53,48 @@ func refresh_items(items: Array[InventoryManager.ItemStack]):
 	
 	_hide_empty_state()
 	_create_item_buttons()
+
+func refresh_structures(structures: Array[GameStructure]):
+	print("DEBUG: refresh_structures called with structures: ", structures.size())
+	
+	# Store structures separately
+	var structure_items = structures
+	
+	# Clear existing display
+	_clear_item_list()
+	
+	if structures.size() == 0:
+		_show_empty_state()
+		return
+	
+	_hide_empty_state()
+	
+	# Create buttons for structures
+	for i in range(structures.size()):
+		var structure = structures[i]
+		if structure != null:
+			var structure_button = _create_structure_button(structure, i)
+			item_container.add_child(structure_button)
+			item_buttons.append(structure_button)
+	
+	await get_tree().process_frame
+	item_container.queue_redraw()
+	emit_signal("item_buttons_created")
+
+func _create_structure_button(structure: GameStructure, index: int) -> Control:
+	var button = Button.new()
+	button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS
+	button.text = structure.name
+	button.custom_minimum_size = Vector2(0, 64)
+	if structure.icon:
+		button.icon = structure.icon
+	
+	button.pressed.connect(func():
+		print("DEBUG: Structure button pressed for ", structure.name, " at index ", index)
+		selected_index = index
+		structure_selected.emit(structure)
+	)
+	return button
 
 func _clear_item_list():
 	for button in item_buttons:

@@ -7,6 +7,7 @@ var hit_frames = {
 
 func _init():
 	name = "Pick Axe"
+	description = "A mining tool with a heavy metal head. Perfect for breaking stone and extracting minerals."
 	icon = load("res://assets/sprite-man/pick_axe_icon_01.png")
 	stack_size = 1
 	craftable = true

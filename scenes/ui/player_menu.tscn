@@ -1,10 +1,9 @@
-[gd_scene load_steps=16 format=3 uid="uid://bcbmqwa8ofwfq"]
+[gd_scene load_steps=15 format=3 uid="uid://bcbmqwa8ofwfq"]
 
 [ext_resource type="Script" uid="uid://bb2w6ivxttklu" path="res://scripts/ui/player_menu.gd" id="1_bsps8"]
 [ext_resource type="PackedScene" uid="uid://b8kgpkram46gn" path="res://scenes/ui/inventory_category_filter.tscn" id="1_nuief"]
 [ext_resource type="PackedScene" uid="uid://cvgrjdhk14guq" path="res://scenes/ui/inventory_item_list.tscn" id="2_bsps8"]
 [ext_resource type="PackedScene" uid="uid://coecdah2bs7x4" path="res://scenes/ui/inventory_item_detail.tscn" id="3_ldtye"]
-[ext_resource type="Script" uid="uid://crdqmbv6vuj6d" path="res://scripts/ui/inventory_item_list.gd" id="4_hbcvs"]
 [ext_resource type="PackedScene" uid="uid://jyu5l75iarfi" path="res://scenes/ui/inventory_action_panel.tscn" id="4_xk7lq"]
 [ext_resource type="Script" uid="uid://btqfh7m2e4t0y" path="res://scripts/ui/inventory_item_detail.gd" id="6_erru2"]
 [ext_resource type="Script" uid="uid://co3v5kj4nyi1e" path="res://scripts/ui/inventory_action_panel.gd" id="8_7csag"]
@@ -69,7 +68,6 @@ size_flags_vertical = 3
 
 [node name="InventoryItemList" parent="TabContainer/Inventory/ContentSection" instance=ExtResource("2_bsps8")]
 layout_mode = 2
-script = ExtResource("4_hbcvs")
 
 [node name="InventoryItemDetail" parent="TabContainer/Inventory/ContentSection" instance=ExtResource("3_ldtye")]
 layout_mode = 2
@@ -136,7 +134,6 @@ split_offset = 200
 
 [node name="EquipmentItemList" parent="TabContainer/Equipment/ContentSection/RightPanelSplit" instance=ExtResource("2_bsps8")]
 layout_mode = 2
-script = ExtResource("4_hbcvs")
 
 [node name="EquipmentItemDetail" parent="TabContainer/Equipment/ContentSection/RightPanelSplit" instance=ExtResource("3_ldtye")]
 layout_mode = 2
@@ -193,7 +190,6 @@ size_flags_vertical = 3
 
 [node name="CraftingItemList" parent="TabContainer/Crafting/ContentSection" instance=ExtResource("2_bsps8")]
 layout_mode = 2
-script = ExtResource("4_hbcvs")
 
 [node name="CraftingItemDetail" parent="TabContainer/Crafting/ContentSection" instance=ExtResource("3_ldtye")]
 layout_mode = 2
@@ -250,7 +246,6 @@ size_flags_vertical = 3
 
 [node name="BuildingItemList" parent="TabContainer/Building/ContentSection" instance=ExtResource("2_bsps8")]
 layout_mode = 2
-script = ExtResource("4_hbcvs")
 
 [node name="BuildingItemDetail" parent="TabContainer/Building/ContentSection" instance=ExtResource("3_ldtye")]
 layout_mode = 2

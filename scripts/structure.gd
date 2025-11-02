@@ -8,3 +8,4 @@ var icon: Texture2D
 var craft_requirements: Dictionary = {}
 var scene_path: String = ""
 var placement_bottom_padding = 0
+var description: String = ""  # Structure description - set by individual item scripts
