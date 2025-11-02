@@ -2,6 +2,9 @@ extends GameStructure
 
 class_name Firepit
 
+signal state_changed(new_state: int, description: String)
+signal fuel_consumed(remaining_time: float)
+
 @export var max_fuel: float = 300.0 # Max fuel storage
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -144,6 +147,8 @@ func light_fire():
 	if animated_sprite:
 		animated_sprite.play("burning")
 	
+	# Emit state change signal
+	state_changed.emit(state, get_current_state_description())
 	print("Fire lit!")
 
 func _on_fuel_tick():
@@ -155,6 +160,9 @@ func _on_fuel_tick():
 
 func consume_fuel_time(amount: float):
 	current_burn_time -= amount
+	
+	# Emit signal for UI updates
+	fuel_consumed.emit(current_burn_time)
 	
 	# If current item burned out, try to start burning next item
 	if current_burn_time <= 0:
@@ -306,6 +314,9 @@ func extinguish():
 		state = ObjectState.UNLIT
 		if animated_sprite:
 			animated_sprite.play("unlit")
+		
+		# Emit state change signal
+		state_changed.emit(state, get_current_state_description())
 
 # Action system implementation
 func get_available_actions() -> Array[String]:
@@ -326,8 +337,27 @@ func perform_action(action_name: String):
 func get_current_state_description() -> String:
 	match state:
 		ObjectState.BURNING:
-			return "Burning (" + str(int(current_burn_time)) + "s remaining)"
+			var total_time = get_total_fuel_time()
+			return "Burning (" + str(int(total_time)) + "s total remaining)"
 		ObjectState.UNLIT:
 			return "Unlit"
 		_:
 			return "Unknown"
+
+func get_total_fuel_time() -> float:
+	"""Calculate total remaining fuel time including current burn + queued items"""
+	var total_time = current_burn_time
+	
+	# Add fuel from items in inventory
+	for i in range(interactive_object.inventory.size()):
+		var stack = interactive_object.inventory[i]
+		if stack and stack.item.category == "fuel":
+			var fuel_per_item = 10.0 # Default
+			if stack.item.has_method("get_fuel_value"):
+				fuel_per_item = stack.item.get_fuel_value()
+			elif stack.item.get("fuel_value"):
+				fuel_per_item = stack.item.fuel_value
+			
+			total_time += fuel_per_item * stack.quantity
+	
+	return total_time

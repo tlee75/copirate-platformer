@@ -67,6 +67,9 @@ func open_for_object(object: Node2D, object_name: String, _slot_count: int):
 		print("Error: No InteractiveObjectComponent found on ", object_name)
 		return
 	
+	# Connect to object signals if available
+	_connect_object_signals()
+	
 	title_label.text = object_name + " Inventory"
 	object_label.text = object_name + " Items"
 	player_label.text = "Player Items"
@@ -186,8 +189,6 @@ func _update_status_display():
 	# Add fuel/inventory info
 	if interactive_obj:
 		var fuel_count = interactive_obj.get_item_count("Stick")  # Example fuel item
-		if fuel_count > 0:
-			status_text += "\nFuel: " + str(fuel_count) + " sticks"
 	
 	status_label.text = status_text
 
@@ -287,3 +288,26 @@ func _transfer_from_object_to_player(object_stack: InventoryManager.ItemStack):
 		print("Successfully transferred 1x ", object_stack.item.name, " to player")
 	else:
 		print("Failed to add item to player inventory")
+
+func _connect_object_signals():
+	"""Connect to object-specific signals for real-time updates"""
+	if not current_object:
+		return
+	
+	# Connect to firepit signals if this is a firepit
+	if current_object.has_signal("state_changed"):
+		if not current_object.state_changed.is_connected(_on_object_state_changed):
+			current_object.state_changed.connect(_on_object_state_changed)
+	
+	if current_object.has_signal("fuel_consumed"):
+		if not current_object.fuel_consumed.is_connected(_on_fuel_consumed):
+			current_object.fuel_consumed.connect(_on_fuel_consumed)
+
+func _on_object_state_changed(new_state: int, description: String):
+	"""Handle object state changes"""
+	_update_status_display()
+	_update_action_buttons()
+
+func _on_fuel_consumed(remaining_time: float):
+	"""Handle fuel consumption updates"""
+	_update_status_display()
