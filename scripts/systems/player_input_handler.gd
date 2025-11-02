@@ -75,7 +75,9 @@ func _input(event):
 	
 	# Route input based on current UI state
 	if any_menu_open:
-		_handle_menu_input(event)
+		# When menus are open, don't handle quick access at all
+		# Let individual UI components handle their own mouse events
+		pass
 	else:
 		_handle_quick_access_input(event)
 
@@ -207,22 +209,22 @@ func _handle_touch_input(event):
 			if selected_stack:
 				_execute_primary_action(selected_stack)
 
-func _handle_menu_input(event):	
-	# Handle mouse wheel scrolling when inventory is open
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			var player_menu = get_tree().get_first_node_in_group("player_menu")
-			if player_menu:
-				var item_list = player_menu.item_list
-				if item_list:
-					if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-						if item_list.has_method("scroll_up"):
-							item_list.scroll_up()
-					else:
-						if item_list.has_method("scroll_down"):
-							item_list.scroll_down()
-			get_viewport().set_input_as_handled()
-			return
+#func _handle_menu_input(event):	
+	## Handle mouse wheel scrolling when inventory is open
+	#if event is InputEventMouseButton and event.pressed:
+		#if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			#var player_menu = get_tree().get_first_node_in_group("player_menu")
+			#if player_menu:
+				#var item_list = player_menu.item_list
+				#if item_list:
+					#if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+						#if item_list.has_method("scroll_up"):
+							#item_list.scroll_up()
+					#else:
+						#if item_list.has_method("scroll_down"):
+							#item_list.scroll_down()
+			#get_viewport().set_input_as_handled()
+			#return
 
 func _handle_quick_access_input(event):
 	"""Handle input when PlayerMenu is closed"""

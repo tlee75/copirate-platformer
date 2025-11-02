@@ -39,6 +39,30 @@ func _ready():
 	refresh_display()
 	_update_selection_visual()
 
+# Input handling for direct interaction
+func _input(event):
+	if not visible:
+		return
+		
+	# Check if any menu is open - use UIManager for centralized check
+	var ui_manager = get_tree().get_first_node_in_group("ui_manager")
+	if ui_manager and ui_manager.is_any_menu_open():
+		return
+	
+	# Fallback check for PlayerMenu if UIManager not available
+	var player_menu = get_tree().get_root().get_node("Platformer/UI/PlayerMenu")
+	if player_menu and player_menu.is_open:
+		return
+	
+	# Handle mouse wheel scrolling over quick access
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			_cycle_selection(-1)
+			get_viewport().set_input_as_handled()
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			_cycle_selection(1)
+			get_viewport().set_input_as_handled()
+
 func refresh_display():
 	# Clear existing buttons and separators
 	for child in item_container.get_children():
@@ -197,24 +221,6 @@ func _on_action_executed(action_type: InventoryActionResolver.ActionType, stack:
 	"""Handle action execution feedback"""
 	if success:
 		refresh_display()
-
-# Input handling for direct interaction
-func _input(event):
-	if not visible:
-		return
-		
-	var player_menu = get_tree().get_root().get_node("Platformer/UI/PlayerMenu")
-	if player_menu and player_menu.is_open:
-		return
-	
-	# Handle mouse wheel scrolling over quick access
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
-			_cycle_selection(-1)
-			get_viewport().set_input_as_handled()
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
-			_cycle_selection(1)
-			get_viewport().set_input_as_handled()
 
 func _cycle_selection(direction: int):
 	var slot = selected_slot + direction

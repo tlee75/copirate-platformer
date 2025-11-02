@@ -21,7 +21,7 @@ func _ready():
 	
 	# FIX: ScrollContainer consumes mouse events by default, set to PASS
 	if scroll_container:
-		scroll_container.mouse_filter = Control.MOUSE_FILTER_PASS
+		scroll_container.mouse_filter = Control.MOUSE_FILTER_STOP
 
 func _setup_ui_references():
 	scroll_container = $ScrollContainer

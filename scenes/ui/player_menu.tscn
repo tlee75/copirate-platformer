@@ -68,6 +68,7 @@ size_flags_vertical = 3
 
 [node name="InventoryItemList" parent="TabContainer/Inventory/ContentSection" instance=ExtResource("2_bsps8")]
 layout_mode = 2
+mouse_filter = 0
 
 [node name="InventoryItemDetail" parent="TabContainer/Inventory/ContentSection" instance=ExtResource("3_ldtye")]
 layout_mode = 2
