@@ -2,9 +2,6 @@ extends CharacterBody2D
 
 class_name Player
 
-#signal inventory_state_changed(is_open: bool)
-signal object_menu_state_changed(is_open: bool)
-
 const WALK_SPEED := 100.0
 const RUN_SPEED := 250.0
 const JUMP_VELOCITY := -400.0
@@ -23,14 +20,15 @@ var current_highlighted_tile: Vector2i = Vector2i(-999, -999)  # Invalid positio
 var last_move_dir: int = 1  # 1 for right, -1 for left
 var was_running_when_jumped: bool = false
 var jump_speed: float = 0.0
-#var inventory_is_open: bool = false
-var object_menu_is_open: bool = false
 var is_in_water: bool = false
 var tile_size: float = 32.0
 var is_dead: bool = false
 var attack_target = null 
 var tool_target = null
 var interact_target = null
+
+# UI Manager reference for centralized state checking
+var ui_manager: UIManager
 
 # Player stats system
 var player_stats: PlayerStats
@@ -79,10 +77,6 @@ func _ready():
 	create_highlight_texture()
 	# Enable input processing so _input can capture key presses
 	set_process_input(true)
-
-	# Connect to inventory and object menu state changes
-	#inventory_state_changed.connect(_on_inventory_state_changed)
-	object_menu_state_changed.connect(_on_object_menu_state_changed)
 	
 	# Add player to group so other scripts can find it easily
 	add_to_group("player")
@@ -95,6 +89,21 @@ func _ready():
 	# Connect to PlayerMenu's input handler once the scene is ready
 	call_deferred("_connect_to_inventory_ui")
 
+	# Get reference to UIManager for centralized menu state checking
+	call_deferred("_setup_ui_manager_reference")
+
+func _setup_ui_manager_reference():
+	"""Set up reference to UIManager for centralized menu state checking"""
+	var ui_layer = get_parent().get_node_or_null("UI")
+	if ui_layer:
+		ui_manager = ui_layer.get_node_or_null("UIManager")
+		if ui_manager:
+			print("Player: Connected to UIManager for menu state checking")
+		else:
+			print("WARNING: UIManager not found - menu blocking may not work correctly")
+	else:
+		print("WARNING: UI layer not found")
+
 func _physics_process(delta):	
 	if is_dead:
 		return
@@ -106,8 +115,15 @@ func _physics_process(delta):
 	var vel: Vector2 = velocity
 	var tile_pos = tilemap.local_to_map(global_position)
 	
-	# Skip input handling if inventory or object menu is open
-	if PlayerInputHandler.is_player_menu_open or object_menu_is_open:
+	# Skip input handling if any menu is open (centralized check through UIManager)
+	var any_menu_open = false
+	if ui_manager:
+		any_menu_open = ui_manager.is_any_menu_open()
+	else:
+		# Fallback to old method if UIManager not available
+		any_menu_open = PlayerInputHandler.is_player_menu_open
+
+	if any_menu_open:
 		# Still apply gravity when inventory is open
 		if not is_on_floor() and not is_underwater:
 			vel.y += gravity * delta
@@ -260,7 +276,8 @@ func _physics_process(delta):
 
 func handle_interact_or_use_action():
 	# Interact/Use Action
-	if Input.is_action_just_pressed("interact") and not PlayerInputHandler.is_player_menu_open:
+	var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else PlayerInputHandler.is_player_menu_open
+	if Input.is_action_just_pressed("interact") and not any_menu_open:
 		if not is_interacting:
 			if is_interact_target():
 				is_interacting = true
@@ -468,8 +485,9 @@ func create_highlight_texture():
 	highlight_texture.set_image(image)
 
 func update_tile_highlights():
-	# Don't show tile highlights when inventory is open
-	if PlayerInputHandler.is_player_menu_open:
+	# Don't show tile highlights when any menu is open
+	var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else PlayerInputHandler.is_player_menu_open
+	if any_menu_open:
 		clear_tile_highlights()
 		return
 		
@@ -562,11 +580,6 @@ func _on_inventory_input_mode_changed(new_mode: InventoryActionResolver.InputMet
 	
 	# Could trigger UI changes here based on input mode
 	# For example, show/hide controller button hints
-
-
-func _on_object_menu_state_changed(is_open: bool):
-	object_menu_is_open = is_open
-	print("Player: Object menu is now ", "open" if is_open else "closed")
 
 func is_mouse_over_combined_menu() -> bool:
 	var ui_layer = get_parent().get_node_or_null("UI")
@@ -776,15 +789,23 @@ func _connect_to_inventory_ui():
 	print("Player connected to PlayerInputHandler singleton")
 
 func is_mouse_over_inventory() -> bool:
-	# Check if mouse is over the inventory UI
+	# Check if mouse is over any UI elements
 	var ui_layer = get_parent().get_node_or_null("UI")
 	if not ui_layer:
 		return false
 	
-	var inventory_ui = ui_layer.get_node_or_null("PlayerMenu")
-	if not inventory_ui or not inventory_ui.visible:
-		return false
-	
 	var mouse_pos = get_viewport().get_mouse_position()
-	var inventory_rect = Rect2(inventory_ui.global_position, inventory_ui.size)
-	return inventory_rect.has_point(mouse_pos)
+	
+	# Check PlayerMenu
+	var player_menu = ui_layer.get_node_or_null("PlayerMenu")
+	if player_menu and player_menu.visible:
+		if Rect2(player_menu.global_position, player_menu.size).has_point(mouse_pos):
+			return true
+	
+	# Check ObjectInventoryMenu
+	var object_menu = ui_layer.get_node_or_null("ObjectInventoryMenu")
+	if object_menu and object_menu.visible:
+		if Rect2(object_menu.global_position, object_menu.size).has_point(mouse_pos):
+			return true
+	
+	return false

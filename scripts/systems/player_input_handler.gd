@@ -12,6 +12,7 @@ var current_input_mode: InventoryActionResolver.InputMethod = InventoryActionRes
 var selected_stack: InventoryManager.ItemStack = null
 var is_player_menu_open: bool = false
 var player: Player = null
+var ui_manager: UIManager
 
 # Quick access state
 var selected_quick_access_slot: int = 0
@@ -28,49 +29,64 @@ func _ready():
 	_detect_initial_input_mode()
 	set_process_unhandled_input(true)
 	print("DEBUG: PlayerInputHandler singleton initialized")
+	
+	# Get UI manager reference
+	ui_manager = get_tree().get_first_node_in_group("ui_manager")
+	if not ui_manager:
+		print("WARNING: UIManager not found in PlayerInputHandler._ready()")
+		print("DEBUG: Available ui_manager group nodes: ", get_tree().get_nodes_in_group("ui_manager"))
+	else:
+		print("SUCCESS: Found UIManager in PlayerInputHandler: ", ui_manager)
 
 func _input(event):
+	# Get current UI state from UIManager
+	var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else false
+	
+	# Handle menu toggle
 	if event.is_action_pressed("player_menu_toggle"):
+		print("DEBUG: player_menu_toggle pressed")
+		
 		# Do not allow the player menu to interrupt an animation
 		if player and (player.is_trigger_action or player.is_interacting or (not player.is_on_floor() and not player.is_underwater)):
+			print("DEBUG: Player animation blocking menu toggle")
 			return
-		var inventory_ui = get_tree().get_first_node_in_group("player_menu")
-		if inventory_ui and inventory_ui.has_method("toggle_player_menu"):
-			inventory_ui.toggle_player_menu()
-			get_viewport().set_input_as_handled()
+		
+		# Route through UIManager instead of direct call
+		if ui_manager:
+			print("DEBUG: Using UIManager.toggle_player_menu()")
+			ui_manager.toggle_player_menu()
+		else:
+			print("DEBUG: UIManager not found, attempting to find it...")
+			_debug_find_ui_manager()
+			
+			if ui_manager:
+				print("DEBUG: Found UIManager on retry, using it")
+				ui_manager.toggle_player_menu()
+			else:
+				print("DEBUG: Still no UIManager, using fallback method")
+				# Fallback to old method if UIManager not available
+				var inventory_ui = get_tree().get_first_node_in_group("player_menu")
+				if inventory_ui and inventory_ui.has_method("toggle_player_menu"):
+					print("DEBUG: Calling inventory_ui.toggle_player_menu() directly")
+					inventory_ui.toggle_player_menu()
+		
+		get_viewport().set_input_as_handled()
+		return
+	
+	# Route input based on current UI state
+	if any_menu_open:
+		_handle_menu_input(event)
+	else:
+		_handle_quick_access_input(event)
+
+func _on_ui_state_changed(has_menu_open: bool):
+	"""Handle UI state changes from UIManager"""
+	is_player_menu_open = has_menu_open and ui_manager.is_player_menu_open()
 	
 	if is_player_menu_open:
-		_handle_menu_input(event)  # Existing functionality
+		_refresh_available_items()
 	else:
-		_handle_quick_access_input(event)  # New functionality
-	
-	## Handle mouse wheel scrolling when inventory is open
-	#if event is InputEventMouseButton and event.pressed:
-		#if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			#var player_menu = get_tree().get_first_node_in_group("player_menu")
-			#if player_menu:
-				#var item_list = player_menu.item_list
-				#if item_list:
-					#if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-						#if item_list.has_method("scroll_up"):
-							#item_list.scroll_up()
-					#else:
-						#if item_list.has_method("scroll_down"):
-							#item_list.scroll_down()
-			#get_viewport().set_input_as_handled()
-			#return
-
-#func _unhandled_input(event):
-	## Only detect input mode changes for controller/keyboard input
-	#if event is InputEventJoypadButton and event.pvar inventory_ui = get_tree().get_first_node_in_group("inventory_ui")ressed:
-		#set_input_mode(InventoryActionResolver.InputMethod.CONTROLLER)
-	#elif event is InputEventKey and event.pressed:
-		## Don't switch to keyboard mode, stay in mouse mode for UI interaction
-		#pass
-	#
-	## Handle input based on current mode (controller only)
-	#if current_input_mode == InventoryActionResolver.InputMethod.CONTROLLER:
-		#_handle_controller_input(event)
+		_reset_navigation_state()
 
 func _detect_initial_input_mode():
 	# Check for connected controllers
@@ -191,7 +207,7 @@ func _handle_touch_input(event):
 			if selected_stack:
 				_execute_primary_action(selected_stack)
 
-func _handle_menu_input(event):
+func _handle_menu_input(event):	
 	# Handle mouse wheel scrolling when inventory is open
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
@@ -365,11 +381,20 @@ func execute_action_on_stack(action_type: InventoryActionResolver.ActionType, st
 	return success
 
 func set_player_menu_open(open: bool):
+	# This method is now mainly for backward compatibility
+	# The actual state should be managed by UIManager
 	is_player_menu_open = open
 	if open:
 		_refresh_available_items()
 	else:
 		_reset_navigation_state()
+	
+	# Sync with UIManager if available
+	if ui_manager:
+		if open and not ui_manager.is_player_menu_open():
+			ui_manager.open_player_menu()
+		elif not open and ui_manager.is_player_menu_open():
+			ui_manager.close_player_menu()
 
 func set_selected_stack(stack: InventoryManager.ItemStack):
 	selected_stack = stack
@@ -399,3 +424,15 @@ func _input_mode_to_string(mode: InventoryActionResolver.InputMethod) -> String:
 			return "Touch"
 		_:
 			return "Unknown"
+
+func _debug_find_ui_manager():
+	"""Debug method to check UIManager availability"""
+	print("DEBUG: Checking for UIManager...")
+	var ui_managers = get_tree().get_nodes_in_group("ui_manager")
+	print("DEBUG: Found ", ui_managers.size(), " ui_manager nodes: ", ui_managers)
+	
+	if ui_managers.size() > 0:
+		ui_manager = ui_managers[0]
+		print("DEBUG: Set ui_manager to: ", ui_manager)
+	else:
+		print("DEBUG: No UIManager found in tree")

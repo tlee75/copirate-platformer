@@ -184,7 +184,7 @@ func _initialize_ui():
 	if action_panel:
 		action_panel.visible = true
 
-func open_player_menu():
+func open_menu():
 	if is_open:
 		return
 	
@@ -202,7 +202,7 @@ func open_player_menu():
 
 	print("Player Menu opened - Default tab: ", get_current_tab())
 
-func close_player_menu():
+func close_menu():
 	if not is_open:
 		return
 	
@@ -216,9 +216,9 @@ func close_player_menu():
 
 func toggle_player_menu():
 	if is_open:
-		close_player_menu()
+		close_menu()
 	else:
-		open_player_menu()
+		open_menu()
 
 # More robust ScrollContainer access
 func _scroll_item_list(delta: int):
@@ -550,4 +550,4 @@ func _on_building_item_selected(structure: GameStructure):
 
 func _on_building_action_requested(structure):
 	BuildingManager.start_building(structure)
-	close_player_menu()
+	close_menu()
