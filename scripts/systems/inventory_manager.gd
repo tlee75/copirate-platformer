@@ -461,44 +461,6 @@ func _can_equip_to_slot(item: GameItem, equipment_slot: String) -> bool:
 	var expected_slot = _get_equipment_slot_for_item(item)
 	return expected_slot == equipment_slot or (expected_slot == "accessory_1" and equipment_slot == "accessory_2")
 
-# ============================================================================
-# BACKWARD COMPATIBILITY LAYER
-# ============================================================================
-
-# These methods provide compatibility with existing code that expects the old interface
-func initialize_hotbar_slots(count: int):
-	print("Backward compatibility: initialize_hotbar_slots called with ", count)
-	# Hotbar is already initialized in _ready()
-
-func initialize_inventory_slots(count: int):
-	print("Backward compatibility: initialize_inventory_slots called with ", count)
-	# New system doesn't need pre-allocated slots
-
-func get_inventory_slot(index: int):
-	# For compatibility, treat this as getting the nth item in inventory
-	if index >= 0 and index < inventory_items.size():
-		var stack = inventory_items[index]
-		return CompatibilitySlotData.new(stack)
-	else:
-		return CompatibilitySlotData.new(null)
-
-# Compatibility class that mimics old InventorySlotData interface
-class CompatibilitySlotData:
-	var item: GameItem
-	var quantity: int
-	var _stack_reference: ItemStack
-	
-	func _init(stack: ItemStack):
-		_stack_reference = stack
-		if stack:
-			item = stack.item
-			quantity = stack.quantity
-		else:
-			item = null
-			quantity = 0
-	
-	func is_empty() -> bool:
-		return item == null or quantity <= 0
 
 # ============================================================================
 # DEBUG FUNCTIONS

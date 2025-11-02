@@ -42,9 +42,6 @@ func _ready():
 		water_flow_manager.tile_flooded.connect(_on_tile_flooded)
 		water_flow_manager.flow_completed.connect(_on_water_flow_completed)
 
-	# Create UI manager group
-	add_to_group("ui_manager")
-
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):  # "ui_cancel" is Escape by default
 		if ui_layer:
@@ -80,16 +77,5 @@ func _close_menus_on_death(stat_name: String):
 	if stat_name == "health":
 		#$UI/PlayerMenu.visible = false
 		#inventory_system.inventory_toggled.emit(false)
-		if $UI.has_node("ObjectMenu"):
-			$UI/ObjectMenu.visible = false
-
-func open_object_menu(object: Node2D, title: String, slot_count: int):
-	# Create or show object inventory UI
-	var object_menu_ui = get_node_or_null("UI/ObjectMenu")
-	
-	if not object_menu_ui:
-		# Create the UI if it doesn't exist
-		object_menu_ui = preload("res://scenes/ui/object_menu.tscn").instantiate()
-		$UI.add_child(object_menu_ui)
-	
-	object_menu_ui.open_object_menu(object, title, slot_count)
+		# Close object menu on death
+		pass

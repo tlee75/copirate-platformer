@@ -57,7 +57,7 @@ func can_object_accept_item(item: GameItem) -> bool:
 	
 	var interactive_object = null
 	for child in current_object.get_children():
-		if child is InteractiveObject:
+		if child is InteractiveObjectComponent:
 			interactive_object = child
 			break
 	

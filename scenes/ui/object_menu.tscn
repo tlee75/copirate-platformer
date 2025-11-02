@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://djnk8i1tduvyc"]
+[gd_scene load_steps=2 format=3 uid="uid://cpi2fsumvgd51"]
 
-[ext_resource type="Script" uid="uid://b8jeecrsjsrkc" path="res://scripts/ui/object_inventory.gd" id="1_bsqsq"]
+[ext_resource type="Script" uid="uid://b8jeecrsjsrkc" path="res://scripts/ui/object_inventory_OLD.gd" id="1_jx26v"]
 
 [node name="ObjectMenu" type="Control"]
 layout_mode = 3
@@ -12,7 +12,7 @@ offset_top = 39.0
 offset_bottom = -97.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_bsqsq")
+script = ExtResource("1_jx26v")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 0

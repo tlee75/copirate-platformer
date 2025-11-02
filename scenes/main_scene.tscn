@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://dj3pqaq3v6bwo"]
+[gd_scene load_steps=36 format=3 uid="uid://dj3pqaq3v6bwo"]
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/main_scene.gd" id="1_4bgka"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_02d50"]
@@ -11,6 +11,8 @@
 [ext_resource type="Script" uid="uid://c8fectjj4powj" path="res://scripts/ui/fps_counter.gd" id="9_onjth"]
 [ext_resource type="PackedScene" uid="uid://bowihm3p0j4x7" path="res://scenes/ui/pause_menu.tscn" id="14_0wyf6"]
 [ext_resource type="PackedScene" uid="uid://cycrpyyqnlp8l" path="res://scenes/ui/quick_access.tscn" id="14_6p3nn"]
+[ext_resource type="Script" uid="uid://xkrck7bgrvxt" path="res://scripts/systems/ui_manager.gd" id="15_k3g67"]
+[ext_resource type="PackedScene" uid="uid://c8eg14mg7ec2p" path="res://scenes/ui/object_inventory_menu.tscn" id="16_4bgka"]
 [ext_resource type="Script" uid="uid://b2o7r4ny0dsb" path="res://scripts/ui/depth_counter.gd" id="17_segjr"]
 [ext_resource type="PackedScene" uid="uid://noyk5n0awjav" path="res://scenes/ui/stats_display.tscn" id="18_beobj"]
 [ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/obstacles/wood_crate.tscn" id="19_267kh"]
@@ -176,6 +178,12 @@ offset_left = 404.0
 offset_top = -96.0
 offset_right = -348.0
 offset_bottom = -16.0
+
+[node name="UIManager" type="Node" parent="UI"]
+script = ExtResource("15_k3g67")
+
+[node name="ObjectInventoryMenu" parent="UI" instance=ExtResource("16_4bgka")]
+visible = false
 
 [node name="WoodCrates" type="Node" parent="."]
 

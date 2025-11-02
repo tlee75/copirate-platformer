@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://cvgrjdhk14guq"]
+[gd_scene load_steps=2 format=3 uid="uid://cvgrjdhk14guq"]
+
+[ext_resource type="Script" uid="uid://crdqmbv6vuj6d" path="res://scripts/ui/inventory_item_list.gd" id="1_wx46s"]
 
 [node name="InventoryItemList" type="Control"]
 layout_mode = 3
@@ -10,6 +12,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 1
+script = ExtResource("1_wx46s")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 layout_mode = 1
