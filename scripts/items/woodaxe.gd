@@ -15,6 +15,7 @@ func _init():
 	underwater_compatible = false
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 3}
+	craft_time = 5.0  # seconds to craft
 	attack_animation = "woodaxe_attack"
 	use_animation = "woodaxe_attack"
 	damage = 1

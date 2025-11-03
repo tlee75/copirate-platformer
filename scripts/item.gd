@@ -13,6 +13,7 @@ class_name GameItem
 @export var is_weapon: bool = false
 @export var damage: int = 0
 @export var description: String = ""  # Item description - set by individual item scripts
+@export var craft_time: float = 3.0  # Time in seconds to craft this item
 
 var category: String = ""
 var icon: Texture2D

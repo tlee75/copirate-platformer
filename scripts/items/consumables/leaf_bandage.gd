@@ -17,6 +17,7 @@ func _init():
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 1}
 	use_animation = "consume"
+	craft_time = 5
 
 func is_consumable() -> bool:
 	return true
