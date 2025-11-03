@@ -74,22 +74,84 @@ func _on_crafting_complete():
 	if not is_crafting or not current_craft_item:
 		return
 	
-	# Complete the crafting
-	print("Crafting completed: ", current_craft_item.name)
-	CraftingManager.craft_item(current_craft_item)
+	# Store item reference before clearing
+	var completed_item = current_craft_item
 	
-	# Reset UI state
+	# Complete the crafting
+	print("Crafting completed: ", completed_item.name)
+	CraftingManager.craft_item(completed_item)
+	
+	# Reset crafting state
 	is_crafting = false
+	current_craft_item = null
+	
+	# Hide progress bar
 	if progress_bar:
 		progress_bar.value = 100
 		progress_bar.visible = false
 	
-	# Re-enable the craft button
-	if craft_button:
-		craft_button.disabled = false
-		craft_button.text = "Craft " + current_craft_item.name
+	# Refresh UI after materials have been consumed
+	_refresh_ui_after_crafting(completed_item)
+
+func _refresh_ui_after_crafting(completed_item: GameItem):
+	"""Refresh UI components after crafting completes"""
 	
-	current_craft_item = null
+	# Update craft button state based on new material availability
+	if craft_button and current_stack:
+		var can_craft = CraftingManager.can_craft_item(current_stack.item)
+		craft_button.disabled = not can_craft
+		craft_button.text = "Craft " + current_stack.item.name
+		print("Updated craft button state: ", "enabled" if can_craft else "disabled")
+	
+	# Find and refresh the item details panel
+	_refresh_item_details_panel()
+	
+	print("UI refreshed after crafting: ", completed_item.name)
+
+func _refresh_item_details_panel():
+	"""Find and refresh the crafting item details panel to show updated material counts"""
+	
+	# Navigate up the scene tree to find the crafting details panel
+	# Path: CraftingActionPanel -> FooterSection -> Crafting -> TabContainer -> PlayerMenu -> UI
+	
+	var current_node = self
+	var attempts = 0
+	
+	# Go up the tree to find PlayerMenu
+	while current_node and attempts < 10:
+		attempts += 1
+		print("DEBUG: Checking node: ", current_node.name, " (type: ", current_node.get_class(), ")")
+		
+		# Look for TabContainer (which is a child of PlayerMenu)
+		var tab_containers = current_node.find_children("TabContainer", "TabContainer", false, false)
+		if tab_containers.size() > 0:
+			var tab_container = tab_containers[0]
+			print("DEBUG: Found TabContainer: ", tab_container.name)
+			
+			# Look for the Crafting tab
+			for tab_child in tab_container.get_children():
+				if tab_child.name == "Crafting":
+					print("DEBUG: Found Crafting tab: ", tab_child.name)
+					
+					# Look for CraftingItemDetail
+					var detail_nodes = tab_child.find_children("CraftingItemDetail", "CraftingItemDetail", true, false)
+					if detail_nodes.size() > 0:
+						var detail_panel = detail_nodes[0]
+						print("DEBUG: Found CraftingItemDetail: ", detail_panel.name)
+						
+						if detail_panel.has_method("refresh_display"):
+							detail_panel.refresh_display()
+							print("SUCCESS: Refreshed crafting item details panel")
+							return
+						else:
+							print("ERROR: CraftingItemDetail missing refresh_display method")
+							return
+					else:
+						print("DEBUG: CraftingItemDetail not found in Crafting tab")
+		
+		current_node = current_node.get_parent()
+	
+	print("WARNING: Could not find crafting item details panel after ", attempts, " attempts")
 
 func start_crafting(item: GameItem):
 	"""Start the crafting process with progress bar"""
@@ -233,9 +295,17 @@ func display_actions_for_item(stack, context = {}):
 	craft_button.text = "Craft " + stack.item.name
 	craft_button.custom_minimum_size = Vector2(150, 40)
 	
-	# Check if can craft
+	# Check if can craft with detailed logging
 	var can_craft = CraftingManager.can_craft_item(stack.item)
 	craft_button.disabled = not can_craft
+	
+	# Debug craft requirements
+	print("Craft button state for ", stack.item.name, ": ", "enabled" if can_craft else "disabled")
+	if not can_craft and stack.item.craft_requirements:
+		for material_name in stack.item.craft_requirements:
+			var required = stack.item.craft_requirements[material_name]
+			var available = InventoryManager.get_total_item_count(material_name)
+			print("  - Need ", required, "x ", material_name, ", have ", available)
 	
 	# Connect to start_crafting method
 	craft_button.pressed.connect(func(): start_crafting(stack.item))
