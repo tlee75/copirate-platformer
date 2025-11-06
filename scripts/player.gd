@@ -6,6 +6,8 @@ const WALK_SPEED := 100.0
 const RUN_SPEED := 250.0
 const JUMP_VELOCITY := -400.0
 
+@export var max_cursor_distance: float = 80.0  # Adjustable in editor
+
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") as float
 
 var was_airborne: bool = false
@@ -448,21 +450,46 @@ func update_cursor_position():
 	var mouse_pos = get_global_mouse_position()
 	var player_pos = global_position
 	
-	# Calculate direction from player to mouse
-	var direction = (mouse_pos - player_pos).normalized()
+	# Calculate direction and distance from player to mouse
+	var direction_to_mouse = mouse_pos - player_pos
+	var distance_to_mouse = direction_to_mouse.length()
 	
-	# Set cursor area position at fixed distance from player
-	var cursor_distance = 50.0  # Fixed distance to prevent infinite range
-	cursor_area.position = direction * cursor_distance
+	# Set maximum crosshair range
+	var cursor_distance = 80.0  # Renamed to avoid shadowing
 	
-	# Face the direction of movement when moving; otherwise, face the mouse direction when idle
+	# Position crosshair at mouse position, but clamp to maximum distance
+	if distance_to_mouse <= cursor_distance:
+		# Mouse is within range - crosshair follows mouse exactly
+		cursor_area.position = direction_to_mouse
+	else:
+		# Mouse is beyond range - clamp crosshair to maximum distance
+		var normalized_direction = direction_to_mouse.normalized()
+		cursor_area.position = normalized_direction * cursor_distance
+		
+		# Warp mouse back to the clamped position to keep it responsive
+		var clamped_world_pos = player_pos + (normalized_direction * cursor_distance)
+		
+		# Convert world position to screen coordinates using get_global_mouse_position()
+		# Since we know the clamped world position, we can calculate the screen position directly
+		var screen_center = get_viewport().get_visible_rect().size / 2.0
+		var camera = get_viewport().get_camera_2d()
+		if camera:
+			# Get the offset from camera to clamped position
+			var camera_offset = clamped_world_pos - camera.global_position
+			# Apply camera zoom and convert to screen coordinates
+			var zoomed_offset = camera_offset * camera.zoom
+			var clamped_screen_pos = screen_center + zoomed_offset
+			Input.warp_mouse(clamped_screen_pos)
+	
+	# Face the direction of movement when moving; otherwise, face the crosshair direction when idle
 	if abs(velocity.x) > 1.0:
 		$AnimatedSprite2D.flip_h = last_move_dir < 0
 	else:
-		$AnimatedSprite2D.flip_h = direction.x < 0
+		# Use the actual crosshair position for facing direction (not raw mouse)
+		var crosshair_direction = cursor_area.position.normalized()
+		$AnimatedSprite2D.flip_h = crosshair_direction.x < 0
 	
 	# Ensure crosshair position is not affected by sprite flipping
-	# Reset any transform that might be affected by parent flipping
 	if cursor_area.has_node("Crosshair"):
 		var crosshair = cursor_area.get_node("Crosshair")
 		crosshair.position = Vector2.ZERO  # Keep crosshair centered on cursor area
