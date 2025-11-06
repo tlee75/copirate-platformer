@@ -16,7 +16,6 @@ var current_burn_time: float = 0.0  # Time left for current burning item
 var cooking_slots: Array[Dictionary] = []  # Track what's cooking in each slot
 
 
-
 func _init():
 	name = "Firepit"
 	description = "Simple stone firepit"
@@ -35,6 +34,8 @@ func _ready():
 	
 	state = ObjectState.UNLIT
 
+	sprite_node = animated_sprite
+
 	# Add interactive object component
 	interactive_object = InteractiveObjectComponent.new()
 	interactive_object.object_name = "Firepit"
@@ -43,9 +44,11 @@ func _ready():
 	add_child(interactive_object)
 
 	# Connect to ResourceManager for fuel consumption
-	# Connect to ResourceManager for fuel consumption (with retry)
 	await get_tree().process_frame
 	_connect_to_resource_manager()
+
+	# Setup hover detection (now async)
+	await setup_hover_detection()
 
 func _connect_to_resource_manager():
 	if ResourceManager.resource_timer:
@@ -55,6 +58,13 @@ func _connect_to_resource_manager():
 		print("DEBUG: ResourceManager not ready, retrying in 0.1 seconds...")
 		await get_tree().create_timer(0.1).timeout
 		_connect_to_resource_manager()
+
+
+func get_hover_color() -> Color:
+	if state == ObjectState.BURNING:
+		return Color(1.3, 1.1, 0.9, 1.0)  # Orange/red tint for burning
+	else:
+		return Color(1.2, 1.2, 1.2, 1.0)  # Neutral bright tint for unlit
 
 func is_interactable() -> bool:
 	return true

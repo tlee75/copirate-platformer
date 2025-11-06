@@ -1,41 +1,48 @@
 extends Node2D
+class_name GameTerrain
 
-class_name GameStructure
-
-var craftable: bool = false
-var category: String = ""
-var icon: Texture2D
-var craft_requirements: Dictionary = {}
-var scene_path: String = ""
-var placement_bottom_padding = 0
-var description: String = ""  # Structure description - set by individual item scripts
-
-# Add these properties to your existing structure.gd:
+# Hover effect properties
 var hover_detector: HoverDetector
 var original_modulate: Color
 var hover_tween: Tween
-var sprite_node  # Can be AnimatedSprite2D or Sprite2D
-var original_scale: Vector2
+var sprite_node: Sprite2D  # Reference to the sprite node
 
-# Add these methods to your existing structure.gd:
+# Terrain properties
+var category: String = "terrain"
 
-func setup_hover_detection():
-	"""Call this from _ready() in structure scenes"""
-	# Wait one frame to ensure scene is fully loaded
+func _ready():
+	# Wait one frame to ensure all @onready variables are initialized
 	await get_tree().process_frame
 	
+	# Find the sprite node automatically
+	_find_sprite_node()
+	
+	# Setup hover detection
+	setup_hover_detection()
+
+func _find_sprite_node():
+	"""Automatically find the Sprite2D node in children"""
+	for child in get_children():
+		if child is Sprite2D:
+			sprite_node = child
+			break
+	
 	if not sprite_node:
-		print("Warning: No sprite found in ", name, " - hover effects disabled")
+		print("Warning: No Sprite2D found in ", name, " - hover effects disabled")
+
+func setup_hover_detection():
+	"""Setup hover detection for terrain objects"""
+	if not sprite_node:
+		print("Warning: No Sprite2D found in ", name, " - hover effects disabled")
 		return
 		
 	original_modulate = sprite_node.modulate
-	original_scale = scale  # Store the original scale of the Node2D
 	
 	# Create hover detector
 	hover_detector = HoverDetector.new()
 	add_child(hover_detector)
 	
-	# Connect the signals
+	# IMPORTANT: Connect the signals to our methods
 	hover_detector.hover_started.connect(_on_hover_enter)
 	hover_detector.hover_ended.connect(_on_hover_exit)
 	
@@ -45,8 +52,7 @@ func setup_hover_detection():
 		hover_detector.setup_collision_from_existing(area_node)
 		print("Hover detection setup for ", name, " with existing Area2D")
 	else:
-		_create_basic_hover_collision()
-		print("Created basic hover collision for ", name)
+		print("Warning: No Area2D found for hover detection in ", name)
 
 func _find_area2d() -> Area2D:
 	"""Find Area2D node in children"""
@@ -55,16 +61,8 @@ func _find_area2d() -> Area2D:
 			return child
 	return null
 
-func _create_basic_hover_collision():
-	"""Create basic rectangular collision for hover detection"""
-	var collision = CollisionShape2D.new()
-	var shape = RectangleShape2D.new()
-	shape.size = Vector2(64, 64)  # Default size, adjust as needed
-	collision.shape = shape
-	hover_detector.add_child(collision)
-
 func _on_hover_enter():
-	"""Called when mouse enters the structure"""
+	"""Called when mouse enters the terrain object"""
 	if not is_interactable():
 		return
 	
@@ -76,21 +74,18 @@ func _on_hover_enter():
 	hover_tween = create_tween()
 	hover_tween.set_parallel(true)
 	
-	# Get hover color
+	# Get hover color (can be overridden by subclasses)
 	var hover_color = get_hover_color()
 	hover_tween.tween_property(sprite_node, "modulate", hover_color, 0.15)
 	
-	# Scale up from the original scale, not from 1.0
-	var hover_scale = original_scale * 1.03  # 3% larger than original
-	hover_tween.tween_property(self, "scale", hover_scale, 0.15)
+	# Subtle scale increase
+	hover_tween.tween_property(self, "scale", Vector2(1.05, 1.05), 0.15)
 	
 	# Change cursor
 	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
-	
-	print("Structure hover entered: ", name)
 
 func _on_hover_exit():
-	"""Called when mouse exits the structure"""
+	"""Called when mouse exits the terrain object"""
 	if not sprite_node:
 		return
 		
@@ -104,16 +99,14 @@ func _on_hover_exit():
 	
 	# Return to original colors and scale
 	hover_tween.tween_property(sprite_node, "modulate", original_modulate, 0.15)
-	hover_tween.tween_property(self, "scale", original_scale, 0.15)  # Back to original scale
+	hover_tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.15)
 	
 	# Reset cursor
 	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
-	
-	print("Structure hover exited: ", name)
 
 func get_hover_color() -> Color:
 	"""Override this in subclasses for custom hover colors"""
-	return Color(1.2, 1.2, 1.2, 1.0)  # Default: slightly brighter
+	return Color(1.1, 1.3, 1.1, 1.0)  # Default: slightly brighter with green tint
 
 func is_interactable() -> bool:
 	"""Override this in subclasses"""
