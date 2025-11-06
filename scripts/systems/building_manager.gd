@@ -1,26 +1,26 @@
 extends Node
 
-signal building_started(structure: GameStructure)
-signal building_completed(structure: GameStructure)
+signal building_started(structure: GameObject)
+signal building_completed(structure: GameObject)
 
-func get_buildable_structures() -> Array[GameStructure]:
-	var buildable_structures: Array[GameStructure] = []
+func get_buildable_structures() -> Array[GameObject]:
+	var buildable_structures: Array[GameObject] = []
 	for item_key in GameObjectsDatabase.game_objects_database:
 		var item = GameObjectsDatabase.game_objects_database[item_key]
-		if item is GameStructure and item.craftable:
+		if item is GameObject and item.craftable:
 			buildable_structures.append(item)
 	return buildable_structures
 
-func get_buildable_structures_by_category(category: String) -> Array[GameStructure]:
-	var buildable_structures: Array[GameStructure] = []
+func get_buildable_structures_by_category(category: String) -> Array[GameObject]:
+	var buildable_structures: Array[GameObject] = []
 	for item_key in GameObjectsDatabase.game_objects_database:
 		var item = GameObjectsDatabase.game_objects_database[item_key]
-		if item is GameStructure and item.craftable:
+		if item is GameObject and item.craftable:
 			if category == "all" or item.category == category:
 				buildable_structures.append(item)
 	return buildable_structures
 
-func has_build_materials(structure: GameStructure) -> bool:
+func has_build_materials(structure: GameObject) -> bool:
 	for material_name in structure.craft_requirements:
 		var required_amount = structure.craft_requirements[material_name]
 		var available_amount = InventoryManager.get_total_item_count(material_name)
@@ -28,7 +28,7 @@ func has_build_materials(structure: GameStructure) -> bool:
 			return false
 	return true
 
-func start_building(structure: GameStructure) -> bool:
+func start_building(structure: GameObject) -> bool:
 	if not has_build_materials(structure):
 		print("Cannot build ", structure.name, " - insufficient materials")
 		return false
@@ -40,7 +40,7 @@ func start_building(structure: GameStructure) -> bool:
 		return true
 	return false
 
-func complete_building(structure: GameStructure) -> bool:
+func complete_building(structure: GameObject) -> bool:
 	# Consume materials
 	for material_name in structure.craft_requirements:
 		var required_amount = structure.craft_requirements[material_name]

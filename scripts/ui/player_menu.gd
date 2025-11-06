@@ -483,7 +483,7 @@ func get_craftable_items_by_category(category: String) -> Array[InventoryManager
 	var craftable_items: Array[InventoryManager.ItemStack] = []
 	for item_key in GameObjectsDatabase.game_objects_database:
 		var item = GameObjectsDatabase.game_objects_database[item_key]
-		# Only include GameItems, exclude GameStructures
+		# Only include GameItems, exclude GameObjects
 		if item is GameItem and item.craftable:
 			if category == "all" or item.category == category:
 				var temp_stack = InventoryManager.ItemStack.new(item, 1)
@@ -539,7 +539,7 @@ func _on_building_category_selected(category: String):
 			building_item_list.set_selected_index(0)
 		_on_building_item_selected(first_structure)
 
-func _on_building_item_selected(structure: GameStructure):
+func _on_building_item_selected(structure: GameObject):
 	print("Building item selected: ", structure.name)
 	
 	if building_item_detail:

@@ -5,7 +5,7 @@ signal item_selected(stack: InventoryManager.ItemStack)
 signal item_action_requested(stack: InventoryManager.ItemStack, action_type: InventoryActionResolver.ActionType)
 signal item_buttons_created
 
-signal structure_selected(structure: GameStructure)
+signal structure_selected(structure: GameObject)
 
 var scroll_container: ScrollContainer
 var item_container: VBoxContainer
@@ -54,7 +54,7 @@ func refresh_items(items: Array[InventoryManager.ItemStack]):
 	_hide_empty_state()
 	_create_item_buttons()
 
-func refresh_structures(structures: Array[GameStructure]):
+func refresh_structures(structures: Array[GameObject]):
 	print("DEBUG: refresh_structures called with structures: ", structures.size())
 	
 	# Store structures separately
@@ -81,7 +81,7 @@ func refresh_structures(structures: Array[GameStructure]):
 	item_container.queue_redraw()
 	emit_signal("item_buttons_created")
 
-func _create_structure_button(structure: GameStructure, index: int) -> Control:
+func _create_structure_button(structure: GameObject, index: int) -> Control:
 	var button = Button.new()
 	button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS
 	button.text = structure.name

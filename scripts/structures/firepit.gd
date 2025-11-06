@@ -1,4 +1,4 @@
-extends GameStructure
+extends GameObject
 
 class_name Firepit
 

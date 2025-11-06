@@ -1,4 +1,4 @@
-extends GameTerrain
+extends GameObject
 
 @export var full_texture: Texture2D
 @export var empty_texture: Texture2D

@@ -1,0 +1,144 @@
+extends Node2D
+class_name GameObject
+
+# Core properties
+var category: String = ""
+var description: String = ""
+
+# Crafting properties (only used by structures)
+var craftable: bool = false
+var icon: Texture2D
+var craft_requirements: Dictionary = {}
+var scene_path: String = ""
+var placement_bottom_padding = 0
+
+# Hover effect properties
+var hover_detector: HoverDetector
+var original_modulate: Color
+var original_scale: Vector2
+var hover_tween: Tween
+var sprite_node  # Can be AnimatedSprite2D or Sprite2D
+
+func _ready():
+	# Wait one frame to ensure all @onready variables are initialized
+	await get_tree().process_frame
+	
+	# Find the sprite node automatically
+	_find_sprite_node()
+	
+	# Setup hover detection
+	setup_hover_detection()
+
+func _find_sprite_node():
+	"""Automatically find the sprite node in children"""
+	for child in get_children():
+		if child is Sprite2D or child is AnimatedSprite2D:
+			sprite_node = child
+			break
+	
+	if not sprite_node:
+		print("Warning: No Sprite2D/AnimatedSprite2D found in ", name, " - hover effects disabled")
+
+func setup_hover_detection():
+	"""Setup hover detection for interactable objects"""
+	if not sprite_node:
+		return
+		
+	original_modulate = sprite_node.modulate
+	original_scale = scale  # Store the original scale
+	
+	# Create hover detector
+	hover_detector = HoverDetector.new()
+	add_child(hover_detector)
+	
+	# Connect the signals
+	hover_detector.hover_started.connect(_on_hover_enter)
+	hover_detector.hover_ended.connect(_on_hover_exit)
+	
+	# Find Area2D and copy collision shape
+	var area_node = _find_area2d()
+	if area_node:
+		hover_detector.setup_collision_from_existing(area_node)
+		print("Hover detection setup for ", name, " with existing Area2D")
+	else:
+		_create_basic_hover_collision()
+		print("Created basic hover collision for ", name)
+
+func _find_area2d() -> Area2D:
+	"""Find Area2D node in children"""
+	for child in get_children():
+		if child is Area2D:
+			return child
+	return null
+
+func _create_basic_hover_collision():
+	"""Create basic rectangular collision for hover detection"""
+	var collision = CollisionShape2D.new()
+	var shape = RectangleShape2D.new()
+	shape.size = Vector2(64, 64)  # Default size
+	collision.shape = shape
+	hover_detector.add_child(collision)
+
+func _on_hover_enter():
+	"""Called when mouse enters the object"""
+	if not is_interactable():
+		return
+	
+	# Kill any existing tween
+	if hover_tween:
+		hover_tween.kill()
+	
+	# Create smooth transition to hover state
+	hover_tween = create_tween()
+	hover_tween.set_parallel(true)
+	
+	# Get hover color
+	var hover_color = get_hover_color()
+	hover_tween.tween_property(sprite_node, "modulate", hover_color, 0.15)
+	
+	# Scale up from the original scale
+	var scale_multiplier = get_hover_scale_multiplier()
+	var hover_scale = original_scale * scale_multiplier
+	hover_tween.tween_property(self, "scale", hover_scale, 0.15)
+	
+	# Change cursor
+	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
+
+func _on_hover_exit():
+	"""Called when mouse exits the object"""
+	if not sprite_node:
+		return
+		
+	# Kill any existing tween
+	if hover_tween:
+		hover_tween.kill()
+	
+	# Create smooth transition back to normal
+	hover_tween = create_tween()
+	hover_tween.set_parallel(true)
+	
+	# Return to original colors and scale
+	hover_tween.tween_property(sprite_node, "modulate", original_modulate, 0.15)
+	hover_tween.tween_property(self, "scale", original_scale, 0.15)
+	
+	# Reset cursor
+	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+
+# Virtual methods - override in subclasses
+func get_hover_color() -> Color:
+	"""Override this in subclasses for custom hover colors"""
+	if category == "terrain":
+		return Color(1.1, 1.3, 1.1, 1.0)  # Green tint for terrain
+	else:
+		return Color(1.2, 1.2, 1.2, 1.0)  # Neutral for structures
+
+func get_hover_scale_multiplier() -> float:
+	"""Override this in subclasses for custom scale amounts"""
+	if category == "terrain":
+		return 1.05  # 5% larger for terrain
+	else:
+		return 1.03  # 3% larger for structures
+
+func is_interactable() -> bool:
+	"""Override this in subclasses"""
+	return true
