@@ -10,9 +10,12 @@ var previous_menu: MenuType = MenuType.NONE
 var player_menu: PlayerMenu
 var object_inventory_menu: Control
 var current_object: Node2D
+var pause_menu: Control
 
 # Menu State Tracking
 var menu_stack: Array[MenuType] = []
+
+
 
 # Signals for UI coordination
 signal menu_opened(menu_type: MenuType)
@@ -61,7 +64,8 @@ func initialize():
 	
 	player_menu = ui_layer.get_node_or_null("PlayerMenu")
 	object_inventory_menu = ui_layer.get_node_or_null("ObjectInventoryMenu")
-	
+	pause_menu = ui_layer.get_node_or_null("PauseMenu")  # Add this line
+
 	if not player_menu:
 		print("ERROR: Could not find PlayerMenu")
 	else:
@@ -72,6 +76,11 @@ func initialize():
 		print("ERROR: Could not find ObjectInventoryMenu")
 	else:
 		print("Found ObjectInventoryMenu successfully")
+
+	if not pause_menu:
+		print("ERROR: Could not find PauseMenu")
+	else:
+		print("Found PauseMenu successfully")
 
 	# Connect to player input handler
 	var player_input_handler = get_tree().get_first_node_in_group("player_input_handler")
@@ -191,6 +200,8 @@ func _close_current_menu():
 			close_player_menu()
 		MenuType.OBJECT:
 			close_object_menu()
+		MenuType.PAUSE:
+			close_pause_menu()  # Add this line
 		MenuType.NONE:
 			pass  # Nothing to close
 		_:
@@ -237,5 +248,33 @@ func can_open_menu(menu_type: MenuType) -> bool:
 			return player_menu != null
 		MenuType.OBJECT:
 			return object_inventory_menu != null
+		MenuType.PAUSE:
+			return pause_menu != null  # Add this line
 		_:
 			return false
+
+# Add pause menu control methods
+func open_pause_menu():
+	"""Open pause menu, closing other menus if necessary"""
+	print("UIManager: Opening pause menu")
+	
+	# Close any other open menu first
+	if current_menu != MenuType.NONE and current_menu != MenuType.PAUSE:
+		_close_current_menu()
+	
+	# Open pause menu
+	if pause_menu and pause_menu.has_method("show_pause_menu"):
+		pause_menu.show_pause_menu()
+		# Don't call _set_current_menu here since pause_menu.show_pause_menu() will handle it
+	else:
+		print("ERROR: Cannot open pause menu - missing method or reference")
+
+func close_pause_menu():
+	"""Close pause menu"""
+	print("UIManager: close_pause_menu() START")
+	
+	if pause_menu and pause_menu.has_method("hide_pause_menu"):
+		pause_menu.hide_pause_menu()
+		# Don't call _set_current_menu here since pause_menu.hide_pause_menu() will handle it
+	
+	print("UIManager: close_pause_menu() END")

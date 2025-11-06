@@ -43,17 +43,16 @@ func _ready():
 		water_flow_manager.flow_completed.connect(_on_water_flow_completed)
 
 func _input(event):
-	if event.is_action_pressed("ui_cancel"):
-		# Only show pause menu if UIManager says no menus are open
-		var ui_manager = $UI/UIManager
-		if ui_manager and ui_manager.is_any_menu_open():
-			# UIManager will handle closing menus
-			return
-		
-		# No other menus open, show pause menu
-		if ui_layer and pause_menu:
-			pause_menu.show()
-			get_tree().paused = true
+	if event.is_action_pressed("ui_cancel"):  # ESC key
+		var ui_manager = get_tree().get_first_node_in_group("ui_manager")
+		if ui_manager:
+			if ui_manager.is_any_menu_open():
+				# Close any open menu
+				ui_manager.close_all_menus()
+			else:
+				# Open pause menu
+				ui_manager.open_pause_menu()
+		get_viewport().set_input_as_handled()
 
 func _on_tile_flooded(_tile_pos: Vector2i, _water_type: int):
 	# You could add particle effects, sounds, etc. here
