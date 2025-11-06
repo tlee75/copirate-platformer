@@ -23,7 +23,28 @@ signal ui_state_changed(has_menu_open: bool)
 func _ready():
 	add_to_group("ui_manager")
 	print("UIManager initialized")
+	
+	# Initialize cursor state
+	_initialize_cursor_state()
+	
 	call_deferred("initialize")
+
+func _initialize_cursor_state():
+	"""Set initial cursor state based on game context"""
+	# Hide cursor by default in gameplay
+	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+	print("UIManager: Cursor initialized as hidden")
+
+func _update_cursor_visibility():
+	"""Update cursor visibility based on current menu state"""
+	if current_menu == MenuType.NONE:
+		# No menus open - hide cursor for clean gameplay
+		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+		print("UIManager: Cursor hidden (no menus open)")
+	else:
+		# Menu is open - show cursor for UI interaction
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		print("UIManager: Cursor visible (menu open: ", _menu_type_to_string(current_menu), ")")
 
 func _input(event):
 	# Handle ESC key to close any open menu
@@ -147,6 +168,9 @@ func _set_current_menu(menu_type: MenuType):
 	
 	print("UIManager: Menu state changed from ", _menu_type_to_string(old_menu), " to ", _menu_type_to_string(menu_type))
 	
+	# Update cursor visibility when menu state changes
+	_update_cursor_visibility()
+	
 	# Emit appropriate signals
 	if old_menu != MenuType.NONE:
 		menu_closed.emit(old_menu)
@@ -159,7 +183,7 @@ func _set_current_menu(menu_type: MenuType):
 	
 	# Emit UI state change
 	ui_state_changed.emit(menu_type != MenuType.NONE)
-
+	
 func _close_current_menu():
 	"""Internal method to close whatever menu is currently open"""
 	match current_menu:
