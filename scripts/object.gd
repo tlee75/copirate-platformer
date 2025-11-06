@@ -13,7 +13,6 @@ var scene_path: String = ""
 var placement_bottom_padding = 0
 
 # Hover effect properties
-var hover_detector: HoverDetector
 var original_modulate: Color
 var original_scale: Vector2
 var hover_tween: Tween
@@ -41,28 +40,45 @@ func _find_sprite_node():
 
 func setup_hover_detection():
 	"""Setup hover detection for interactable objects"""
+	# Wait one frame to ensure scene is fully loaded
+	await get_tree().process_frame
+	
 	if not sprite_node:
 		return
 		
 	original_modulate = sprite_node.modulate
-	original_scale = scale  # Store the original scale
+	original_scale = scale
 	
-	# Create hover detector
-	hover_detector = HoverDetector.new()
-	add_child(hover_detector)
+	# Find our Area2D
+	var our_area = _find_area2d()
+	if not our_area:
+		print("Warning: No Area2D found for hover detection in ", name)
+		return
 	
-	# Connect the signals
-	hover_detector.hover_started.connect(_on_hover_enter)
-	hover_detector.hover_ended.connect(_on_hover_exit)
+	# Connect our area's signals to detect when player's cursor enters/exits
+	if not our_area.area_entered.is_connected(_on_area_entered):
+		our_area.area_entered.connect(_on_area_entered)
+	if not our_area.area_exited.is_connected(_on_area_exited):
+		our_area.area_exited.connect(_on_area_exited)
 	
-	# Find Area2D and copy collision shape
-	var area_node = _find_area2d()
-	if area_node:
-		hover_detector.setup_collision_from_existing(area_node)
-		print("Hover detection setup for ", name, " with existing Area2D")
-	else:
-		_create_basic_hover_collision()
-		print("Created basic hover collision for ", name)
+	print("Crosshair hover detection setup for ", name)
+
+func _on_area_entered(area: Area2D):
+	"""Called when another area enters our area"""
+	# Check if it's the player's cursor area
+	if _is_player_cursor_area(area):
+		_on_hover_enter()
+
+func _on_area_exited(area: Area2D):
+	"""Called when another area exits our area"""
+	# Check if it's the player's cursor area
+	if _is_player_cursor_area(area):
+		_on_hover_exit()
+
+func _is_player_cursor_area(area: Area2D) -> bool:
+	"""Check if the given area is the player's cursor area"""
+	var parent = area.get_parent()
+	return parent and parent.is_in_group("player") and area.name == "CursorArea"
 
 func _find_area2d() -> Area2D:
 	"""Find Area2D node in children"""
@@ -71,16 +87,8 @@ func _find_area2d() -> Area2D:
 			return child
 	return null
 
-func _create_basic_hover_collision():
-	"""Create basic rectangular collision for hover detection"""
-	var collision = CollisionShape2D.new()
-	var shape = RectangleShape2D.new()
-	shape.size = Vector2(64, 64)  # Default size
-	collision.shape = shape
-	hover_detector.add_child(collision)
-
 func _on_hover_enter():
-	"""Called when mouse enters the object"""
+	"""Called when crosshair enters the object"""
 	if not is_interactable():
 		return
 	
@@ -101,11 +109,10 @@ func _on_hover_enter():
 	var hover_scale = original_scale * scale_multiplier
 	hover_tween.tween_property(self, "scale", hover_scale, 0.15)
 	
-	# Change cursor
-	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
+	print("Crosshair hover entered: ", name)
 
 func _on_hover_exit():
-	"""Called when mouse exits the object"""
+	"""Called when crosshair exits the object"""
 	if not sprite_node:
 		return
 		
@@ -121,8 +128,7 @@ func _on_hover_exit():
 	hover_tween.tween_property(sprite_node, "modulate", original_modulate, 0.15)
 	hover_tween.tween_property(self, "scale", original_scale, 0.15)
 	
-	# Reset cursor
-	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+	print("Crosshair hover exited: ", name)
 
 # Virtual methods - override in subclasses
 func get_hover_color() -> Color:

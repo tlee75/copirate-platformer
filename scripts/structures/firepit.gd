@@ -34,8 +34,6 @@ func _ready():
 	
 	state = ObjectState.UNLIT
 
-	sprite_node = animated_sprite
-
 	# Add interactive object component
 	interactive_object = InteractiveObjectComponent.new()
 	interactive_object.object_name = "Firepit"
@@ -47,8 +45,8 @@ func _ready():
 	await get_tree().process_frame
 	_connect_to_resource_manager()
 
-	# Setup hover detection (now async)
-	await setup_hover_detection()
+	# Call parent _ready() which sets up hover detection
+	super._ready()
 
 func _connect_to_resource_manager():
 	if ResourceManager.resource_timer:
