@@ -221,7 +221,13 @@ func _on_move_button_pressed():
 		_transfer_from_player_to_object(selected_player_item)
 
 func _on_close_button_pressed():
-	close_menu()
+	# Use UIManager to properly close the menu and restore game state
+	var ui_manager = get_tree().get_first_node_in_group("ui_manager")
+	if ui_manager and ui_manager.has_method("close_object_menu"):
+		ui_manager.close_object_menu()
+	else:
+		# Fallback to direct close if UIManager not found
+		close_menu()
 
 # ============================================================================
 # ITEM SELECTION HANDLERS
