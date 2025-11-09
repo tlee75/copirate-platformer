@@ -308,10 +308,41 @@ func handle_interact_or_use_action():
 						var environment_msg = "underwater" if is_underwater else "on land"
 						print("Cannot use ", item_name, " ", environment_msg, "!")
 						return
-					tool_target = get_tool_target()
-					handle_quick_access_action(selected_stack, tool_target)
+					# Use the currently targeted object/tile from our targeting system
+					if current_targeted_object != null:
+						# Check if current target is valid for this tool
+						var tool_item = selected_stack.item
+						if is_valid_tool_target(current_targeted_object, tool_item):
+							tool_target = current_targeted_object
+							handle_quick_access_action(selected_stack, tool_target)
+						else:
+							print("Cannot use ", tool_item.name, " on this target")
+					else:
+						print("No target selected for tool use")
 				else:
 					print("Cannot interact or use an item")
+
+func is_valid_tool_target(target: Variant, tool_item) -> bool:
+	"""Check if the target is valid for this tool"""
+	if not tool_item or not tool_item.is_tool or tool_item.tool_action == "":
+		return false
+	
+	# Handle tile targets (Vector2i)
+	if typeof(target) == TYPE_VECTOR2I:
+		var tile_pos = target as Vector2i
+		var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
+		if tile_data:
+			match tool_item.tool_action:
+				"dig":
+					return tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable")
+				# Add other tile tool actions here as needed
+		return false
+	
+	# Handle object targets (Node2D)
+	elif target is GameObject:
+		return check_object_tool_compatibility(target, tool_item.tool_action)
+	
+	return false
 
 func handle_attack_action():
 	if PlacementManager.placement_active:
@@ -772,18 +803,18 @@ func get_attack_target():
 			targets.append(parent)
 	return targets[0] if targets.size() > 0 else null
 
-func get_tool_target():
-	var tile_pos = get_tiles_in_cursor_area()
-	if tile_pos.size() > 0 and is_tile_target(tile_pos[0]):
-		return tile_pos[0]
-	for body in cursor_area.get_overlapping_bodies():
-		if body.has_method("is_tool_target") and body.is_tool_target():
-			return body
-	for area in cursor_area.get_overlapping_areas():
-		var parent = area.get_parent()
-		if parent.has_method("is_tool_target") and parent.is_tool_target():
-			return parent
-	return null
+#func get_tool_target():
+	#var tile_pos = get_tiles_in_cursor_area()
+	#if tile_pos.size() > 0 and is_tile_target(tile_pos[0]):
+		#return tile_pos[0]
+	#for body in cursor_area.get_overlapping_bodies():
+		#if body.has_method("is_tool_target") and body.is_tool_target():
+			#return body
+	#for area in cursor_area.get_overlapping_areas():
+		#var parent = area.get_parent()
+		#if parent.has_method("is_tool_target") and parent.is_tool_target():
+			#return parent
+	#return null
 
 func get_potential_targets() -> Array:
 	var overlapping_areas = cursor_area.get_overlapping_areas()

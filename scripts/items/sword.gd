@@ -19,6 +19,6 @@ func _init():
 	attack_animation = "sword_attack"
 	damage = 1
 	is_weapon = true
-	target_range = 45.0
+	target_range = 60.0
 	target_spread = 12.0
 	
