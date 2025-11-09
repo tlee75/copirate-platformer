@@ -30,6 +30,8 @@ var is_dead: bool = false
 var attack_target = null 
 var tool_target = null
 var interact_target = null
+var current_hover_target: GameObject = null
+var current_targeted_object: Variant = null
 
 # UI Manager reference for centralized state checking
 var ui_manager: UIManager
@@ -76,6 +78,9 @@ func _ready():
 	# Get references to cursor area and tilemap
 	cursor_area = $CursorArea
 	tilemap = get_parent().get_node("TileMap")
+	
+	# Initialize crosshair as hidden
+	set_crosshair_visibility(false)
 	
 	# Create reusable highlight texture
 	create_highlight_texture()
@@ -730,18 +735,23 @@ func _on_stat_depleted(stat_name: String):
 			print("Player is dehydrated!")
 
 func is_interact_target():
-	var all_targets = get_potential_targets()
+	"""Check if current targeted object is interactable"""
+	# Only allow interaction with the currently targeted object
+	if not current_targeted_object:
+		return false
 	
-	# Find first interactable target
-	for target in all_targets:
-		print(target)
-		if target != self and target.has_method("is_interactable") and target.is_interactable():
-			print("interactable")
-			interact_target = target
-			target.set_cooldown()
+	# Handle tile targets (Vector2i) - not interactable
+	if typeof(current_targeted_object) == TYPE_VECTOR2I:
+		return false
+	
+	# Handle object targets (Node2D)
+	if current_targeted_object is Node2D:
+		if current_targeted_object.has_method("is_interactable") and current_targeted_object.is_interactable():
+			interact_target = current_targeted_object
+			current_targeted_object.set_cooldown()
 			return true
-		
-	print("No interactable objects in range")
+	
+	return false
 
 func is_attack_target(target):
 	return target and target.has_method("is_attack_target") and target.is_attack_target()
@@ -894,7 +904,10 @@ func update_crosshair_targeting():
 	# FALLBACK: Position at mouse location (no range limit)
 	cursor_area.position = mouse_pos - player_pos
 	
-	# Clear tile highlights when no specific target is found
+	# Clear all targeting effects when no specific target is found
+	current_targeted_object = null
+	clear_hover_target()
+	set_crosshair_visibility(false)
 	clear_tile_highlights()
 	current_highlighted_tile = Vector2i(-999, -999)
 
@@ -936,7 +949,9 @@ func get_attackable_at_position(world_pos: Vector2, max_range: float):
 func get_interactable_at_position(world_pos: Vector2, max_range: float):
 	"""Check for interactable GameObjects directly at cursor position"""
 	var player_pos = global_position
-	if world_pos.distance_to(player_pos) > max_range:
+	var distance = world_pos.distance_to(player_pos)
+		
+	if distance > max_range:
 		return null
 	
 	var space_state = get_world_2d().direct_space_state
@@ -1040,17 +1055,42 @@ func check_object_tool_compatibility(obj: GameObject, tool_action: String) -> bo
 	return false
 
 func snap_crosshair_to_target(target: Node2D):
-	"""Position crosshair at target's location and clear tile highlights"""
+	"""Position crosshair at target's location and manage hover effects"""
 	cursor_area.global_position = target.global_position
+	
+	# Store current target for interaction system
+	current_targeted_object = target
+	
+	# Handle hover effects for GameObjects
+	if target is GameObject:
+		set_hover_target(target)
+	else:
+		clear_hover_target()
+	
+	# Show crosshair for attackable targets, hide for peaceful interactions
+	var show_crosshair = false
+	if target.has_method("is_attack_target") and target.is_attack_target(target):
+		show_crosshair = true
+	elif target.has_method("is_attackable") and target.is_attackable():
+		show_crosshair = true
+	
+	# Update crosshair visibility
+	set_crosshair_visibility(show_crosshair)
 	
 	# Clear tile highlights when targeting objects (not tiles)
 	clear_tile_highlights()
 	current_highlighted_tile = Vector2i(-999, -999)
 
 func snap_crosshair_to_tile(tile_pos: Vector2i):
-	"""Position crosshair at tile's center and highlight it"""
+	"""Position crosshair at tile's center, highlight it, and hide crosshair symbol"""
 	var world_pos = tilemap.map_to_local(tile_pos)
 	cursor_area.global_position = world_pos
+	
+	# Store tile as current target
+	current_targeted_object = tile_pos  # Store the tile position as target
+	
+	# Hide crosshair for tile targets (digging is peaceful)
+	set_crosshair_visibility(false)
 	
 	# Update tile highlighting for this targeted tile
 	update_tile_highlights_for_target(tile_pos)
@@ -1304,3 +1344,28 @@ func update_tile_highlights_for_target(target_tile: Vector2i):
 	# Create highlight for the targeted tile
 	if target_tile != Vector2i(-999, -999):
 		create_tile_highlight_optimized(target_tile)
+
+func set_crosshair_visibility(visible: bool):
+	"""Show or hide the crosshair + symbol"""
+	if cursor_area.has_node("Crosshair"):
+		var crosshair = cursor_area.get_node("Crosshair")
+		crosshair.visible = visible
+
+func set_hover_target(target: GameObject):
+	"""Set a new hover target and manage hover effects"""
+	# Clear previous hover if different target
+	if current_hover_target and current_hover_target != target:
+		if is_instance_valid(current_hover_target):
+			current_hover_target._on_hover_exit()
+	
+	# Set new hover target
+	current_hover_target = target
+	if target and target.has_method("_on_hover_enter"):
+		target._on_hover_enter()
+
+func clear_hover_target():
+	"""Clear current hover target and effects"""
+	if current_hover_target:
+		if is_instance_valid(current_hover_target):
+			current_hover_target._on_hover_exit()
+		current_hover_target = null

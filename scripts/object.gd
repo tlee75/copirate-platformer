@@ -39,7 +39,7 @@ func _find_sprite_node():
 		print("Warning: No Sprite2D/AnimatedSprite2D found in ", name, " - hover effects disabled")
 
 func setup_hover_detection():
-	"""Setup hover detection for interactable objects"""
+	"""Hover detection now handled by targeting system"""
 	# Wait one frame to ensure scene is fully loaded
 	await get_tree().process_frame
 	
@@ -48,43 +48,22 @@ func setup_hover_detection():
 		
 	original_modulate = sprite_node.modulate
 	original_scale = scale
-	
-	# Find our Area2D
-	var our_area = _find_area2d()
-	if not our_area:
-		print("Warning: No Area2D found for hover detection in ", name)
-		return
-	
-	# Connect our area's signals to detect when player's cursor enters/exits
-	if not our_area.area_entered.is_connected(_on_area_entered):
-		our_area.area_entered.connect(_on_area_entered)
-	if not our_area.area_exited.is_connected(_on_area_exited):
-		our_area.area_exited.connect(_on_area_exited)
-	
-	print("Crosshair hover detection setup for ", name)
+
 
 func _on_area_entered(area: Area2D):
-	"""Called when another area enters our area"""
-	# Check if it's the player's cursor area
-	if _is_player_cursor_area(area):
-		_on_hover_enter()
+	"""No longer used - hover handled by targeting system"""
+	pass
 
 func _on_area_exited(area: Area2D):
-	"""Called when another area exits our area"""
-	# Check if it's the player's cursor area
-	if _is_player_cursor_area(area):
-		_on_hover_exit()
+	"""No longer used - hover handled by targeting system"""
+	pass
 
 func _is_player_cursor_area(area: Area2D) -> bool:
-	"""Check if the given area is the player's cursor area"""
-	var parent = area.get_parent()
-	return parent and parent.is_in_group("player") and area.name == "CursorArea"
+	"""No longer used - hover handled by targeting system"""
+	return false
 
 func _find_area2d() -> Area2D:
-	"""Find Area2D node in children"""
-	for child in get_children():
-		if child is Area2D:
-			return child
+	"""No longer used - hover handled by targeting system"""
 	return null
 
 func _on_hover_enter():
@@ -108,8 +87,7 @@ func _on_hover_enter():
 	var scale_multiplier = get_hover_scale_multiplier()
 	var hover_scale = original_scale * scale_multiplier
 	hover_tween.tween_property(self, "scale", hover_scale, 0.15)
-	
-	print("Crosshair hover entered: ", name)
+
 
 func _on_hover_exit():
 	"""Called when crosshair exits the object"""
@@ -127,8 +105,6 @@ func _on_hover_exit():
 	# Return to original colors and scale
 	hover_tween.tween_property(sprite_node, "modulate", original_modulate, 0.15)
 	hover_tween.tween_property(self, "scale", original_scale, 0.15)
-	
-	print("Crosshair hover exited: ", name)
 
 # Virtual methods - override in subclasses
 func get_hover_color() -> Color:
