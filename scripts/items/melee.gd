@@ -21,3 +21,5 @@ func _init():
 	is_tool = false
 	is_weapon = true
 	damage = 1
+	target_range = 40.0
+	target_spread = 15.0

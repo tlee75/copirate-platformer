@@ -14,6 +14,9 @@ class_name GameItem
 @export var damage: int = 0
 @export var description: String = ""  # Item description - set by individual item scripts
 @export var craft_time: float = 3.0  # Time in seconds to craft this item
+@export var target_range: float = 50.0      # Maximum targeting range
+@export var target_spread: float = 10.0     # Targeting spread width  
+@export var tool_action: String = ""        # "dig", "chop", "mine", etc.
 
 var category: String = ""
 var icon: Texture2D

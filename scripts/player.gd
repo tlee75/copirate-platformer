@@ -7,6 +7,8 @@ const RUN_SPEED := 250.0
 const JUMP_VELOCITY := -400.0
 
 @export var max_cursor_distance: float = 80.0  # Adjustable in editor
+@export var default_interact_range: float = 80.0   # Default interaction range
+@export var default_interact_spread: float = 20.0  # Default interaction spread
 
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") as float
 
@@ -260,7 +262,7 @@ func _physics_process(delta):
 	update_cursor_position()
 	
 	# Update tile highlights
-	update_tile_highlights()
+	#update_tile_highlights()
 	
 	handle_interact_or_use_action()
 	
@@ -446,46 +448,18 @@ func _on_death_animation_finished():
 			get_tree().paused = true
 
 func update_cursor_position():
-	# Get mouse position in world coordinates
-	var mouse_pos = get_global_mouse_position()
-	var player_pos = global_position
+	# Only check mouse bounds occasionally to prevent rapid warping
+	if Engine.get_physics_frames() % 3 == 0:
+		keep_mouse_in_screen()
 	
-	# Calculate direction and distance from player to mouse
-	var direction_to_mouse = mouse_pos - player_pos
-	var distance_to_mouse = direction_to_mouse.length()
-	
-	# Set maximum crosshair range
-	var cursor_distance = 80.0  # Renamed to avoid shadowing
-	
-	# Position crosshair at mouse position, but clamp to maximum distance
-	if distance_to_mouse <= cursor_distance:
-		# Mouse is within range - crosshair follows mouse exactly
-		cursor_area.position = direction_to_mouse
-	else:
-		# Mouse is beyond range - clamp crosshair to maximum distance
-		var normalized_direction = direction_to_mouse.normalized()
-		cursor_area.position = normalized_direction * cursor_distance
-		
-		# Warp mouse back to the clamped position to keep it responsive
-		var clamped_world_pos = player_pos + (normalized_direction * cursor_distance)
-		
-		# Convert world position to screen coordinates using get_global_mouse_position()
-		# Since we know the clamped world position, we can calculate the screen position directly
-		var screen_center = get_viewport().get_visible_rect().size / 2.0
-		var camera = get_viewport().get_camera_2d()
-		if camera:
-			# Get the offset from camera to clamped position
-			var camera_offset = clamped_world_pos - camera.global_position
-			# Apply camera zoom and convert to screen coordinates
-			var zoomed_offset = camera_offset * camera.zoom
-			var clamped_screen_pos = screen_center + zoomed_offset
-			Input.warp_mouse(clamped_screen_pos)
+	# New smart targeting system
+	update_crosshair_targeting()
 	
 	# Face the direction of movement when moving; otherwise, face the crosshair direction when idle
 	if abs(velocity.x) > 1.0:
 		$AnimatedSprite2D.flip_h = last_move_dir < 0
 	else:
-		# Use the actual crosshair position for facing direction (not raw mouse)
+		# Use the actual crosshair position for facing direction
 		var crosshair_direction = cursor_area.position.normalized()
 		$AnimatedSprite2D.flip_h = crosshair_direction.x < 0
 	
@@ -494,6 +468,22 @@ func update_cursor_position():
 		var crosshair = cursor_area.get_node("Crosshair")
 		crosshair.position = Vector2.ZERO  # Keep crosshair centered on cursor area
 
+func keep_mouse_in_screen():
+	"""Prevent mouse from leaving the screen bounds with buffer"""
+	# Get current screen size (updates dynamically with window resize)
+	var screen_size = DisplayServer.window_get_size()
+	var mouse_pos = get_viewport().get_mouse_position()
+	
+	# Add buffer to prevent cursor from going slightly outside
+	var buffer = 5.0
+	var clamped_pos = Vector2(
+		clamp(mouse_pos.x, buffer, screen_size.x - buffer),
+		clamp(mouse_pos.y, buffer, screen_size.y - buffer)
+	)
+	
+	# Only warp if the position actually changed
+	if mouse_pos.distance_to(clamped_pos) > 1.0:
+		Input.warp_mouse(clamped_pos)
 func create_highlight_texture():
 	# Create the highlight texture once and reuse it
 	var map_tile_size = tilemap.tile_set.tile_size
@@ -836,3 +826,481 @@ func is_mouse_over_inventory() -> bool:
 			return true
 	
 	return false
+
+func update_crosshair_targeting():
+	"""Main targeting logic with priority system"""
+	var mouse_pos = get_global_mouse_position()
+	var player_pos = global_position
+	var direction = (mouse_pos - player_pos).normalized()
+	
+	# PRIORITY 1: Direct cursor position checks
+	
+	# 1.1 Direct attackable target (mainhand weapon OR melee default)
+	var mainhand_item = InventoryManager.get_equipped_item("main_hand")
+	var attack_item = mainhand_item
+	
+	if not mainhand_item or not mainhand_item.is_weapon:
+		# Use melee as default when no weapon equipped
+		attack_item = GameObjectsDatabase.game_objects_database["melee"]
+	
+	if attack_item:
+		var target = get_attackable_at_position(mouse_pos, attack_item.target_range)
+		if target:
+			snap_crosshair_to_target(target)
+			return
+
+	# 1.2 Direct interactable object  
+	var interactable = get_interactable_at_position(mouse_pos, default_interact_range)
+	if interactable:
+		snap_crosshair_to_target(interactable)
+		return
+	
+	# 1.3 Direct tool targeting
+	var quick_stack = get_selected_quick_access_item()
+	if quick_stack and quick_stack.item and quick_stack.item.is_tool and quick_stack.item.tool_action != "":
+		var tool_target = get_tool_target_at_position(mouse_pos, quick_stack.item)
+		if tool_target != null:
+			if typeof(tool_target) == TYPE_VECTOR2I:
+				snap_crosshair_to_tile(tool_target)
+			else:
+				snap_crosshair_to_target(tool_target)
+			return
+	
+	# PRIORITY 2: Raycast path targeting
+	
+	# 2.1 Raycast attackable targets (weapon spread)
+	if attack_item:
+		var raycast_target = raycast_attackable_targets(player_pos, direction, attack_item)
+		if raycast_target:
+			snap_crosshair_to_target(raycast_target)
+			return
+	
+	# 2.2 Raycast interactable objects (default spread)  
+	var obj_target = raycast_interactable_objects(player_pos, direction, default_interact_range, default_interact_spread)
+	if obj_target:
+		snap_crosshair_to_target(obj_target)
+		return
+	
+	# 2.3 Raycast tool targets
+	if quick_stack and quick_stack.item and quick_stack.item.is_tool:
+		var tool_target = raycast_tool_targets(player_pos, direction, quick_stack.item)
+		if tool_target != null:
+			if typeof(tool_target) == TYPE_VECTOR2I:
+				snap_crosshair_to_tile(tool_target)
+			else:
+				snap_crosshair_to_target(tool_target)
+			return
+	
+	# FALLBACK: Position at mouse location (no range limit)
+	cursor_area.position = mouse_pos - player_pos
+	
+	# Clear tile highlights when no specific target is found
+	clear_tile_highlights()
+	current_highlighted_tile = Vector2i(-999, -999)
+
+func get_attackable_at_position(world_pos: Vector2, max_range: float):
+	"""Check for attackable targets directly at cursor position"""
+	var player_pos = global_position
+	if world_pos.distance_to(player_pos) > max_range:
+		return null
+	
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsPointQueryParameters2D.new()
+	query.position = world_pos
+	query.collision_mask = 0xFFFFFFFF  # Check all collision layers
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	
+	var results = space_state.intersect_point(query)
+	
+	for result in results:
+		var collider = result.collider
+		
+		# Check StaticBody2D objects (like WoodCrates)
+		if collider is StaticBody2D and collider != self:
+			if collider.has_method("is_attack_target") and collider.is_attack_target(collider):
+				return collider
+		
+		# Check Area2D objects and their parents
+		elif collider is Area2D:
+			var parent = collider.get_parent()
+			if parent != self and parent.has_method("is_attack_target"):
+				if parent.is_attack_target(parent):
+					return parent
+			elif collider != self and collider.has_method("is_attack_target"):
+				if collider.is_attack_target(collider):
+					return collider
+	
+	return null
+
+func get_interactable_at_position(world_pos: Vector2, max_range: float):
+	"""Check for interactable GameObjects directly at cursor position"""
+	var player_pos = global_position
+	if world_pos.distance_to(player_pos) > max_range:
+		return null
+	
+	var space_state = get_world_2d().direct_space_state
+	
+	# First try point query for Area2D objects
+	var query = PhysicsPointQueryParameters2D.new()
+	query.position = world_pos
+	query.collision_mask = 0xFFFFFFFF  # Check all collision layers
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	
+	var results = space_state.intersect_point(query)
+	for result in results:
+		var collider = result.collider
+		
+		# Check if collider is an Area2D whose parent is a GameObject
+		if collider is Area2D and collider.get_parent() is GameObject:
+			var target_object = collider.get_parent()
+			if target_object != self and target_object.has_method("is_interactable"):
+				if target_object.is_interactable():
+					return target_object
+		
+		# Check if collider is directly a GameObject (unlikely but possible)
+		elif collider is GameObject:
+			if collider != self and collider.has_method("is_interactable"):
+				if collider.is_interactable():
+					return collider
+	
+	return null
+
+func get_tool_target_at_position(world_pos: Vector2, tool_item) -> Variant:
+	"""Check for valid tool targets (objects or tiles) at cursor position"""
+	var player_pos = global_position
+	if world_pos.distance_to(player_pos) > tool_item.target_range:
+		return null
+	
+	# First check for GameObject targets
+	var object_target = check_tool_object_at_position(world_pos, tool_item.tool_action)
+	if object_target:
+		return object_target
+	
+	# Then check for tile targets
+	var tile_target = check_tool_tile_at_position(world_pos, tool_item.tool_action)
+	if tile_target != Vector2i(-999, -999):
+		return tile_target
+	
+	return null
+
+func check_tool_object_at_position(world_pos: Vector2, tool_action: String):
+	"""Check for GameObjects that can be targeted by this tool"""
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsPointQueryParameters2D.new()
+	query.position = world_pos
+	query.collision_mask = 0xFFFFFFFF  # Check all collision layers
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	
+	var results = space_state.intersect_point(query)
+	for result in results:
+		var collider = result.collider
+		
+		# Check if collider is an Area2D whose parent is a GameObject
+		if collider is Area2D and collider.get_parent() is GameObject:
+			var target_object = collider.get_parent()
+			if target_object != self and check_object_tool_compatibility(target_object, tool_action):
+				return target_object
+		
+		# Check if collider is directly a GameObject
+		elif collider is GameObject:
+			if collider != self and check_object_tool_compatibility(collider, tool_action):
+				return collider
+	
+	return null
+
+func check_tool_tile_at_position(world_pos: Vector2, tool_action: String) -> Vector2i:
+	"""Check for tiles that can be targeted by this tool"""
+	var tile_pos = tilemap.local_to_map(tilemap.to_local(world_pos))
+	var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
+	
+	if not tile_data:
+		return Vector2i(-999, -999)
+	
+	# Match tool action to tile properties
+	match tool_action:
+		"dig":
+			if tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
+				return tile_pos
+	
+	return Vector2i(-999, -999)
+
+func check_object_tool_compatibility(obj: GameObject, tool_action: String) -> bool:
+	"""Check if an object can be targeted by this tool action"""
+	match tool_action:
+		"chop":
+			return obj.category == "terrain" and ("tree" in obj.name.to_lower() or "coconut" in obj.name.to_lower())
+		"harvest":
+			return obj.category == "terrain" and obj.has_method("is_interactable") and obj.is_interactable()
+		"dig":
+			return false  # Dig targets tiles, not objects
+	
+	return false
+
+func snap_crosshair_to_target(target: Node2D):
+	"""Position crosshair at target's location and clear tile highlights"""
+	cursor_area.global_position = target.global_position
+	
+	# Clear tile highlights when targeting objects (not tiles)
+	clear_tile_highlights()
+	current_highlighted_tile = Vector2i(-999, -999)
+
+func snap_crosshair_to_tile(tile_pos: Vector2i):
+	"""Position crosshair at tile's center and highlight it"""
+	var world_pos = tilemap.map_to_local(tile_pos)
+	cursor_area.global_position = world_pos
+	
+	# Update tile highlighting for this targeted tile
+	update_tile_highlights_for_target(tile_pos)
+
+func raycast_attackable_targets(origin: Vector2, direction: Vector2, weapon) -> Node2D:
+	"""Raycast for attackable targets with weapon spread"""
+	var max_range = weapon.target_range
+	var spread_width = weapon.target_spread
+	
+	# Center raycast first (highest priority)
+	var center_target = single_raycast_for_attackables(origin, direction, max_range)
+	if center_target:
+		return center_target
+	
+	# Spread raycasts - collect all hits with their distances
+	var spread_hits: Array = []
+	var spread_angles = generate_spread_angles(spread_width)
+	
+	for angle in spread_angles:
+		var spread_direction = direction.rotated(deg_to_rad(angle))
+		var hit = single_raycast_for_attackables(origin, spread_direction, max_range)
+		if hit:
+			spread_hits.append({
+				"target": hit,
+				"distance": origin.distance_to(hit.global_position),
+				"angle_from_center": abs(angle)
+			})
+	
+	if spread_hits.size() > 0:
+		# Sort by distance first (nearest), then by angle from center (most centered)
+		spread_hits.sort_custom(func(a, b): 
+			if abs(a.distance - b.distance) < 5.0:  # If distances are very close
+				return a.angle_from_center < b.angle_from_center  # Prefer more centered
+			return a.distance < b.distance  # Otherwise prefer nearest
+		)
+		return spread_hits[0].target
+	
+	return null
+
+func raycast_interactable_objects(origin: Vector2, direction: Vector2, max_range: float, spread_width: float) -> GameObject:
+	"""Raycast for interactable GameObjects"""
+	# Center raycast first
+	var center_target = single_raycast_for_interactables(origin, direction, max_range)
+	if center_target:
+		return center_target
+	
+	# Spread raycasts
+	var spread_hits: Array = []
+	var spread_angles = generate_spread_angles(spread_width)
+	
+	for angle in spread_angles:
+		var spread_direction = direction.rotated(deg_to_rad(angle))
+		var hit = single_raycast_for_interactables(origin, spread_direction, max_range)
+		if hit:
+			spread_hits.append({
+				"target": hit,
+				"distance": origin.distance_to(hit.global_position),
+				"angle_from_center": abs(angle)
+			})
+	
+	if spread_hits.size() > 0:
+		spread_hits.sort_custom(func(a, b):
+			if abs(a.distance - b.distance) < 5.0:
+				return a.angle_from_center < b.angle_from_center
+			return a.distance < b.distance
+		)
+		return spread_hits[0].target
+	
+	return null
+
+func raycast_tool_targets(origin: Vector2, direction: Vector2, tool) -> Variant:
+	"""Raycast for tool targets (objects and tiles)"""
+	var max_range = tool.target_range
+	var spread_width = tool.target_spread
+	var action = tool.tool_action
+	
+	# Center raycast first - check both objects and tiles
+	var center_target = check_tool_targets_at_ray(origin, direction, max_range, action)
+	if center_target != null:
+		return center_target
+	
+	# Spread raycasts
+	var spread_targets: Array = []
+	var spread_angles = generate_spread_angles(spread_width)
+	
+	for angle in spread_angles:
+		var spread_direction = direction.rotated(deg_to_rad(angle))
+		var target = check_tool_targets_at_ray(origin, spread_direction, max_range, action)
+		if target != null:
+			var distance = 0.0
+			if typeof(target) == TYPE_VECTOR2I:
+				# Tile target
+				var tile_world_pos = tilemap.map_to_local(target)
+				distance = origin.distance_to(tile_world_pos)
+			else:
+				# GameObject target
+				distance = origin.distance_to(target.global_position)
+			
+			spread_targets.append({
+				"target": target,
+				"distance": distance,
+				"angle_from_center": abs(angle)
+			})
+	
+	if spread_targets.size() > 0:
+		spread_targets.sort_custom(func(a, b):
+			if abs(a.distance - b.distance) < 5.0:
+				return a.angle_from_center < b.angle_from_center
+			return a.distance < b.distance
+		)
+		return spread_targets[0].target
+	
+	return null
+
+func single_raycast_for_attackables(origin: Vector2, direction: Vector2, max_range: float) -> Node2D:
+	"""Single raycast to find attackable targets"""
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(origin, origin + direction * max_range)
+	query.collision_mask = 0xFFFFFFFF
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	
+	var result = space_state.intersect_ray(query)
+	
+	if result and result.collider:
+		var hit_object = result.collider
+		
+		# Check StaticBody2D (like crates)
+		if hit_object is StaticBody2D and hit_object != self:
+			if hit_object.has_method("is_attack_target") and hit_object.is_attack_target(hit_object):
+				return hit_object
+		
+		# Check Area2D and parents
+		elif hit_object is Area2D:
+			var parent = hit_object.get_parent()
+			if parent != self and parent.has_method("is_attack_target"):
+				if parent.is_attack_target(parent):
+					return parent
+			elif hit_object != self and hit_object.has_method("is_attack_target"):
+				if hit_object.is_attack_target(hit_object):
+					return hit_object
+	
+	return null
+
+func single_raycast_for_interactables(origin: Vector2, direction: Vector2, max_range: float) -> GameObject:
+	"""Single raycast to find interactable GameObjects"""
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(origin, origin + direction * max_range)
+	query.collision_mask = 0xFFFFFFFF
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	
+	var result = space_state.intersect_ray(query)
+	
+	if result and result.collider:
+		var hit_object = result.collider
+		
+		# Check if collider is an Area2D whose parent is a GameObject
+		if hit_object is Area2D and hit_object.get_parent() is GameObject:
+			var target_object = hit_object.get_parent()
+			if target_object != self and target_object.has_method("is_interactable"):
+				if target_object.is_interactable():
+					return target_object
+		
+		# Check if collider is directly a GameObject
+		elif hit_object is GameObject:
+			if hit_object != self and hit_object.has_method("is_interactable"):
+				if hit_object.is_interactable():
+					return hit_object
+	
+	return null
+
+func check_tool_targets_at_ray(origin: Vector2, direction: Vector2, max_range: float, tool_action: String) -> Variant:
+	"""Check for tool targets along a ray"""
+	# First check for GameObject targets that match tool action
+	var object_target = raycast_for_tool_objects(origin, direction, max_range, tool_action)
+	if object_target:
+		return object_target
+	
+	# Then check for tile targets that match tool action  
+	var tile_target = raycast_for_tool_tiles(origin, direction, max_range, tool_action)
+	if tile_target != Vector2i(-999, -999):
+		return tile_target
+	
+	return null
+
+func raycast_for_tool_objects(origin: Vector2, direction: Vector2, max_range: float, tool_action: String) -> GameObject:
+	"""Raycast for GameObjects that can be targeted by this tool action"""
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(origin, origin + direction * max_range)
+	query.collision_mask = 0xFFFFFFFF
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	
+	var result = space_state.intersect_ray(query)
+	
+	if result and result.collider:
+		var hit_object = result.collider
+		if hit_object is Area2D and hit_object.get_parent() is GameObject:
+			var target = hit_object.get_parent()
+			if target != self and check_object_tool_compatibility(target, tool_action):
+				return target
+		elif hit_object is GameObject:
+			if hit_object != self and check_object_tool_compatibility(hit_object, tool_action):
+				return hit_object
+	
+	return null
+
+func raycast_for_tool_tiles(origin: Vector2, direction: Vector2, max_range: float, tool_action: String) -> Vector2i:
+	"""Raycast for tiles that can be targeted by this tool action"""
+	# Sample points along the ray to check for tiles
+	var step_size = 16.0  # Check every 16 pixels
+	var steps = int(max_range / step_size)
+	
+	for i in range(1, steps + 1):
+		var test_pos = origin + direction * (i * step_size)
+		var tile_pos = tilemap.local_to_map(tilemap.to_local(test_pos))
+		var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
+		
+		if tile_data:
+			match tool_action:
+				"dig":
+					if tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
+						return tile_pos
+	
+	return Vector2i(-999, -999)
+
+func generate_spread_angles(spread_width: float) -> Array[float]:
+	"""Generate angles from center outward for spread targeting"""
+	var angles: Array[float] = []
+	var step = 5.0  # 5-degree increments
+	var half_spread = spread_width / 2.0
+	
+	for i in range(1, int(half_spread / step) + 1):
+		var angle = i * step
+		angles.append(-angle)  # Left side
+		angles.append(angle)   # Right side
+	
+	return angles
+
+func update_tile_highlights_for_target(target_tile: Vector2i):
+	"""Update tile highlights only for the targeted tile"""
+	# Check if we need to update (only if target tile changed)
+	if target_tile == current_highlighted_tile:
+		return  # No change needed
+	
+	# Clear previous highlights
+	clear_tile_highlights()
+	current_highlighted_tile = target_tile
+	
+	# Create highlight for the targeted tile
+	if target_tile != Vector2i(-999, -999):
+		create_tile_highlight_optimized(target_tile)

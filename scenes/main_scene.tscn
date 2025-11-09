@@ -215,16 +215,16 @@ wait_time = 2.0
 autostart = true
 
 [node name="Stick2" parent="." instance=ExtResource("24_ruju6")]
-position = Vector2(-206, 2164)
+position = Vector2(-193, 2085)
 
 [node name="Stick" parent="." instance=ExtResource("24_ruju6")]
-position = Vector2(-172, 2164)
+position = Vector2(-163, 2075)
 
 [node name="WoodAxe" parent="." instance=ExtResource("25_5nybl")]
 position = Vector2(-42, 2088)
 
 [node name="GoldCoin" parent="." instance=ExtResource("26_cq0lk")]
-position = Vector2(60, 2169)
+position = Vector2(-128, 2075)
 
 [node name="WaterFlowManager" type="Node" parent="."]
 script = ExtResource("27_j2yw6")
@@ -249,3 +249,6 @@ position = Vector2(-261, 2064)
 
 [node name="BerryBush" parent="." instance=ExtResource("23_j4epa")]
 position = Vector2(577, 2282)
+
+[node name="WoodCrate" parent="." instance=ExtResource("19_267kh")]
+position = Vector2(334, 2123)

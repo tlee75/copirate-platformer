@@ -33,22 +33,19 @@ func _ready():
 	call_deferred("initialize")
 
 func _initialize_cursor_state():
-	"""Set initial cursor state based on game context"""
-	# Hide cursor by default in gameplay
-	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-	print("UIManager: Cursor initialized as hidden")
-
-func _update_cursor_visibility():
-	"""Update cursor visibility based on current menu state"""
-	if current_menu == MenuType.NONE:
-		# No menus open - hide cursor for clean gameplay
-		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-		print("UIManager: Cursor hidden (no menus open)")
+	"""Set initial cursor state with custom cursor icon"""
+	# Load and set custom cursor
+	var cursor_texture = load("res://assets/cursor_icon_32x32.png")
+	if cursor_texture:
+		Input.set_custom_mouse_cursor(cursor_texture)
+		print("UIManager: Custom cursor loaded successfully")
 	else:
-		# Menu is open - show cursor for UI interaction
-		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		print("UIManager: Cursor visible (menu open: ", _menu_type_to_string(current_menu), ")")
-
+		print("ERROR: Could not load cursor icon at res://assets/cursor_icon_32x32.png")
+	
+	# Always show cursor now (no more hiding for gameplay)
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	print("UIManager: Cursor initialized as always visible")
+	
 func _input(event):
 	# Handle ESC key to close any open menu
 	if event.is_action_pressed("ui_cancel"):
@@ -176,10 +173,7 @@ func _set_current_menu(menu_type: MenuType):
 	current_menu = menu_type
 	
 	print("UIManager: Menu state changed from ", _menu_type_to_string(old_menu), " to ", _menu_type_to_string(menu_type))
-	
-	# Update cursor visibility when menu state changes
-	_update_cursor_visibility()
-	
+		
 	# Emit appropriate signals
 	if old_menu != MenuType.NONE:
 		menu_closed.emit(old_menu)
