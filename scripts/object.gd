@@ -117,9 +117,9 @@ func get_hover_color() -> Color:
 func get_hover_scale_multiplier() -> float:
 	"""Override this in subclasses for custom scale amounts"""
 	if category == "terrain":
-		return 1.05  # 5% larger for terrain
+		return 1.00  # 5% larger for terrain
 	else:
-		return 1.03  # 3% larger for structures
+		return 1.00  # 3% larger for structures
 
 func is_interactable() -> bool:
 	"""Override this in subclasses"""
