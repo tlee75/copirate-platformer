@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=3 uid="uid://cvgrjdhk14guq"]
+
+[ext_resource type="Script" uid="uid://crdqmbv6vuj6d" path="res://scripts/ui/inventory_item_list.gd" id="1_wx46s"]
+
+[node name="InventoryItemList" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 1
+script = ExtResource("1_wx46s")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -8.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+horizontal_scroll_mode = 0
+
+[node name="ItemContainer" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/separation = 5
+
+[node name="EmptyLabel" type="Label" parent="ScrollContainer/ItemContainer"]
+layout_mode = 2
+text = "No items in this category"
+horizontal_alignment = 1
+vertical_alignment = 1

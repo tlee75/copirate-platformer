@@ -6,6 +6,7 @@ class_name Stick
 
 func _init():
 	name = "Stick"
+	description = "A small wooden branch. Burns well as fuel and useful for basic crafting."
 	stack_size = 99
 	category = "fuel"
 	craftable = false

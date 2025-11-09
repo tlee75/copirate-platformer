@@ -8,7 +8,8 @@ var hit_frames = {
 
 func _init():
 	name = "Sword"
-	icon = load("res://assets/Captain Clown Nose/Sprites/Captain Clown Nose/Sword/21-Sword Idle/Sword Idle 01.png")
+	description = "A sharp steel blade. Effective in close combat with decent damage output."
+	icon = load("res://assets/sprite-man/short_sword_icon_64x18.png")
 	stack_size = 1
 	craftable = true
 	category = "weapon"
@@ -18,3 +19,6 @@ func _init():
 	attack_animation = "sword_attack"
 	damage = 1
 	is_weapon = true
+	target_range = 60.0
+	target_spread = 12.0
+	

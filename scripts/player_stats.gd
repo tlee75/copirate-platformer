@@ -333,3 +333,15 @@ func handle_hunger_update():	# Handle eating and duration
 	else:
 		# Deplete hunger - fixed amount per timer tick
 		modify_hunger(-hunger_usage_rate * hunger_usage_modifier)
+
+func debug_add_health(amount: float = 10.0):
+	"""Debug: Add health (positive amount heals, negative damages)"""
+	modify_health(amount)
+	print("DEBUG: Health changed by ", amount, " - Now: ", current_health, "/", max_health)
+
+func debug_kill_player():
+	"""Debug: Set health to 0 to test death"""
+	current_health = 0.0
+	health_changed.emit(current_health, max_health)
+	stat_depleted.emit("health")
+	print("DEBUG: Player killed for testing")

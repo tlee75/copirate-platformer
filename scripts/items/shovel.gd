@@ -32,6 +32,9 @@ func _init():
 	craft_requirements = {"Gold Coin": 2}
 	is_tool = true
 	damage = 1
+	target_range = 60.0
+	target_spread = 20.0
+	tool_action = "dig"
 
 func handle_use_frame(player, anim, frame):
 	handle_attack_frame(player, anim, frame)

@@ -7,6 +7,7 @@ var hit_frames = {
 
 func _init():
 	name = "Pick Axe"
+	description = "A mining tool with a heavy metal head. Perfect for breaking stone and extracting minerals."
 	icon = load("res://assets/sprite-man/pick_axe_icon_01.png")
 	stack_size = 1
 	craftable = true
@@ -14,6 +15,7 @@ func _init():
 	underwater_compatible = false
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 3}
+	craft_time = 5.0  # seconds to craft
 	attack_animation = "pickaxe_attack"
 	use_animation = "pickaxe_attack"
 	damage = 1

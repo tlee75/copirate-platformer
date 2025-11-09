@@ -1,0 +1,423 @@
+extends Node
+
+# Unified input handler for inventory and quick access across all device types
+# Processes mouse/keyboard, controller, and touch input uniformly  
+# Handles both menu navigation and quick access cycling
+
+signal action_executed(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack, success: bool)
+signal input_mode_changed(new_mode: InventoryActionResolver.InputMethod)
+
+var action_resolver: InventoryActionResolver
+var current_input_mode: InventoryActionResolver.InputMethod = InventoryActionResolver.InputMethod.MOUSE_KEYBOARD
+var selected_stack: InventoryManager.ItemStack = null
+var is_player_menu_open: bool = false
+var player: Player = null
+var ui_manager: UIManager
+
+# Quick access state
+var selected_quick_access_slot: int = 0
+var quick_access_items: Array[InventoryManager.ItemStack] = []
+
+# Touch/controller navigation state
+var selected_category: String = "all"
+var selected_item_index: int = 0
+var available_items: Array[InventoryManager.ItemStack] = []
+
+func _ready():
+	action_resolver = InventoryActionResolver.new()
+	player = get_tree().get_first_node_in_group("player")
+	_detect_initial_input_mode()
+	set_process_unhandled_input(true)
+	print("DEBUG: PlayerInputHandler singleton initialized")
+	
+	# Get UI manager reference
+	ui_manager = get_tree().get_first_node_in_group("ui_manager")
+	if not ui_manager:
+		print("WARNING: UIManager not found in PlayerInputHandler._ready()")
+		print("DEBUG: Available ui_manager group nodes: ", get_tree().get_nodes_in_group("ui_manager"))
+	else:
+		print("SUCCESS: Found UIManager in PlayerInputHandler: ", ui_manager)
+
+func _input(event):
+	# Get current UI state from UIManager
+	var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else false
+	
+	# Handle menu toggle
+	if event.is_action_pressed("player_menu_toggle"):
+		print("DEBUG: player_menu_toggle pressed")
+		
+		# Do not allow the player menu to interrupt an animation
+		if player and (player.is_trigger_action or player.is_interacting or (not player.is_on_floor() and not player.is_underwater)):
+			print("DEBUG: Player animation blocking menu toggle")
+			return
+		
+		# Route through UIManager instead of direct call
+		if ui_manager:
+			print("DEBUG: Using UIManager.toggle_player_menu()")
+			ui_manager.toggle_player_menu()
+		else:
+			print("DEBUG: UIManager not found, attempting to find it...")
+			_debug_find_ui_manager()
+			
+			if ui_manager:
+				print("DEBUG: Found UIManager on retry, using it")
+				ui_manager.toggle_player_menu()
+			else:
+				print("DEBUG: Still no UIManager, using fallback method")
+				# Fallback to old method if UIManager not available
+				var inventory_ui = get_tree().get_first_node_in_group("player_menu")
+				if inventory_ui and inventory_ui.has_method("toggle_player_menu"):
+					print("DEBUG: Calling inventory_ui.toggle_player_menu() directly")
+					inventory_ui.toggle_player_menu()
+		
+		get_viewport().set_input_as_handled()
+		return
+	
+	# Route input based on current UI state
+	if any_menu_open:
+		# When menus are open, don't handle quick access at all
+		# Let individual UI components handle their own mouse events
+		pass
+	else:
+		_handle_quick_access_input(event)
+
+func _on_ui_state_changed(has_menu_open: bool):
+	"""Handle UI state changes from UIManager"""
+	is_player_menu_open = has_menu_open and ui_manager.is_player_menu_open()
+	
+	if is_player_menu_open:
+		_refresh_available_items()
+	else:
+		_reset_navigation_state()
+
+func _detect_initial_input_mode():
+	# Check for connected controllers
+	var joypads = Input.get_connected_joypads()
+	if joypads.size() > 0:
+		set_input_mode(InventoryActionResolver.InputMethod.CONTROLLER)
+	else:
+		set_input_mode(InventoryActionResolver.InputMethod.MOUSE_KEYBOARD)
+
+func _update_input_mode(event):
+	var new_mode = current_input_mode
+	
+	# Only allow controller input to switch modes when inventory is open
+	if is_player_menu_open:
+		if event is InputEventJoypadButton and event.pressed:
+			new_mode = InventoryActionResolver.InputMethod.CONTROLLER
+		# Don't change modes for mouse/keyboard when inventory is open
+		return
+	
+	# Normal mode detection when inventory is closed
+	if event is InputEventMouseButton:
+		new_mode = InventoryActionResolver.InputMethod.MOUSE_KEYBOARD
+	elif event is InputEventJoypadButton and event.pressed:
+		new_mode = InventoryActionResolver.InputMethod.CONTROLLER
+	elif event is InputEventScreenTouch:
+		new_mode = InventoryActionResolver.InputMethod.TOUCH
+	
+	if new_mode != current_input_mode:
+		set_input_mode(new_mode)
+
+func set_input_mode(mode: InventoryActionResolver.InputMethod):
+	if mode == current_input_mode:
+		return
+	
+	var old_mode = current_input_mode
+	current_input_mode = mode
+	
+	print("Input mode changed: ", _input_mode_to_string(old_mode), " -> ", _input_mode_to_string(mode))
+	
+	# Reset navigation state when switching modes
+	_reset_navigation_state()
+	
+	input_mode_changed.emit(current_input_mode)
+
+func _handle_mouse_keyboard_input(event):
+	# Handle direct action inputs
+	if event.is_action_pressed("inventory_use"):
+		if selected_stack:
+			_execute_primary_action(selected_stack)
+	
+	elif event.is_action_pressed("inventory_equip"):
+		if selected_stack:
+			_execute_action_by_input("inventory_equip", selected_stack)
+	
+	elif event.is_action_pressed("inventory_quick_move"):
+		if selected_stack:
+			_execute_action_by_input("inventory_quick_move", selected_stack)
+	
+	elif event.is_action_pressed("inventory_drop"):
+		if selected_stack:
+			_execute_action_by_input("inventory_drop", selected_stack)
+	
+	elif event.is_action_pressed("inventory_lock"):
+		if selected_stack:
+			_execute_action_by_input("inventory_lock", selected_stack)
+
+func _handle_controller_input(event):
+	if not event.is_pressed():
+		return
+	
+	# Handle navigation inputs
+	if event.is_action_pressed("ui_up"):
+		_navigate_items(-1)
+	elif event.is_action_pressed("ui_down"):
+		_navigate_items(1)
+	elif event.is_action_pressed("ui_left"):
+		_navigate_categories(-1)
+	elif event.is_action_pressed("ui_right"):
+		_navigate_categories(1)
+	
+	# Handle action inputs
+	elif event.is_action_pressed("inventory_use"):
+		var current_stack = _get_current_selected_stack()
+		if current_stack:
+			_execute_primary_action(current_stack)
+	
+	elif event.is_action_pressed("inventory_equip"):
+		var current_stack = _get_current_selected_stack()
+		if current_stack:
+			_execute_action_by_input("inventory_equip", current_stack)
+	
+	elif event.is_action_pressed("inventory_quick_move"):
+		var current_stack = _get_current_selected_stack()
+		if current_stack:
+			_execute_action_by_input("inventory_quick_move", current_stack)
+	
+	elif event.is_action_pressed("inventory_drop"):
+		var current_stack = _get_current_selected_stack()
+		if current_stack:
+			_execute_action_by_input("inventory_drop", current_stack)
+	
+	elif event.is_action_pressed("inventory_lock"):
+		var current_stack = _get_current_selected_stack()
+		if current_stack:
+			_execute_action_by_input("inventory_lock", current_stack)
+
+func _handle_touch_input(event):
+	# Touch input will be handled by UI elements directly
+	# This method processes gesture-based actions
+	
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			# Touch down - select item at position
+			# TODO: Implement touch selection based on screen coordinates
+			pass
+		else:
+			# Touch release - execute primary action on selected item
+			if selected_stack:
+				_execute_primary_action(selected_stack)
+
+func _handle_quick_access_input(event):
+	"""Handle input when PlayerMenu is closed"""
+	if event.is_action_pressed("quick_access_next"):
+		_cycle_quick_access_next()
+	elif event.is_action_pressed("quick_access_previous"):
+		_cycle_quick_access_previous()
+	elif event.is_action_pressed("quick_access_select_1"):
+		_select_quick_access_slot(0)
+	elif event.is_action_pressed("quick_access_select_2"):
+		_select_quick_access_slot(1)
+	elif event.is_action_pressed("quick_access_select_3"):
+		_select_quick_access_slot(2)
+	elif event.is_action_pressed("quick_access_select_4"):
+		_select_quick_access_slot(3)
+	elif event.is_action_pressed("quick_access_select_5"):
+		_select_quick_access_slot(4)
+	elif event.is_action_pressed("quick_access_select_6"):
+		_select_quick_access_slot(5)
+	elif event.is_action_pressed("quick_access_select_7"):
+		_select_quick_access_slot(6)
+	elif event.is_action_pressed("quick_access_select_8"):
+		_select_quick_access_slot(7)
+	elif event.is_action_pressed("interact"):
+		_use_selected_quick_access_item()
+
+func _cycle_quick_access_next():
+	"""Cycle to next non-empty quick access slot"""
+	_refresh_quick_access_items()
+	var start_slot = selected_quick_access_slot
+	
+	for i in range(8):
+		selected_quick_access_slot = (selected_quick_access_slot + 1) % 8
+		if quick_access_items[selected_quick_access_slot] != null:
+			print("Cycled to quick access slot ", selected_quick_access_slot)
+			return
+		if selected_quick_access_slot == start_slot:
+			break
+	
+	print("No quick access items to cycle through")
+
+func _cycle_quick_access_previous():
+	"""Cycle to previous non-empty quick access slot"""
+	_refresh_quick_access_items()
+	var start_slot = selected_quick_access_slot
+	
+	for i in range(8):
+		selected_quick_access_slot = (selected_quick_access_slot - 1 + 8) % 8
+		if quick_access_items[selected_quick_access_slot] != null:
+			print("Cycled to quick access slot ", selected_quick_access_slot)
+			return
+		if selected_quick_access_slot == start_slot:
+			break
+	
+	print("No quick access items to cycle through")
+
+func _select_quick_access_slot(slot: int):
+	"""Directly select specific quick access slot"""
+	if slot >= 0 and slot < 8:
+		selected_quick_access_slot = slot
+		print("Selected quick access slot ", slot)
+
+func _use_selected_quick_access_item():
+	"""Use item in currently selected quick access slot"""
+	_refresh_quick_access_items()
+	var stack = quick_access_items[selected_quick_access_slot]
+	if stack:
+		_execute_primary_action(stack)
+	else:
+		print("No item in quick access slot ", selected_quick_access_slot)
+
+func _refresh_quick_access_items():
+	"""Update cached quick access items array"""
+	quick_access_items.clear()
+	quick_access_items.resize(8)
+	
+	for i in range(8):
+		quick_access_items[i] = InventoryManager.get_quick_access_stack(i)
+
+func _navigate_items(direction: int):
+	if available_items.size() == 0:
+		_refresh_available_items()
+		return
+	
+	selected_item_index = clamp(selected_item_index + direction, 0, available_items.size() - 1)
+	print("Selected item: ", selected_item_index, "/", available_items.size() - 1, " - ", _get_current_selected_stack().item.name if _get_current_selected_stack() else "None")
+
+func _navigate_categories(direction: int):
+	var categories = InventoryManager.get_available_categories()
+	var current_index = categories.find(selected_category)
+	
+	if current_index == -1:
+		current_index = 0
+	
+	current_index = clamp(current_index + direction, 0, categories.size() - 1)
+	selected_category = categories[current_index]
+	selected_item_index = 0  # Reset item selection when changing categories
+	
+	_refresh_available_items()
+	print("Selected category: ", selected_category, " (", available_items.size(), " items)")
+
+func _refresh_available_items():
+	available_items = InventoryManager.get_items_by_category(selected_category)
+	selected_item_index = clamp(selected_item_index, 0, max(0, available_items.size() - 1))
+
+func _get_current_selected_stack() -> InventoryManager.ItemStack:
+	if available_items.size() == 0:
+		_refresh_available_items()
+	
+	if selected_item_index >= 0 and selected_item_index < available_items.size():
+		return available_items[selected_item_index]
+	
+	return null
+
+func _reset_navigation_state():
+	selected_item_index = 0
+	selected_category = "all"
+	_refresh_available_items()
+
+func _execute_primary_action(stack: InventoryManager.ItemStack):
+	var action = action_resolver.get_action_for_input("inventory_use", stack)
+	if action:
+		var success = action_resolver.execute_action(action.type, stack)
+		print("Executed primary action '", action.label, "' on ", stack.item.name, " - Success: ", success)
+		action_executed.emit(action.type, stack, success)
+		
+		# Refresh navigation if items changed
+		if success:
+			_refresh_available_items()
+	else:
+		print("No primary action available for ", stack.item.name)
+
+func _execute_action_by_input(input_action: String, stack: InventoryManager.ItemStack):
+	var action = action_resolver.get_action_for_input(input_action, stack)
+	if action:
+		var success = action_resolver.execute_action(action.type, stack)
+		print("Executed ", input_action, " action '", action.label, "' on ", stack.item.name, " - Success: ", success)
+		action_executed.emit(action.type, stack, success)
+		
+		# Refresh navigation if items changed
+		if success:
+			_refresh_available_items()
+	else:
+		print("No action available for ", input_action, " on ", stack.item.name)
+
+func execute_action_on_stack(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack) -> bool:
+	if not stack:
+		return false
+	
+	var success = action_resolver.execute_action(action_type, stack)
+	action_executed.emit(action_type, stack, success)
+	
+	if success:
+		_refresh_available_items()
+	
+	return success
+
+func set_player_menu_open(open: bool):
+	# This method is now mainly for backward compatibility
+	# The actual state should be managed by UIManager
+	is_player_menu_open = open
+	if open:
+		_refresh_available_items()
+	else:
+		_reset_navigation_state()
+	
+	# Sync with UIManager if available
+	if ui_manager:
+		if open and not ui_manager.is_player_menu_open():
+			ui_manager.open_player_menu()
+		elif not open and ui_manager.is_player_menu_open():
+			ui_manager.close_player_menu()
+
+func set_selected_stack(stack: InventoryManager.ItemStack):
+	selected_stack = stack
+
+func get_available_actions_for_stack(stack: InventoryManager.ItemStack, context: Dictionary = {}) -> Array[InventoryActionResolver.ActionData]:
+	return action_resolver.get_available_actions(stack)
+
+func get_current_input_mode() -> InventoryActionResolver.InputMethod:
+	return current_input_mode
+
+func get_selected_category() -> String:
+	return selected_category
+
+func get_selected_item_index() -> int:
+	return selected_item_index
+
+func get_available_items() -> Array[InventoryManager.ItemStack]:
+	return available_items
+
+func _input_mode_to_string(mode: InventoryActionResolver.InputMethod) -> String:
+	match mode:
+		InventoryActionResolver.InputMethod.MOUSE_KEYBOARD:
+			return "Mouse/Keyboard"
+		InventoryActionResolver.InputMethod.CONTROLLER:
+			return "Controller"
+		InventoryActionResolver.InputMethod.TOUCH:
+			return "Touch"
+		_:
+			return "Unknown"
+
+func _debug_find_ui_manager():
+	"""Debug method to check UIManager availability"""
+	print("DEBUG: Checking for UIManager...")
+	var ui_managers = get_tree().get_nodes_in_group("ui_manager")
+	print("DEBUG: Found ", ui_managers.size(), " ui_manager nodes: ", ui_managers)
+	
+	if ui_managers.size() > 0:
+		ui_manager = ui_managers[0]
+		print("DEBUG: Set ui_manager to: ", ui_manager)
+	else:
+		print("DEBUG: No UIManager found in tree")

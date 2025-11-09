@@ -100,8 +100,14 @@ func is_placement_valid(instance) -> bool:
 
 	# Ground tile check - there must be ground below the structure
 	var tilemap = get_tree().current_scene.get_node("TileMap")
+
 	# Check the tile where the structure center is positioned
 	var structure_cell = tilemap.local_to_map(instance.position)
+
+	# Don't allow placement if there's a ground tile at the structure position
+	var current_tile_id = tilemap.get_cell_source_id(0, structure_cell)
+	if current_tile_id == GROUND_TILE_ID:
+		return false
 	
 	# Check if there's ground in the tile below the structure
 	var ground_check_cell = Vector2i(structure_cell.x, structure_cell.y + 1)

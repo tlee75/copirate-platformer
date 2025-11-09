@@ -17,6 +17,7 @@ func _init():
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 1}
 	use_animation = "consume"
+	craft_time = 5
 
 func is_consumable() -> bool:
 	return true
@@ -32,6 +33,6 @@ func extra_use_startup(player, slot_data):
 		player_stats.start_healing(10)
 		
 		# Store slot data for removal after animation finishes
-		pending_slot_data = slot_data
+		#pending_slot_data = slot_data
 	else:
 		print("no player stats")

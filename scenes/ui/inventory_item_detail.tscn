@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://coecdah2bs7x4"]
+
+[node name="InventoryItemDetail" type="Control"]
+custom_minimum_size = Vector2(300, 400)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3
+
+[node name="NinePatchRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.40392157, 0.81960785, 0.56078434, 0.34117648)
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="ItemHeader" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="IconNameContainer" type="HBoxContainer" parent="MainContainer/ItemHeader"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 15
+
+[node name="ItemIcon" type="TextureRect" parent="MainContainer/ItemHeader/IconNameContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 0
+stretch_mode = 5
+
+[node name="NameContainer" type="VBoxContainer" parent="MainContainer/ItemHeader/IconNameContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+
+[node name="ItemName" type="Label" parent="MainContainer/ItemHeader/IconNameContainer/NameContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 18
+
+[node name="ItemCategory" type="Label" parent="MainContainer/ItemHeader/IconNameContainer/NameContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 12
+
+[node name="StatsContainer" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="QuantityLabel" type="Label" parent="MainContainer/StatsContainer"]
+layout_mode = 2
+
+[node name="StackSizeLabel" type="Label" parent="MainContainer/StatsContainer"]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="MainContainer/StatsContainer"]
+layout_mode = 2
+
+[node name="DescriptionContainer" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DescriptionTitle" type="Label" parent="MainContainer/DescriptionContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Description"
+
+[node name="DescriptionText" type="RichTextLabel" parent="MainContainer/DescriptionContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 12
+theme_override_font_sizes/bold_font_size = 12
+theme_override_font_sizes/bold_italics_font_size = 12
+theme_override_font_sizes/italics_font_size = 12
+theme_override_font_sizes/mono_font_size = 12

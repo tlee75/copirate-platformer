@@ -12,6 +12,11 @@ class_name GameItem
 @export var is_tool = false
 @export var is_weapon: bool = false
 @export var damage: int = 0
+@export var description: String = ""  # Item description - set by individual item scripts
+@export var craft_time: float = 3.0  # Time in seconds to craft this item
+@export var target_range: float = 50.0      # Maximum targeting range
+@export var target_spread: float = 10.0     # Targeting spread width  
+@export var tool_action: String = ""        # "dig", "chop", "mine", etc.
 
 var category: String = ""
 var icon: Texture2D
@@ -19,7 +24,7 @@ var craft_requirements: Dictionary = {}
 var cooked_result_item_name: String = ""  # What this item becomes when cooked
 var attack_animation = ""
 var use_animation = ""
-var pending_slot_data: InventoryManager.InventorySlotData = null
+var pending_item_stack: InventoryManager.ItemStack = null
 
 func is_consumable() -> bool:
 	return false
@@ -38,7 +43,7 @@ func attack(player, target):
 	anim_sprite.animation_finished.connect(_on_attack_animation_finished.bind(player))
 	anim_sprite.play(attack_animation)
 
-func use(player, target, slot_data = null):
+func use(player, target, item_stack = null):
 	if use_animation == "" or use_animation == null:
 		print("WARNING: Item '%s' has no use_animation set!" % self.name)
 		return
@@ -47,17 +52,17 @@ func use(player, target, slot_data = null):
 	player.is_trigger_action = true
 	print("trigger action true")
 	var anim_sprite = player.get_node("AnimatedSprite2D")
-	extra_use_startup(player, slot_data)
+	extra_use_startup(player, item_stack)
 	cleanup_connections(player)
 	anim_sprite.frame_changed.connect(_on_use_frame_changed.bind(player))
 	anim_sprite.animation_finished.connect(_on_use_animation_finished.bind(player))
 	anim_sprite.play(use_animation)
 	
-	# For consumables, store the slot data so it can be cleaned up later
-	if is_consumable() and slot_data:
-		pending_slot_data = slot_data
+	# For consumables, store the item stack so it can be cleaned up later
+	if is_consumable() and item_stack:
+		pending_item_stack = item_stack
 	else:
-		pending_slot_data = null
+		pending_item_stack = null
 
 func _on_attack_frame_changed(player):
 	var anim_sprite = player.get_node("AnimatedSprite2D")
@@ -99,10 +104,10 @@ func _on_use_animation_finished(player):
 	extra_use_cleanup(player)
 	
 	# Remove the consumable that was stored previously
-	if is_consumable() and pending_slot_data and not pending_slot_data.is_empty() and pending_slot_data.item.name == self.name:
-		pending_slot_data.remove_item(1)
-		InventoryManager.hotbar_changed.emit()
-		pending_slot_data = null
+	if is_consumable() and pending_item_stack and pending_item_stack.quantity > 0 and pending_item_stack.item.name == self.name:
+		InventoryManager.use_item_stack(pending_item_stack)
+		InventoryManager.quick_access_changed.emit()
+		pending_item_stack = null
 	cleanup_connections(player)
 
 func extra_attack_startup(_player):

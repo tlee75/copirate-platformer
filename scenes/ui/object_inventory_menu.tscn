@@ -1,0 +1,132 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8eg14mg7ec2p"]
+
+[ext_resource type="PackedScene" uid="uid://cvgrjdhk14guq" path="res://scenes/ui/inventory_item_list.tscn" id="1_gna8g"]
+[ext_resource type="Script" uid="uid://bu6354et7bgf8" path="res://scripts/ui/object_inventory_menu.gd" id="1_hkgev"]
+
+[node name="ObjectInventoryMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hkgev")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 74.0
+offset_top = 50.0
+offset_right = -83.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="Header" type="Control" parent="MainContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="TitleLabel" type="Label" parent="MainContainer/Header"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -0.5
+offset_top = -11.5
+offset_right = 0.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Object Inventory"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContentContainer" type="HSplitContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="PlayerLabel" type="Label" parent="MainContainer/ContentContainer/LeftPanel"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Player Items"
+horizontal_alignment = 1
+
+[node name="PlayerItemList" parent="MainContainer/ContentContainer/LeftPanel" instance=ExtResource("1_gna8g")]
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="ObjectLabel" type="Label" parent="MainContainer/ContentContainer/RightPanel"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Object Items"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="MainContainer/ContentContainer/RightPanel"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "Ready"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="ObjectItemList" parent="MainContainer/ContentContainer/RightPanel" instance=ExtResource("1_gna8g")]
+layout_mode = 2
+
+[node name="Footer" type="Control" parent="MainContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="ActionContainer" type="HBoxContainer" parent="MainContainer/Footer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="MoveButton" type="Button" parent="MainContainer/Footer/ActionContainer"]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "Move"
+
+[node name="TakeButton" type="Button" parent="MainContainer/Footer/ActionContainer"]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "Take Item"
+
+[node name="CloseButton" type="Button" parent="MainContainer/Footer/ActionContainer"]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "Close"

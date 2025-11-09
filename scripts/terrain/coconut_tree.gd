@@ -1,4 +1,4 @@
-extends Node2D
+extends GameObject
 
 @export var full_texture: Texture2D
 @export var empty_texture: Texture2D
@@ -8,16 +8,20 @@ extends Node2D
 enum CoconutTreeState { FULL, EMPTY }
 var state: int = CoconutTreeState.FULL
 var health: int = max_health
-var category: String = "terrain"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	# Set category for GameObject base class
+	category = "terrain"
+	
 	if full_texture:
 		$Sprite2D.texture = full_texture
 
+	# Call parent _ready() to setup hover detection
+	super._ready()
+
 func is_interactable() -> bool:
 	return state == CoconutTreeState.FULL
-
 
 # Interact action handler (for future use)
 func interact():
@@ -34,9 +38,7 @@ func interact():
 	print("Harvesting coconuts - will regrow in ", regeneration_time, " seconds")
 	
 	# Register with ResourceManager for regeneration
-
 	ResourceManager.register_resource_regeneration(self, regeneration_time)
-
 
 func set_cooldown():
 	pass

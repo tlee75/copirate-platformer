@@ -1,19 +1,23 @@
-extends Node2D
+extends GameObject
 
 @export var full_texture: Texture2D
 @export var empty_texture: Texture2D
 @export var max_health: int = 1
 @export var regeneration_time: float = 30.0 
+@onready var sprite = $Sprite2D
+@onready var area = $Area2D
 
 enum BerryBushState { FULL, EMPTY }
 var state: int = BerryBushState.FULL
 var health: int = max_health
-var category: String = "terrain"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	if full_texture:
 		$Sprite2D.texture = full_texture
+
+	# Call parent _ready() which will setup hover detection
+	super._ready()
 
 func is_interactable() -> bool:
 	return state == BerryBushState.FULL
