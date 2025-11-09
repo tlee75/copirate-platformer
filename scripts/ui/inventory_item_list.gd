@@ -144,36 +144,6 @@ func _create_item_button(stack: InventoryManager.ItemStack, index: int) -> Contr
 	)
 	return button
 
-#func _create_item_buttons():
-	#for i in range(current_items.size()):
-		#var stack = current_items[i]
-		#var item_button = _create_item_button(stack, i)
-		#item_container.add_child(item_button)
-		#item_buttons.append(item_button)
-	#
-	## Ensure the container layout is updated
-	#await get_tree().process_frame
-	#item_container.queue_redraw()
-	#
-	#emit_signal("item_buttons_created")
-#
-#
-#func _create_item_button(stack: InventoryManager.ItemStack, index: int) -> Control:
-	#var button = Button.new()
-	#button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS  # ADD THIS LINE
-	#button.text = stack.get_display_name() + " (x" + str(stack.quantity) + ")"
-	#button.custom_minimum_size = Vector2(0, 64)  # or whatever height you want
-	#if stack.item.icon:
-		#button.icon = stack.item.icon
-	#
-	## Add comprehensive mouse event tracking
-	#button.pressed.connect(func():
-		#print("DEBUG: Button.pressed signal fired for ", stack.item.name, " at index ", index)
-		#_on_item_selected(index)
-	#)
-	#return button
-
-
 func set_selected_index(index: int):
 	print("DEBUG: set_selected_index called with index: ", index)
 	if index >= -1 and index < current_items.size():

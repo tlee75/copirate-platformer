@@ -24,7 +24,6 @@ var current_highlighted_tile: Vector2i = Vector2i(-999, -999)  # Invalid positio
 var last_move_dir: int = 1  # 1 for right, -1 for left
 var was_running_when_jumped: bool = false
 var jump_speed: float = 0.0
-var is_in_water: bool = false
 var tile_size: float = 32.0
 var is_dead: bool = false
 var attack_target = null 
@@ -40,14 +39,10 @@ var ui_manager: UIManager
 var player_stats: PlayerStats
 
 # Water movement effects
-var water_slow_factor: float = 0.7
 var swim_speed: float = 150.0
 var is_underwater: bool = false
 var water_surface_y: int = -1
 var water_depth: int = -1
-
-# UI
-var equipment_panel: Node = null
 
 # Animation hit frame definition for animations without an item script
 var default_hit_frames = {
@@ -59,9 +54,6 @@ var default_hit_frames = {
 func _ready():
 	var frames = load("res://resources/player_sprites.tres")
 	$AnimatedSprite2D.sprite_frames = frames
-	## Remove procedural Visual if it exists
-	#if has_node("Visual"):
-		#get_node("Visual").queue_free()
 
 	# Ensure an AnimatedSprite2D is present
 	var anim: AnimatedSprite2D
@@ -100,6 +92,23 @@ func _ready():
 
 	# Get reference to UIManager for centralized menu state checking
 	call_deferred("_setup_ui_manager_reference")
+
+func _input(event):
+	"""Handle debug input for stat manipulation"""
+	# Only process debug input in debug builds or when explicitly enabled
+	if not OS.is_debug_build():
+		return
+
+   # Numpad debug controls for stats
+	if event is InputEventKey and event.pressed:
+		match event.keycode:
+			# Numpad 1 - Health controls
+			KEY_KP_1:
+				player_stats.debug_add_health(-10.0)   # Heal
+
+			# Numpad Period - Empty all stats (but keep alive)
+			KEY_KP_PERIOD:
+				player_stats.debug_kill_player()     # Actually kill for death testing
 
 func _setup_ui_manager_reference():
 	"""Set up reference to UIManager for centralized menu state checking"""
@@ -145,10 +154,6 @@ func _physics_process(delta):
 		var target_animation = "swim_idle" if is_underwater else "idle"
 		if $AnimatedSprite2D.animation != target_animation:
 			$AnimatedSprite2D.play(target_animation)
-		
-		# Clear action states
-		#is_trigger_action = false
-		#is_interacting = false
 		
 		# Don't process any other input when menus are open
 		return
@@ -266,9 +271,6 @@ func _physics_process(delta):
 	# Update cursor area position based on mouse position
 	update_cursor_position()
 	
-	# Update tile highlights
-	#update_tile_highlights()
-	
 	handle_interact_or_use_action()
 	
 	handle_attack_action()
@@ -349,7 +351,7 @@ func handle_attack_action():
 		return # Placement manager handles input
 	
 	# Main Hand Action - left mouse button (but not when clicking on UI)
-	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_quick_access() and not is_mouse_over_combined_menu() and not is_mouse_over_inventory():
+	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_quick_access() and not is_mouse_over_inventory():
 		print("left click")
 		# Only perform an action if one is not already in progress
 		if not is_trigger_action:
@@ -520,6 +522,7 @@ func keep_mouse_in_screen():
 	# Only warp if the position actually changed
 	if mouse_pos.distance_to(clamped_pos) > 1.0:
 		Input.warp_mouse(clamped_pos)
+
 func create_highlight_texture():
 	# Create the highlight texture once and reuse it
 	var map_tile_size = tilemap.tile_set.tile_size
@@ -537,29 +540,6 @@ func create_highlight_texture():
 	highlight_texture = ImageTexture.new()
 	highlight_texture.set_image(image)
 
-func update_tile_highlights():
-	# Don't show tile highlights when any menu is open
-	var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else PlayerInputHandler.is_player_menu_open
-	if any_menu_open:
-		clear_tile_highlights()
-		return
-		
-	# Get tiles that would be affected by cursor
-	var affected_tiles = get_tiles_in_cursor_area()
-	
-	# Check if we need to update (only if target tile changed)
-	var new_target = affected_tiles[0] if affected_tiles.size() > 0 else Vector2i(-999, -999)
-	if new_target == current_highlighted_tile:
-		return  # No change needed
-	
-	# Clear previous highlights
-	clear_tile_highlights()
-	current_highlighted_tile = new_target
-	
-	# Create highlight for new tile if it exists
-	if affected_tiles.size() > 0:
-		create_tile_highlight_optimized(affected_tiles[0])
-
 func clear_tile_highlights():
 	# Remove all existing highlight sprites
 	for highlight in tile_highlights:
@@ -567,23 +547,6 @@ func clear_tile_highlights():
 			highlight.queue_free()
 	tile_highlights.clear()
 	highlighted_tiles.clear()
-
-func get_tiles_in_cursor_area() -> Array[Vector2i]:
-	var affected_tiles: Array[Vector2i] = []
-	
-	# Get crosshair position (same as cursor collision center)
-	var cursor_collision = cursor_area.get_node("CursorCollision")
-	var crosshair_pos = cursor_collision.global_position
-	
-	# Use Godot's built-in coordinate conversion to handle negative coordinates correctly
-	var target_tile = tilemap.local_to_map(tilemap.to_local(crosshair_pos))
-	
-	# Check if this tile exists
-	var source_id = tilemap.get_cell_source_id(0, target_tile)
-	if source_id != -1:  # Only include if tile exists
-		affected_tiles.append(target_tile)
-	
-	return affected_tiles
 
 func create_tile_highlight_optimized(tile_pos: Vector2i):
 	# Create a highlight sprite using the pre-created texture
@@ -601,10 +564,6 @@ func create_tile_highlight_optimized(tile_pos: Vector2i):
 	get_parent().add_child(highlight)
 	tile_highlights.append(highlight)
 	highlighted_tiles.append(tile_pos)
-
-#func _on_inventory_state_changed(is_open: bool):
-	#inventory_is_open = is_open
-	#print("Player: Inventory is now ", "open" if is_open else "closed")
 	
 func _on_inventory_action_executed(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack, success: bool):
 	print("Player: Inventory action executed - ", action_type, " on ", stack.item.name, " - Success: ", success)
@@ -634,27 +593,6 @@ func _on_inventory_input_mode_changed(new_mode: InventoryActionResolver.InputMet
 	# Could trigger UI changes here based on input mode
 	# For example, show/hide controller button hints
 
-func is_mouse_over_combined_menu() -> bool:
-	var ui_layer = get_parent().get_node_or_null("UI")
-	if not ui_layer:
-		return false
-	var combined_menu = ui_layer.get_node_or_null("PlayerMenu")
-	if not combined_menu or not combined_menu.visible:
-		return false
-	
-	var mouse_pos = get_viewport().get_mouse_position()
-	
-	# Check if mouse is over the main PlayerMenu control
-	if combined_menu.get_global_rect().has_point(mouse_pos):
-		return true
-	
-	# Also check the TabContainer specifically since it extends beyond the parent
-	var tab_container = combined_menu.get_node_or_null("TabBar")
-	if tab_container and tab_container.get_global_rect().has_point(mouse_pos):
-		return true
-
-	return false
-
 func is_mouse_over_quick_access() -> bool:
 	# Check if mouse is over the quick access display
 	var ui_layer = get_parent().get_node_or_null("UI")
@@ -677,19 +615,6 @@ func get_selected_quick_access_item():
 	if not quick_access:
 		return null
 	return quick_access.get_selected_stack()
-
-func execute_quick_access_action_with_resolver(slot_index: int):
-	# Use the new action resolver system for quick access actions
-	var quick_access_stack = InventoryManager.get_quick_access_stack(slot_index)
-	if quick_access_stack:
-		# Find the PlayerMenu's input handler
-		var inventory_ui = get_tree().get_first_node_in_group("inventory_ui")
-		if inventory_ui and inventory_ui.input_handler:
-			# Execute the primary action on the quick access item
-			var action = inventory_ui.input_handler.action_resolver.get_action_for_input("inventory_use", quick_access_stack)
-			if action:
-				return inventory_ui.input_handler.execute_action_on_stack(action.type, quick_access_stack)
-	return false
 
 func is_on_water_tile() -> bool:
 	var tile_pos = tilemap.local_to_map(global_position)
@@ -802,31 +727,6 @@ func get_attack_target():
 		if parent != self and parent.has_method("is_attack_target") and parent.is_attack_target(parent):
 			targets.append(parent)
 	return targets[0] if targets.size() > 0 else null
-
-#func get_tool_target():
-	#var tile_pos = get_tiles_in_cursor_area()
-	#if tile_pos.size() > 0 and is_tile_target(tile_pos[0]):
-		#return tile_pos[0]
-	#for body in cursor_area.get_overlapping_bodies():
-		#if body.has_method("is_tool_target") and body.is_tool_target():
-			#return body
-	#for area in cursor_area.get_overlapping_areas():
-		#var parent = area.get_parent()
-		#if parent.has_method("is_tool_target") and parent.is_tool_target():
-			#return parent
-	#return null
-
-func get_potential_targets() -> Array:
-	var overlapping_areas = cursor_area.get_overlapping_areas()
-	var overlapping_bodies = cursor_area.get_overlapping_bodies()
-	var all_targets: Array = []
-	for body in overlapping_bodies:
-		all_targets.append(body)
-	for area in overlapping_areas:
-		var parent = area.get_parent()
-		if parent != self:
-			all_targets.append(parent)
-	return all_targets
 
 func add_loot(item_name: String, amount: int):
 	# Implement inventory logic
@@ -1127,45 +1027,29 @@ func snap_crosshair_to_tile(tile_pos: Vector2i):
 	update_tile_highlights_for_target(tile_pos)
 
 func raycast_attackable_targets(origin: Vector2, direction: Vector2, weapon) -> Node2D:
-	"""Raycast for attackable targets with weapon spread"""
-	var max_range = weapon.target_range
-	var spread_width = weapon.target_spread
-	
-	# Center raycast first (highest priority)
-	var center_target = single_raycast_for_attackables(origin, direction, max_range)
-	if center_target:
-		return center_target
-	
-	# Spread raycasts - collect all hits with their distances
-	var spread_hits: Array = []
-	var spread_angles = generate_spread_angles(spread_width)
-	
-	for angle in spread_angles:
-		var spread_direction = direction.rotated(deg_to_rad(angle))
-		var hit = single_raycast_for_attackables(origin, spread_direction, max_range)
-		if hit:
-			spread_hits.append({
-				"target": hit,
-				"distance": origin.distance_to(hit.global_position),
-				"angle_from_center": abs(angle)
-			})
-	
-	if spread_hits.size() > 0:
-		# Sort by distance first (nearest), then by angle from center (most centered)
-		spread_hits.sort_custom(func(a, b): 
-			if abs(a.distance - b.distance) < 5.0:  # If distances are very close
-				return a.angle_from_center < b.angle_from_center  # Prefer more centered
-			return a.distance < b.distance  # Otherwise prefer nearest
-		)
-		return spread_hits[0].target
-	
-	return null
+	return generic_raycast_targeting(
+		origin, direction, weapon.target_range, weapon.target_spread,
+		single_raycast_for_attackables
+	)
 
 func raycast_interactable_objects(origin: Vector2, direction: Vector2, max_range: float, spread_width: float) -> GameObject:
-	"""Raycast for interactable GameObjects"""
+	return generic_raycast_targeting(
+		origin, direction, max_range, spread_width,
+		single_raycast_for_interactables
+	)
+
+func raycast_tool_targets(origin: Vector2, direction: Vector2, tool) -> Variant:
+	return generic_raycast_targeting(
+		origin, direction, tool.target_range, tool.target_spread,
+		func(o, d, r): return check_tool_targets_at_ray(o, d, r, tool.tool_action)
+	)
+
+func generic_raycast_targeting(origin: Vector2, direction: Vector2, max_range: float, spread_width: float, raycast_callback: Callable) -> Variant:
+	"""Generic raycast with spread pattern - uses callback for specific target detection"""
+	
 	# Center raycast first
-	var center_target = single_raycast_for_interactables(origin, direction, max_range)
-	if center_target:
+	var center_target = raycast_callback.call(origin, direction, max_range)
+	if center_target != null:
 		return center_target
 	
 	# Spread raycasts
@@ -1174,11 +1058,12 @@ func raycast_interactable_objects(origin: Vector2, direction: Vector2, max_range
 	
 	for angle in spread_angles:
 		var spread_direction = direction.rotated(deg_to_rad(angle))
-		var hit = single_raycast_for_interactables(origin, spread_direction, max_range)
-		if hit:
+		var hit = raycast_callback.call(origin, spread_direction, max_range)
+		if hit != null:
+			var distance = calculate_distance_to_target(origin, hit)
 			spread_hits.append({
 				"target": hit,
-				"distance": origin.distance_to(hit.global_position),
+				"distance": distance,
 				"angle_from_center": abs(angle)
 			})
 	
@@ -1192,49 +1077,13 @@ func raycast_interactable_objects(origin: Vector2, direction: Vector2, max_range
 	
 	return null
 
-func raycast_tool_targets(origin: Vector2, direction: Vector2, tool) -> Variant:
-	"""Raycast for tool targets (objects and tiles)"""
-	var max_range = tool.target_range
-	var spread_width = tool.target_spread
-	var action = tool.tool_action
-	
-	# Center raycast first - check both objects and tiles
-	var center_target = check_tool_targets_at_ray(origin, direction, max_range, action)
-	if center_target != null:
-		return center_target
-	
-	# Spread raycasts
-	var spread_targets: Array = []
-	var spread_angles = generate_spread_angles(spread_width)
-	
-	for angle in spread_angles:
-		var spread_direction = direction.rotated(deg_to_rad(angle))
-		var target = check_tool_targets_at_ray(origin, spread_direction, max_range, action)
-		if target != null:
-			var distance = 0.0
-			if typeof(target) == TYPE_VECTOR2I:
-				# Tile target
-				var tile_world_pos = tilemap.map_to_local(target)
-				distance = origin.distance_to(tile_world_pos)
-			else:
-				# GameObject target
-				distance = origin.distance_to(target.global_position)
-			
-			spread_targets.append({
-				"target": target,
-				"distance": distance,
-				"angle_from_center": abs(angle)
-			})
-	
-	if spread_targets.size() > 0:
-		spread_targets.sort_custom(func(a, b):
-			if abs(a.distance - b.distance) < 5.0:
-				return a.angle_from_center < b.angle_from_center
-			return a.distance < b.distance
-		)
-		return spread_targets[0].target
-	
-	return null
+func calculate_distance_to_target(origin: Vector2, target: Variant) -> float:
+	"""Handle distance calculation for both objects and tiles"""
+	if typeof(target) == TYPE_VECTOR2I:
+		var tile_world_pos = tilemap.map_to_local(target)
+		return origin.distance_to(tile_world_pos)
+	else:
+		return origin.distance_to(target.global_position)
 
 func single_raycast_for_attackables(origin: Vector2, direction: Vector2, max_range: float) -> Node2D:
 	"""Single raycast to find attackable targets"""

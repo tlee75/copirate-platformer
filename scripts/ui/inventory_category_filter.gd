@@ -41,25 +41,6 @@ func _create_category_button(category: String):
 	category_container.add_child(button)
 	category_buttons[category] = button
 
-#func _create_category_button(category: String):
-	#var button = Button.new()
-	#button.text = _get_category_display_name(category)
-	#button.toggle_mode = true
-	#button.button_group = _get_or_create_button_group()
-	#button.custom_minimum_size = Vector2(120, 40)
-	#
-	## Style the button
-	#button.add_theme_stylebox_override("normal", _create_category_button_style(false))
-	#button.add_theme_stylebox_override("pressed", _create_category_button_style(true))
-	#button.add_theme_stylebox_override("hover", _create_category_button_style(false, true))
-	#
-	## Connect signals
-	#button.pressed.connect(_on_category_button_pressed.bind(category))
-	#
-	## Add to container and track
-	#category_container.add_child(button)
-	#category_buttons[category] = button
-
 func _get_category_display_name(category: String) -> String:
 	var display_names = {
 		"all": "All Items",

@@ -10,6 +10,9 @@ extends Node2D
 @onready var pause_menu = $UI/PauseMenu
 @onready var player_stats: PlayerStats
 
+
+var ui_manager: UIManager
+
 var respawn_position: Vector2
 
 func _ready():	
@@ -22,6 +25,8 @@ func _ready():
 	pause_menu.resume_requested.connect(_on_resume)
 	pause_menu.restart_requested.connect(_on_restart)
 	pause_menu.respawn_requested.connect(_on_respawn)
+
+	ui_manager = get_tree().get_first_node_in_group("ui_manager")
 
 	# Get reference to player stats
 	player_stats = player.player_stats
@@ -44,7 +49,6 @@ func _ready():
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):  # ESC key
-		var ui_manager = get_tree().get_first_node_in_group("ui_manager")
 		if ui_manager:
 			if ui_manager.is_any_menu_open():
 				# Close any open menu
@@ -80,7 +84,7 @@ func _on_respawn():
 
 func _close_menus_on_death(stat_name: String):
 	if stat_name == "health":
-		#$UI/PlayerMenu.visible = false
-		#inventory_system.inventory_toggled.emit(false)
-		# Close object menu on death
-		pass
+		if ui_manager:
+			if ui_manager.is_any_menu_open():
+				# Close any open menu
+				ui_manager.close_all_menus()
