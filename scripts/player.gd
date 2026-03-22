@@ -407,6 +407,8 @@ func handle_animations():
 				# Swim while stationary
 				if $AnimatedSprite2D.animation != "swim_idle":
 					$AnimatedSprite2D.play("swim_idle")
+				else:
+					print("Playing: ", $AnimatedSprite2D.animation)
 		else:
 			# Normal airborne animations when not underwater
 			var use_running_anims = was_running_when_jumped
@@ -443,14 +445,16 @@ func handle_animations():
 					# Only change animation if it's different from current
 					if $AnimatedSprite2D.animation != target_anim:
 						$AnimatedSprite2D.play(target_anim)
-			else:
-				if is_underwater:
-					# Swimming idle when not moving underwater
-					if $AnimatedSprite2D.animation != "swim_idle":
-						$AnimatedSprite2D.play("swim_idle")
-				else:
-					# Normal idle on land
-					$AnimatedSprite2D.play("idle")
+			#else:
+				#if is_underwater:
+					## Swimming idle when not moving underwater
+					#if $AnimatedSprite2D.animation != "swim_idle":
+						#$AnimatedSprite2D.play("swim_idle")
+					#else:
+						#print("Playing: %", $AnimatedSprite2D.animation)
+				#else:
+					## Normal idle on land
+					#$AnimatedSprite2D.play("idle")
 
 func _on_ground_animation_finished():
 	# Only transition if we're still on the ground
