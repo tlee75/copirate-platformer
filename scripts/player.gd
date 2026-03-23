@@ -319,8 +319,11 @@ func handle_interact_or_use_action():
 							handle_quick_access_action(selected_stack, tool_target)
 						else:
 							print("Cannot use ", tool_item.name, " on this target")
+					# Use the item if there is a use animation
+					elif selected_stack.item.use_animation and selected_stack.item.use_animation != null:
+						handle_quick_access_action(selected_stack, null)
 					else:
-						print("No target selected for tool use")
+						print("The quick access item has no use animation or the target is invalid")
 				else:
 					print("Cannot interact or use an item")
 
