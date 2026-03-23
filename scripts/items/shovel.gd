@@ -16,7 +16,7 @@ const DIRT_HOLE_Y = 0
 
 # Animation hit frame definition
 var hit_frames = {
-	"shovel_attack": [16, 35,58], # List is required for single frames
+	"shovel_attack": [6], # List is required for single frames
 }
 
 func _init():

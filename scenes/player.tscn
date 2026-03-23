@@ -11,12 +11,10 @@ script = ExtResource("1_4flbx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=170537221]
 sprite_frames = ExtResource("2_onrkg")
-animation = &"swim"
-frame_progress = 0.50157315
+animation = &"shovel_attack"
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1727286070]
 zoom = Vector2(1.5, 1.5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1728569321]
-visible = false
 shape = SubResource("CapsuleShape2D_g2els")
