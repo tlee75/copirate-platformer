@@ -3,7 +3,7 @@ class_name WoodAxe
 
 # Animation hit frame definition
 var hit_frames = {
-	"woodaxe_attack": [32, 55], # List is required for single frames
+	"woodaxe_attack": [3], # List is required for single frames
 }
 
 func _init():
