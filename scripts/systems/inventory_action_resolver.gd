@@ -106,30 +106,15 @@ func execute_action(action_type: ActionType, stack: InventoryManager.ItemStack, 
 func _execute_use_action(stack: InventoryManager.ItemStack) -> bool:
 	print("DEBUG: _execute_use_action called")
 	print("  stack:", stack)
-	# Handle object interaction first
-	#var scene_tree = get_tree()
-	#if scene_tree == null:
-		## Scene tree not available, skip object interaction
-		#var item = stack.item
-		## Skip to the item logic below
-	#else:
-		#var main_scene = scene_tree.current_scene
-		#if main_scene:
-			#var player_menu = main_scene.get_node("UI/PlayerMenu")  
-			#if player_menu and player_menu.has_meta("interacting_with_object"):
-				#var object_menu = scene_tree.get_first_node_in_group("object_menu")
-				#if object_menu and object_menu.can_object_accept_item(stack.item):
-					#var object_title = player_menu.get_meta("object_title", "Object")
-					#print("Adding ", stack.item.name, " to ", object_title)
-					## Remove one item from inventory
-					#InventoryManager.remove_items_by_name(stack.item.name, 1)
-					#return true
 
 	var item = stack.item
 	
 	match item.category:
 		"consumable", "food":
-			return InventoryManager.use_item_stack(stack)
+			var player = get_tree().get_first_node_in_group("player")
+			if not player:
+				return false
+			return player.try_use_item(stack)
 		
 		"weapon", "armor", "helmet", "chest", "legs", "hands", "feet", "shield", "accessory":
 			return InventoryManager.toggle_equip_item_stack(stack)

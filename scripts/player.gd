@@ -327,6 +327,17 @@ func handle_interact_or_use_action():
 				else:
 					print("There is no item in the selected slot, check for race condition with player input handler")
 
+func try_use_item(stack: InventoryManager.ItemStack) -> bool:
+	"""Used by inventory UI to consume/use an item with player state validation."""
+	if is_dead or is_trigger_action or is_interacting:
+		print("Cannot use item: player is busy or dead")
+		return false
+	if not can_use_item_in_current_environment(stack.item):
+		print("Cannot use ", stack.item.name, " in current environment!")
+		return false
+	stack.item.use(self, null, stack)
+	return true
+
 func is_valid_tool_target(target: Variant, tool_item) -> bool:
 	"""Check if the target is valid for this tool"""
 	if not tool_item or not tool_item.is_tool or tool_item.tool_action == "":

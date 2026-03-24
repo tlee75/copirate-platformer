@@ -25,6 +25,7 @@ var available_items: Array[InventoryManager.ItemStack] = []
 
 func _ready():
 	action_resolver = InventoryActionResolver.new()
+	add_child(action_resolver)
 	player = get_tree().get_first_node_in_group("player")
 	_detect_initial_input_mode()
 	set_process_unhandled_input(true)

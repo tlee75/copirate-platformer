@@ -171,8 +171,6 @@ func _set_item_description(item: GameItem):
 		var actions = input_handler.get_available_actions_for_stack(current_stack)
 		for action in actions:
 			var action_text = "• " + action.label
-			if action.is_primary:
-				action_text += " [color=lightblue](Primary)[/color]"
 			if action.input_hint != "":
 				action_text += " [color=gray](" + action.input_hint + ")[/color]"
 			description += action_text + "\n"
