@@ -4,6 +4,7 @@ class_name GameObject
 # Core properties
 var category: String = ""
 var description: String = ""
+var target_actions: Array[String] = []
 
 # Crafting properties (only used by structures)
 var craftable: bool = false

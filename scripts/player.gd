@@ -421,8 +421,7 @@ func handle_animations():
 				# Swim while stationary
 				if $AnimatedSprite2D.animation != "swim_idle":
 					$AnimatedSprite2D.play("swim_idle")
-				else:
-					print("Playing: ", $AnimatedSprite2D.animation)
+
 		else:
 			# Normal airborne animations when not underwater
 			var use_running_anims = was_running_when_jumped
@@ -993,15 +992,7 @@ func check_tool_tile_at_position(world_pos: Vector2, tool_action: String) -> Vec
 
 func check_object_tool_compatibility(obj: GameObject, tool_action: String) -> bool:
 	"""Check if an object can be targeted by this tool action"""
-	match tool_action:
-		"chop":
-			return obj.category == "terrain" and ("tree" in obj.name.to_lower() or "coconut" in obj.name.to_lower())
-		"harvest":
-			return obj.category == "terrain" and obj.has_method("is_interactable") and obj.is_interactable()
-		"dig":
-			return false  # Dig targets tiles, not objects
-	
-	return false
+	return tool_action in obj.target_actions
 
 func snap_crosshair_to_target(target: Node2D):
 	"""Position crosshair at target's location and manage hover effects"""

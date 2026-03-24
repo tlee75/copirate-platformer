@@ -2,7 +2,7 @@ extends GameObject
 
 @export var full_texture: Texture2D
 @export var empty_texture: Texture2D
-@export var max_health: int = 1
+@export var max_health: int = 3
 @export var regeneration_time: float = 30.0 
 
 enum CoconutTreeState { FULL, EMPTY }
@@ -13,6 +13,8 @@ var health: int = max_health
 func _ready():
 	# Set category for GameObject base class
 	category = "terrain"
+	
+	target_actions = ["chop"]
 	
 	if full_texture:
 		$Sprite2D.texture = full_texture
@@ -48,3 +50,16 @@ func regenerate():
 	if full_texture:
 		$Sprite2D.texture = full_texture
 	print("Coconut Tree has regrown!")
+
+func take_damage(amount: int):
+	health -= amount
+	print("Coconut Tree health: ", health, "/", max_health)
+	if health <= 0:
+		_on_chopped_down()
+
+func _on_chopped_down():
+	var player = get_tree().get_first_node_in_group("player")
+	if player and player.has_method("add_loot"):
+		player.add_loot("stick", 3)  # or "wood" once you have that item
+	print("Coconut Tree chopped down!")
+	queue_free()

@@ -89,14 +89,17 @@ func _on_attack_animation_finished(player):
 func _on_use_frame_changed(player):
 	var anim_sprite = player.get_node("AnimatedSprite2D")
 	var anim = anim_sprite.animation
-	if "hit_frames" in self and anim in self.hit_frames:
-		handle_use_frame(player, anim, anim_sprite.frame)
-	else:
-		print("WARNING: animation ", anim, "not found in hit_frames keys: ", self.hit_frames.keys())
-			
+	var frame = anim_sprite.frame
+	if "hit_frames" in self and anim in self.hit_frames and frame in self.hit_frames[anim]:
+		handle_use_frame(player, anim, frame)
 
 func handle_use_frame(player, _anim, _frame):
-	print("%s used by %s" % [self.name, player.name])
+	var target = player.attack_target
+	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("take_damage"):
+		target.take_damage(damage)
+		print("Chopped ", target.name, " for ", damage, " damage")
+	else:
+		print("Wood axe swing: no choppable target")
 
 func _on_use_animation_finished(player):
 	player.is_trigger_action = false
