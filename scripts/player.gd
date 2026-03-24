@@ -271,7 +271,7 @@ func _physics_process(delta):
 	# Update cursor area position based on mouse position
 	update_cursor_position()
 	
-	#handle_interact_or_use_action()
+	handle_interact_or_use_action()
 	
 	handle_attack_action()
 
@@ -570,18 +570,6 @@ func create_tile_highlight_optimized(tile_pos: Vector2i):
 	tile_highlights.append(highlight)
 	highlighted_tiles.append(tile_pos)
 
-func _on_inventory_action_requested(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack):
-	print("_on_inventory_action_requested - ", action_type, " on ", stack.item.name)
-
-	match action_type:
-		InventoryActionResolver.ActionType.EQUIP:
-			print("Item equip requested: ", stack.item.name)
-		InventoryActionResolver.ActionType.USE:
-			print("Item use requested: ", stack.item.name)
-			handle_interact_or_use_action()
-		InventoryActionResolver.ActionType.QUICK_ACCESS:
-			print("Item move to quick access requested: ", stack.item.name)
-
 func _on_inventory_action_executed(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack, success: bool):
 	print("Player: Inventory action executed - ", action_type, " on ", stack.item.name, " - Success: ", success)
 	
@@ -761,7 +749,6 @@ func add_loot(item_name: String, amount: int):
 
 func _connect_to_player_input_handler_ui():
 	# Connect to the singleton PlayerInputHandler
-	PlayerInputHandler.action_requested.connect(_on_inventory_action_requested)
 	PlayerInputHandler.action_executed.connect(_on_inventory_action_executed)
 	PlayerInputHandler.input_mode_changed.connect(_on_inventory_input_mode_changed)
 	print("Player connected to PlayerInputHandler singleton")

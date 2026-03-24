@@ -186,9 +186,7 @@ func _execute_primary_action():
 	if selected_index >= 0 and selected_index < current_items.size():
 		var stack = current_items[selected_index]
 		if input_handler:
-			var action = input_handler.action_resolver.get_action_for_input("inventory_use", stack)
-			if action:
-				item_action_requested.emit(stack, action.type)
+			item_action_requested.emit(stack, InventoryActionResolver.ActionType.USE)
 
 func get_selected_stack() -> InventoryManager.ItemStack:
 	if selected_index >= 0 and selected_index < current_items.size():

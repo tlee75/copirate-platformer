@@ -25,13 +25,11 @@ class ActionData:
 	var label: String
 	var icon: Texture2D
 	var input_hint: String
-	var is_primary: bool = false
 	
-	func _init(action_type: ActionType, action_label: String, hint: String = "", primary: bool = false):
+	func _init(action_type: ActionType, action_label: String, hint: String = ""):
 		type = action_type
 		label = action_label
 		input_hint = hint
-		is_primary = primary
 
 # Get available actions for an ItemStack
 func get_available_actions(stack: InventoryManager.ItemStack) -> Array[ActionData]:
@@ -42,7 +40,7 @@ func get_available_actions(stack: InventoryManager.ItemStack) -> Array[ActionDat
 
 	# Use/Consume
 	if item.category in ["consumable", "food"]:
-		actions.append(ActionData.new(ActionType.USE, "Consume", "E/A", true))
+		actions.append(ActionData.new(ActionType.USE, "Consume", "E/A"))
 
 	# Equip/Unequip
 	if item.category in ["weapon", "armor", "helmet", "chest", "legs", "hands", "feet", "shield", "accessory"]:
@@ -214,7 +212,7 @@ func get_action_for_input(input_action: String, stack: InventoryManager.ItemStac
 	match input_action:
 		"inventory_use":
 			for action in actions:
-				if action.is_primary:
+				if action.type == ActionType.USE:
 					return action
 		
 		"inventory_equip":

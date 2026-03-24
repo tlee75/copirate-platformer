@@ -220,14 +220,9 @@ func _create_action_button(action: InventoryActionResolver.ActionData) -> Button
 	button.text = action.label
 	button.custom_minimum_size = Vector2(120, 40)
 	
-	# Style primary action differently
-	if action.is_primary:
-		button.add_theme_stylebox_override("normal", _create_primary_button_style())
-		button.add_theme_stylebox_override("hover", _create_primary_button_style(true))
-	else:
-		button.add_theme_stylebox_override("normal", _create_secondary_button_style())
-		button.add_theme_stylebox_override("hover", _create_secondary_button_style(true))
-	
+	button.add_theme_stylebox_override("normal", _create_secondary_button_style())
+	button.add_theme_stylebox_override("hover", _create_secondary_button_style(true))
+
 	# Add input hint as tooltip
 	if action.input_hint != "": 
 		button.tooltip_text = "Press " + action.input_hint
@@ -236,20 +231,6 @@ func _create_action_button(action: InventoryActionResolver.ActionData) -> Button
 	button.pressed.connect(_on_action_button_pressed.bind(action.type))
 	
 	return button
-
-func _create_primary_button_style(hover: bool = false) -> StyleBoxFlat:
-	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.2, 0.5, 1.0, 0.8) if not hover else Color(0.3, 0.6, 1.0, 0.9)
-	style.border_color = Color(0.4, 0.7, 1.0)
-	style.border_width_left = 2
-	style.border_width_right = 2
-	style.border_width_top = 2
-	style.border_width_bottom = 2
-	style.corner_radius_top_left = 6
-	style.corner_radius_top_right = 6
-	style.corner_radius_bottom_left = 6
-	style.corner_radius_bottom_right = 6
-	return style
 
 func _create_secondary_button_style(hover: bool = false) -> StyleBoxFlat:
 	var style = StyleBoxFlat.new()

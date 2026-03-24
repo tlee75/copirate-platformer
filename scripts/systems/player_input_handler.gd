@@ -4,7 +4,6 @@ extends Node
 # Processes mouse/keyboard, controller, and touch input uniformly  
 # Handles both menu navigation and quick access cycling
 
-signal action_requested(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack)
 signal action_executed(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack, success: bool)
 signal input_mode_changed(new_mode: InventoryActionResolver.InputMethod)
 
@@ -235,8 +234,6 @@ func _handle_quick_access_input(event):
 		_select_quick_access_slot(6)
 	elif event.is_action_pressed("quick_access_select_8"):
 		_select_quick_access_slot(7)
-	elif event.is_action_pressed("interact"):
-		_use_quick_access_item() # TODO: This is wrong? Should should also interact with objects not just use quick accses items?
 
 func _cycle_quick_access_next():
 	if not quick_access:
@@ -329,22 +326,25 @@ func _get_quick_access() -> QuickAccessDisplay:
 		quick_access = get_tree().get_first_node_in_group("quick_access")
 	return quick_access
 
+func _get_player() -> Player:
+	if not player:
+		player = get_tree().get_first_node_in_group("player")
+	return player
+
+func _get_ui_manager() -> UIManager:
+	if not ui_manager:
+		ui_manager = get_tree().get_first_node_in_group("ui_manager")
+	return ui_manager
+
 func _reset_navigation_state():
 	selected_item_index = 0
 	selected_category = "all"
 	_refresh_available_items()
 
 func _execute_primary_action(stack: InventoryManager.ItemStack):
-	var action = action_resolver.get_action_for_input("inventory_use", stack)
-	if action:
-		# Request the player script to perform actions so they can be coordinated
-		action_requested.emit(action.type, stack)
-		var success = action_resolver.execute_action(action.type, stack)
-		#print("Executed primary action '", action.label, "' on ", stack.item.name, " - Success: ", success)
-		#action_executed.emit(action.type, stack, success)
-		
-	else:
-		print("No primary action available for ", stack.item.name)
+	var success = action_resolver.execute_action(InventoryActionResolver.ActionType.USE, stack)
+	print("Executed primary action on ", stack.item.name, " - Success: ", success)
+	action_executed.emit(InventoryActionResolver.ActionType.USE, stack, success)
 
 func _execute_action_by_input(input_action: String, stack: InventoryManager.ItemStack):
 	var action = action_resolver.get_action_for_input(input_action, stack)
