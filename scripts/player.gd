@@ -87,8 +87,8 @@ func _ready():
 	add_child(player_stats)
 	player_stats.stat_depleted.connect(_on_stat_depleted)
 
-	# Connect to PlayerMenu's input handler once the scene is ready
-	call_deferred("_connect_to_inventory_ui")
+	# Connect to Player input handler once the scene is ready
+	call_deferred("_connect_to_player_input_handler_ui")
 
 	# Get reference to UIManager for centralized menu state checking
 	call_deferred("_setup_ui_manager_reference")
@@ -271,7 +271,7 @@ func _physics_process(delta):
 	# Update cursor area position based on mouse position
 	update_cursor_position()
 	
-	handle_interact_or_use_action()
+	#handle_interact_or_use_action()
 	
 	handle_attack_action()
 
@@ -325,7 +325,7 @@ func handle_interact_or_use_action():
 					else:
 						print("The quick access item has no use animation or the target is invalid")
 				else:
-					print("Cannot interact or use an item")
+					print("There is no item in the selected slot, check for race condition with player input handler")
 
 func is_valid_tool_target(target: Variant, tool_item) -> bool:
 	"""Check if the target is valid for this tool"""
@@ -569,17 +569,31 @@ func create_tile_highlight_optimized(tile_pos: Vector2i):
 	get_parent().add_child(highlight)
 	tile_highlights.append(highlight)
 	highlighted_tiles.append(tile_pos)
-	
+
+func _on_inventory_action_requested(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack):
+	print("_on_inventory_action_requested - ", action_type, " on ", stack.item.name)
+
+	match action_type:
+		InventoryActionResolver.ActionType.EQUIP:
+			print("Item equip requested: ", stack.item.name)
+		InventoryActionResolver.ActionType.USE:
+			print("Item use requested: ", stack.item.name)
+			handle_interact_or_use_action()
+		InventoryActionResolver.ActionType.QUICK_ACCESS:
+			print("Item move to quick access requested: ", stack.item.name)
+
 func _on_inventory_action_executed(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack, success: bool):
 	print("Player: Inventory action executed - ", action_type, " on ", stack.item.name, " - Success: ", success)
 	
 	# Handle any player-specific responses to inventory actions
+	# I believe we should trigger animations here when appropriate
 	if success:
 		match action_type:
 			InventoryActionResolver.ActionType.EQUIP:
 				print("Item equipped: ", stack.item.name)
 			InventoryActionResolver.ActionType.USE:
 				print("Item used: ", stack.item.name)
+				print("Perform animation?")
 			InventoryActionResolver.ActionType.QUICK_ACCESS:
 				print("Item moved to quick access: ", stack.item.name)
 
@@ -616,7 +630,7 @@ func get_selected_quick_access_item():
 	var ui_layer = get_parent().get_node_or_null("UI")
 	if not ui_layer:
 		return null
-	var quick_access = ui_layer.get_node_or_null("QuickAccess")
+	var quick_access: QuickAccessDisplay = ui_layer.get_node_or_null("QuickAccess")
 	if not quick_access:
 		return null
 	return quick_access.get_selected_stack()
@@ -745,8 +759,9 @@ func add_loot(item_name: String, amount: int):
 	else:
 		return false
 
-func _connect_to_inventory_ui():
+func _connect_to_player_input_handler_ui():
 	# Connect to the singleton PlayerInputHandler
+	PlayerInputHandler.action_requested.connect(_on_inventory_action_requested)
 	PlayerInputHandler.action_executed.connect(_on_inventory_action_executed)
 	PlayerInputHandler.input_mode_changed.connect(_on_inventory_input_mode_changed)
 	print("Player connected to PlayerInputHandler singleton")

@@ -17,6 +17,10 @@ signal item_used(stack: InventoryManager.ItemStack)
 
 func _ready():
 	"""Setup UI references and connect signals"""
+	
+	# Declare in a group for discovery
+	add_to_group("quick_access")
+	
 	# Get UI references
 	background = get_node_or_null("Background")
 	container = get_node_or_null("Container")

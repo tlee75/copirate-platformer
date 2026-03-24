@@ -13,6 +13,7 @@ Thumbs.db
 .idea/
 .clinerules/
 .editorconfig
+.github/copilot-instructions.md
 
 # Build outputs
 bin/

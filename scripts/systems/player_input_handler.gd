@@ -4,6 +4,7 @@ extends Node
 # Processes mouse/keyboard, controller, and touch input uniformly  
 # Handles both menu navigation and quick access cycling
 
+signal action_requested(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack)
 signal action_executed(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack, success: bool)
 signal input_mode_changed(new_mode: InventoryActionResolver.InputMethod)
 
@@ -15,8 +16,8 @@ var player: Player = null
 var ui_manager: UIManager
 
 # Quick access state
-var selected_quick_access_slot: int = 0
 var quick_access_items: Array[InventoryManager.ItemStack] = []
+var quick_access: QuickAccessDisplay
 
 # Touch/controller navigation state
 var selected_category: String = "all"
@@ -79,7 +80,8 @@ func _input(event):
 		# Let individual UI components handle their own mouse events
 		pass
 	else:
-		_handle_quick_access_input(event)
+		# Handle any and all inputs here
+		_handle_quick_access_input(event) # This only handles quick access related inputs
 
 func _on_ui_state_changed(has_menu_open: bool):
 	"""Handle UI state changes from UIManager"""
@@ -134,6 +136,7 @@ func set_input_mode(mode: InventoryActionResolver.InputMethod):
 	input_mode_changed.emit(current_input_mode)
 
 func _handle_mouse_keyboard_input(event):
+	print("handle mouse and keyboard event")
 	# Handle direct action inputs
 	if event.is_action_pressed("inventory_use"):
 		if selected_stack:
@@ -210,8 +213,9 @@ func _handle_touch_input(event):
 				_execute_primary_action(selected_stack)
 
 func _handle_quick_access_input(event):
-	"""Handle input when PlayerMenu is closed"""
+	"""Handle quick access input when PlayerMenu is closed"""
 	if event.is_action_pressed("quick_access_next"):
+		print("quick access next")
 		_cycle_quick_access_next()
 	elif event.is_action_pressed("quick_access_previous"):
 		_cycle_quick_access_previous()
@@ -232,52 +236,50 @@ func _handle_quick_access_input(event):
 	elif event.is_action_pressed("quick_access_select_8"):
 		_select_quick_access_slot(7)
 	elif event.is_action_pressed("interact"):
-		_use_selected_quick_access_item()
+		_use_quick_access_item() # TODO: This is wrong? Should should also interact with objects not just use quick accses items?
 
 func _cycle_quick_access_next():
-	"""Cycle to next non-empty quick access slot"""
-	_refresh_quick_access_items()
-	var start_slot = selected_quick_access_slot
-	
-	for i in range(8):
-		selected_quick_access_slot = (selected_quick_access_slot + 1) % 8
-		if quick_access_items[selected_quick_access_slot] != null:
-			print("Cycled to quick access slot ", selected_quick_access_slot)
-			return
-		if selected_quick_access_slot == start_slot:
-			break
-	
-	print("No quick access items to cycle through")
+	if not quick_access:
+		quick_access = _get_quick_access()
+	if quick_access:
+		quick_access._cycle_selection(1)
+	else:
+		print("Quick access handle not found")
 
 func _cycle_quick_access_previous():
-	"""Cycle to previous non-empty quick access slot"""
-	_refresh_quick_access_items()
-	var start_slot = selected_quick_access_slot
-	
-	for i in range(8):
-		selected_quick_access_slot = (selected_quick_access_slot - 1 + 8) % 8
-		if quick_access_items[selected_quick_access_slot] != null:
-			print("Cycled to quick access slot ", selected_quick_access_slot)
-			return
-		if selected_quick_access_slot == start_slot:
-			break
-	
-	print("No quick access items to cycle through")
+	if not quick_access:
+		quick_access = _get_quick_access()
+	if quick_access:
+		quick_access._cycle_selection(-1)
+	else:
+		print("Quick access handle not found")
 
 func _select_quick_access_slot(slot: int):
 	"""Directly select specific quick access slot"""
-	if slot >= 0 and slot < 8:
-		selected_quick_access_slot = slot
+	if not quick_access:
+		quick_access = _get_quick_access()
+	
+	if quick_access:
+		quick_access.set_selected_slot(slot)
 		print("Selected quick access slot ", slot)
-
-func _use_selected_quick_access_item():
-	"""Use item in currently selected quick access slot"""
-	_refresh_quick_access_items()
-	var stack = quick_access_items[selected_quick_access_slot]
-	if stack:
-		_execute_primary_action(stack)
 	else:
-		print("No item in quick access slot ", selected_quick_access_slot)
+		print("Quick access handle not found")
+
+
+func _use_quick_access_item():
+	"""Use item in currently selected quick access slot"""
+	if not quick_access:
+		quick_access = _get_quick_access()
+	
+	if quick_access:
+		var stack = quick_access.get_selected_stack()
+		if stack:
+			print("stack")
+			_execute_primary_action(stack)
+		else:
+			print("No item in quick access slot ", quick_access.selected_slot)
+	else:
+		print("No quick_access")
 
 func _refresh_quick_access_items():
 	"""Update cached quick access items array"""
@@ -322,6 +324,11 @@ func _get_current_selected_stack() -> InventoryManager.ItemStack:
 	
 	return null
 
+func _get_quick_access() -> QuickAccessDisplay:
+	if not quick_access:
+		quick_access = get_tree().get_first_node_in_group("quick_access")
+	return quick_access
+
 func _reset_navigation_state():
 	selected_item_index = 0
 	selected_category = "all"
@@ -330,13 +337,12 @@ func _reset_navigation_state():
 func _execute_primary_action(stack: InventoryManager.ItemStack):
 	var action = action_resolver.get_action_for_input("inventory_use", stack)
 	if action:
+		# Request the player script to perform actions so they can be coordinated
+		action_requested.emit(action.type, stack)
 		var success = action_resolver.execute_action(action.type, stack)
-		print("Executed primary action '", action.label, "' on ", stack.item.name, " - Success: ", success)
-		action_executed.emit(action.type, stack, success)
+		#print("Executed primary action '", action.label, "' on ", stack.item.name, " - Success: ", success)
+		#action_executed.emit(action.type, stack, success)
 		
-		# Refresh navigation if items changed
-		if success:
-			_refresh_available_items()
 	else:
 		print("No primary action available for ", stack.item.name)
 
