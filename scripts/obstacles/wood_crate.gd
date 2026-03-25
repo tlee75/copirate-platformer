@@ -102,7 +102,8 @@ func break_object():
 	print(object_name, " destroyed!")
 	
 	# Drop loot before destruction
-	drop_loot()
+	#drop_loot()
+	LootDropper.drop_loot(loot_table, self)
 	
 	# Disable solid collision so player can walk through
 	#solid_collision.disabled = false
@@ -120,77 +121,77 @@ func break_object():
 		await get_tree().create_timer(0.1).timeout
 		queue_free()
 
-# Loot dropping system
-func drop_loot():
-	for loot_entry in loot_table:
-		var item_scene = loot_entry[0]
-		var drop_chance = loot_entry[1]
-		var min_quantity = loot_entry[2] 
-		var max_quantity = loot_entry[3]
-		
-		# Roll for drop chance
-		if randf() <= drop_chance:
-			var quantity = randi_range(min_quantity, max_quantity)
-			
-			# Spawn the items
-			for i in quantity:
-				spawn_loot_item(item_scene, i)
+## Loot dropping system
+#func drop_loot():
+	#for loot_entry in loot_table:
+		#var item_scene = loot_entry[0]
+		#var drop_chance = loot_entry[1]
+		#var min_quantity = loot_entry[2] 
+		#var max_quantity = loot_entry[3]
+		#
+		## Roll for drop chance
+		#if randf() <= drop_chance:
+			#var quantity = randi_range(min_quantity, max_quantity)
+			#
+			## Spawn the items
+			#for i in quantity:
+				#spawn_loot_item(item_scene, i)
 
-func spawn_loot_item(item_scene: PackedScene, offset_index: int):
-	if not item_scene:
-		print("Failed to spawn loot: PackedScene is null")
-		return
-	
-	# Instantiate the item
-	var item_instance = item_scene.instantiate()
-	
-	# Find a valid spawn position
-	var spawn_position = find_valid_spawn_position(offset_index)
-	item_instance.global_position = spawn_position
-	
-	# Add to the scene
-	get_parent().add_child(item_instance)
+#func spawn_loot_item(item_scene: PackedScene, offset_index: int):
+	#if not item_scene:
+		#print("Failed to spawn loot: PackedScene is null")
+		#return
+	#
+	## Instantiate the item
+	#var item_instance = item_scene.instantiate()
+	#
+	## Find a valid spawn position
+	#var spawn_position = find_valid_spawn_position(offset_index)
+	#item_instance.global_position = spawn_position
+	#
+	## Add to the scene
+	#get_parent().add_child(item_instance)
 
 
-func find_valid_spawn_position(offset_index: int) -> Vector2:
-	var max_attempts = 20
-	var attempt = 0
-	
-	while attempt < max_attempts:
-		# Try different spawn positions with very small spread
-		var spawn_offset = Vector2(
-			randf_range(-8, 8) + (offset_index * 4), 
-			randf_range(-8, 8)
-		)
-		var test_position = global_position + spawn_offset
-		
-		# Check if this position is valid
-		if is_position_valid(test_position):
-			return test_position
-		
-		attempt += 1
-	
-	# If no valid position found, spawn at object position (it's disappearing anyway)
-	print("Warning: Could not find valid spawn position, using ", object_name, " location")
-	return global_position
-
-func is_position_valid(pos: Vector2) -> bool:
-	# Get the world's space state for collision checking
-	var space_state = get_world_2d().direct_space_state
-	
-	# Create a small query to check for collisions at this position
-	var query = PhysicsPointQueryParameters2D.new()
-	query.position = pos
-	query.collision_mask = 1  # Check against collision layer 1 (adjust as needed)
-	
-	# Check for collisions with tiles/static bodies
-	var result = space_state.intersect_point(query)
-	
-	# Position is valid if nothing solid is there
-	for collision in result:
-		var collider = collision.collider
-		# Avoid spawning inside tiles (TileMap) or other StaticBody2D objects
-		if collider is TileMap or (collider is StaticBody2D and collider != self):
-			return false
-	
-	return true
+#func find_valid_spawn_position(offset_index: int) -> Vector2:
+	#var max_attempts = 20
+	#var attempt = 0
+	#
+	#while attempt < max_attempts:
+		## Try different spawn positions with very small spread
+		#var spawn_offset = Vector2(
+			#randf_range(-8, 8) + (offset_index * 4), 
+			#randf_range(-8, 8)
+		#)
+		#var test_position = global_position + spawn_offset
+		#
+		## Check if this position is valid
+		#if is_position_valid(test_position):
+			#return test_position
+		#
+		#attempt += 1
+	#
+	## If no valid position found, spawn at object position (it's disappearing anyway)
+	#print("Warning: Could not find valid spawn position, using ", object_name, " location")
+	#return global_position
+#
+#func is_position_valid(pos: Vector2) -> bool:
+	## Get the world's space state for collision checking
+	#var space_state = get_world_2d().direct_space_state
+	#
+	## Create a small query to check for collisions at this position
+	#var query = PhysicsPointQueryParameters2D.new()
+	#query.position = pos
+	#query.collision_mask = 1  # Check against collision layer 1 (adjust as needed)
+	#
+	## Check for collisions with tiles/static bodies
+	#var result = space_state.intersect_point(query)
+	#
+	## Position is valid if nothing solid is there
+	#for collision in result:
+		#var collider = collision.collider
+		## Avoid spawning inside tiles (TileMap) or other StaticBody2D objects
+		#if collider is TileMap or (collider is StaticBody2D and collider != self):
+			#return false
+	#
+	#return true

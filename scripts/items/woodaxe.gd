@@ -3,7 +3,7 @@ class_name WoodAxe
 
 # Animation hit frame definition
 var hit_frames = {
-	"woodaxe_attack": [6], # List is required for single frames
+	"woodaxe_attack": [4], # List is required for single frames
 }
 
 func _init():
@@ -19,5 +19,11 @@ func _init():
 	attack_animation = "woodaxe_attack"
 	use_animation = "woodaxe_attack"
 	damage = 1
+	harvest_amount = 1
 	is_tool = true
 	tool_action = "chop"
+
+func extra_use_cleanup(_player):
+	var target = _player.attack_target
+	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("on_harvest_complete"):
+		target.on_harvest_complete()

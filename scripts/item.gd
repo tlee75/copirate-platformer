@@ -12,6 +12,7 @@ class_name GameItem
 @export var is_tool = false
 @export var is_weapon: bool = false
 @export var damage: int = 0
+@export var harvest_amount: int = 0
 @export var description: String = ""  # Item description - set by individual item scripts
 @export var craft_time: float = 3.0  # Time in seconds to craft this item
 @export var target_range: float = 50.0      # Maximum targeting range
@@ -95,16 +96,17 @@ func _on_use_frame_changed(player):
 
 func handle_use_frame(player, _anim, _frame):
 	var target = player.attack_target
-	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("take_damage"):
-		target.take_damage(damage)
-		print("Chopped ", target.name, " for ", damage, " damage")
+	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and self.harvest_amount > 0 and target.has_method("harvest"):
+		target.harvest(harvest_amount)
+		print("Harvested ", target.name, " for ", harvest_amount)
 	else:
-		print("Wood axe swing: no choppable target")
+		print("Cannot harvest target")
 
 func _on_use_animation_finished(player):
+	print("_on_use_animation_finished")
 	player.is_trigger_action = false
-	player.attack_target = null
 	extra_use_cleanup(player)
+	player.attack_target = null
 	
 	# Remove the consumable that was stored previously
 	if is_consumable() and pending_item_stack and pending_item_stack.quantity > 0 and pending_item_stack.item.name == self.name:
@@ -123,7 +125,7 @@ func extra_attack_cleanup(_player):
 	pass
 
 func extra_use_cleanup(_player):
-	pass
+	print("item extra_use_cleanup")
 
 
 func cleanup_connections(user):

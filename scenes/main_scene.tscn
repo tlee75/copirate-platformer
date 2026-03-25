@@ -245,7 +245,9 @@ position = Vector2(-572, 2110)
 position = Vector2(-442, 2175)
 
 [node name="CoconutTree" parent="." unique_id=1453547572 instance=ExtResource("30_02d50")]
-position = Vector2(-261, 2064)
+position = Vector2(-261, 2107)
+max_harvest = null
+regeneration_time = null
 
 [node name="BerryBush" parent="." unique_id=1022453375 instance=ExtResource("23_j4epa")]
 position = Vector2(577, 2282)

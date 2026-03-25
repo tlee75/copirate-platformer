@@ -2,22 +2,28 @@ extends GameObject
 
 @export var full_texture: Texture2D
 @export var empty_texture: Texture2D
-@export var max_health: int = 3
+@export var max_harvest: int = 3
 @export var regeneration_time: float = 30.0 
+@export var stick_scene: PackedScene
+#@export var coconut_scene: PackedScene
+
+@onready var harvest_remaining: int = max_harvest
+@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 enum CoconutTreeState { FULL, EMPTY }
 var state: int = CoconutTreeState.FULL
-var health: int = max_health
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# Set category for GameObject base class
 	category = "terrain"
 	
+	harvest_remaining = max_harvest
+	
 	target_actions = ["chop"]
 	
-	if full_texture:
-		$Sprite2D.texture = full_texture
+	if animated_sprite:
+		animated_sprite.play("idle")
 
 	# Call parent _ready() to setup hover detection
 	super._ready()
@@ -30,8 +36,8 @@ func interact():
 	if state == CoconutTreeState.EMPTY:
 		return
 	state = CoconutTreeState.EMPTY
-	if empty_texture:
-		$Sprite2D.texture = empty_texture
+	if animated_sprite:
+		animated_sprite.play("idle_empty")
 	
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("add_loot"):
@@ -47,19 +53,33 @@ func set_cooldown():
 
 func regenerate():
 	state = CoconutTreeState.FULL
-	if full_texture:
-		$Sprite2D.texture = full_texture
+	if animated_sprite:
+		animated_sprite.play("idle")
 	print("Coconut Tree has regrown!")
 
-func take_damage(amount: int):
-	health -= amount
-	print("Coconut Tree health: ", health, "/", max_health)
-	if health <= 0:
-		_on_chopped_down()
+func harvest(amount: int):
+	harvest_remaining -= amount
+	if animated_sprite:
+		animated_sprite.play("hit_empty")
+	print("Coconut Tree harvest: ", harvest_remaining, "/", max_harvest)
 
-func _on_chopped_down():
-	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("add_loot"):
-		player.add_loot("stick", 3)  # or "wood" once you have that item
-	print("Coconut Tree chopped down!")
-	queue_free()
+func on_harvest_complete():
+	if harvest_remaining <= 0:
+		#var player = get_tree().get_first_node_in_group("player")
+		#if player and player.has_method("add_loot"):
+			#player.add_loot("stick", 3)  # or "wood" once you have that item
+		var loot_table = [
+			[stick_scene, 1.0, 2, 4],
+			#[coconut_scene, 1.0, 2, 4]
+		]
+		LootDropper.drop_loot(loot_table, self)
+		print("Coconut Tree chopped down!")
+		
+		# Play destruction animation if available
+		if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("break"):
+			animated_sprite.play("break")
+			# Wait for animation to finish, then remove object
+			await animated_sprite.animation_finished
+		else:
+			print("WARN: Unable to find break animation")
+		queue_free()
