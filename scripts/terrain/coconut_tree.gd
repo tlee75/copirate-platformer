@@ -13,6 +13,11 @@ extends GameObject
 enum CoconutTreeState { FULL, EMPTY }
 var state: int = CoconutTreeState.FULL
 
+var loot_table = [
+	[stick_scene, 1.0, 2, 4],
+	#[coconut_scene, 1.0, 2, 4]
+]
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# Set category for GameObject base class
@@ -59,19 +64,12 @@ func regenerate():
 
 func harvest(amount: int):
 	harvest_remaining -= amount
-	if animated_sprite:
+	if animated_sprite and harvest_remaining >= 0:
 		animated_sprite.play("hit_empty")
 	print("Coconut Tree harvest: ", harvest_remaining, "/", max_harvest)
 
 func on_harvest_complete():
 	if harvest_remaining <= 0:
-		#var player = get_tree().get_first_node_in_group("player")
-		#if player and player.has_method("add_loot"):
-			#player.add_loot("stick", 3)  # or "wood" once you have that item
-		var loot_table = [
-			[stick_scene, 1.0, 2, 4],
-			#[coconut_scene, 1.0, 2, 4]
-		]
 		LootDropper.drop_loot(loot_table, self)
 		print("Coconut Tree chopped down!")
 		

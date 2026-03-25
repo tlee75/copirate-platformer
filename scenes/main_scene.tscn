@@ -21,9 +21,7 @@
 [ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/items/shovel.tscn" id="21_duuju"]
 [ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/items/sword.tscn" id="22_8dxha"]
 [ext_resource type="PackedScene" uid="uid://bqjbr0fr548wk" path="res://scenes/terrain/berry_bush.tscn" id="23_j4epa"]
-[ext_resource type="PackedScene" uid="uid://ckk3o0r7wv6tc" path="res://scenes/items/stick.tscn" id="24_ruju6"]
 [ext_resource type="PackedScene" uid="uid://bau4ht0cid8a1" path="res://scenes/items/wood_axe.tscn" id="25_5nybl"]
-[ext_resource type="PackedScene" uid="uid://dhi7durjec88o" path="res://scenes/items/gold_coin.tscn" id="26_cq0lk"]
 [ext_resource type="Script" uid="uid://31qjwgftkyrw" path="res://scripts/systems/water_flow_manager.gd" id="27_j2yw6"]
 [ext_resource type="PackedScene" uid="uid://b5y8lh6n7kve" path="res://scenes/items/simple_rock.tscn" id="28_8pjrr"]
 [ext_resource type="Script" uid="uid://duwg2nwj6sc2e" path="res://scripts/systems/placement_manager.gd" id="29_0xxsb"]
@@ -106,7 +104,7 @@ script = ExtResource("1_4bgka")
 
 [node name="Player" parent="." unique_id=1352661183 groups=["player"] instance=ExtResource("2_02d50")]
 z_index = 1
-position = Vector2(-94, 2142)
+position = Vector2(-94, 2149)
 
 [node name="CursorArea" type="Area2D" parent="Player" unique_id=150247619]
 position = Vector2(33, 0)
@@ -214,17 +212,8 @@ position = Vector2(222, 2154)
 wait_time = 2.0
 autostart = true
 
-[node name="Stick2" parent="." unique_id=173540561 instance=ExtResource("24_ruju6")]
-position = Vector2(-193, 2085)
-
-[node name="Stick" parent="." unique_id=1584812632 instance=ExtResource("24_ruju6")]
-position = Vector2(-163, 2075)
-
 [node name="WoodAxe" parent="." unique_id=715209706 instance=ExtResource("25_5nybl")]
 position = Vector2(-42, 2088)
-
-[node name="GoldCoin" parent="." unique_id=749941113 instance=ExtResource("26_cq0lk")]
-position = Vector2(-128, 2075)
 
 [node name="WaterFlowManager" type="Node" parent="." unique_id=2080095331]
 script = ExtResource("27_j2yw6")
@@ -245,12 +234,16 @@ position = Vector2(-572, 2110)
 position = Vector2(-442, 2175)
 
 [node name="CoconutTree" parent="." unique_id=1453547572 instance=ExtResource("30_02d50")]
-position = Vector2(-261, 2107)
-max_harvest = null
-regeneration_time = null
+position = Vector2(-299, 2107)
 
 [node name="BerryBush" parent="." unique_id=1022453375 instance=ExtResource("23_j4epa")]
 position = Vector2(577, 2282)
 
 [node name="WoodCrate" parent="." unique_id=204324573 instance=ExtResource("19_267kh")]
 position = Vector2(334, 2123)
+
+[node name="CoconutTree2" parent="." unique_id=1813802444 instance=ExtResource("30_02d50")]
+position = Vector2(-803, 2043)
+
+[node name="CoconutTree3" parent="." unique_id=1605635901 instance=ExtResource("30_02d50")]
+position = Vector2(-930, 2043)
