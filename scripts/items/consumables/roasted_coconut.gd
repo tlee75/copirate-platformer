@@ -1,19 +1,18 @@
 extends GameItem
-class_name Coconut
+class_name RoastedCoconut
 
 var player_stats: PlayerStats
 
 func _init():
-	name = "Coconut"
-	icon = load("res://assets/consumables/raw_coconut_1.png")
+	name = "Roasted Coconut"
+	icon = load("res://assets/consumables/roasted_coconut_1.png")
 	stack_size = 10
 	craftable = false
 	category = "food"
 	underwater_compatible = false
 	land_compatible = true
-	is_cookable = true
+	is_cookable = false
 	cook_time = 8.0
-	cooked_result_item_name = "roasted_coconut"
 	use_animation = "consume"
 
 func is_consumable() -> bool:
@@ -34,3 +33,4 @@ func extra_use_startup(player, slot_data):
 		#pending_slot_data = slot_data
 	else:
 		print("no player stats")
+		

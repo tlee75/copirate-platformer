@@ -13,6 +13,8 @@ extends GameObject
 enum CoconutTreeState { FULL, EMPTY }
 var state: int = CoconutTreeState.FULL
 
+var player: Player
+
 var loot_table = [
 	[stick_scene, 1.0, 2, 4],
 	#[coconut_scene, 1.0, 2, 4]
@@ -44,7 +46,7 @@ func interact():
 	if animated_sprite:
 		animated_sprite.play("idle_empty")
 	
-	var player = get_tree().get_first_node_in_group("player")
+	player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("add_loot"):
 		player.add_loot("coconut", 1)
 	
