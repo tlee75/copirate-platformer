@@ -206,7 +206,7 @@ position = Vector2(60, 2083)
 [node name="Resources" type="Node" parent="." unique_id=1510119859]
 
 [node name="BerryBush" parent="Resources" unique_id=1553395660 instance=ExtResource("23_j4epa")]
-position = Vector2(222, 2154)
+position = Vector2(218, 2143)
 
 [node name="TwoSecondTimer" type="Timer" parent="Resources" unique_id=1740078514]
 wait_time = 2.0
@@ -218,32 +218,36 @@ position = Vector2(-42, 2088)
 [node name="WaterFlowManager" type="Node" parent="." unique_id=2080095331]
 script = ExtResource("27_j2yw6")
 
-[node name="SimpleRock" parent="." unique_id=568820042 instance=ExtResource("28_8pjrr")]
-position = Vector2(497, 2268)
-
 [node name="PlacementManager" type="Node" parent="." unique_id=2123466378]
 script = ExtResource("29_0xxsb")
 
-[node name="SimpleRock2" parent="." unique_id=1451659254 instance=ExtResource("28_8pjrr")]
-position = Vector2(712, 2429)
-
-[node name="SimpleRock3" parent="." unique_id=1379053989 instance=ExtResource("28_8pjrr")]
-position = Vector2(-572, 2110)
-
-[node name="SimpleRock4" parent="." unique_id=1591105709 instance=ExtResource("28_8pjrr")]
-position = Vector2(-442, 2175)
-
-[node name="CoconutTree" parent="." unique_id=1453547572 instance=ExtResource("30_02d50")]
-position = Vector2(-299, 2107)
-
 [node name="BerryBush" parent="." unique_id=1022453375 instance=ExtResource("23_j4epa")]
-position = Vector2(577, 2282)
+position = Vector2(779, 2397)
 
 [node name="WoodCrate" parent="." unique_id=204324573 instance=ExtResource("19_267kh")]
 position = Vector2(334, 2123)
 
-[node name="CoconutTree2" parent="." unique_id=1813802444 instance=ExtResource("30_02d50")]
+[node name="CoconutTrees" type="Node" parent="." unique_id=213760523]
+
+[node name="CoconutTree3" parent="CoconutTrees" unique_id=1605635901 instance=ExtResource("30_02d50")]
+position = Vector2(-930, 2043)
+
+[node name="CoconutTree2" parent="CoconutTrees" unique_id=1813802444 instance=ExtResource("30_02d50")]
 position = Vector2(-803, 2043)
 
-[node name="CoconutTree3" parent="." unique_id=1605635901 instance=ExtResource("30_02d50")]
-position = Vector2(-930, 2043)
+[node name="CoconutTree" parent="CoconutTrees" unique_id=1453547572 instance=ExtResource("30_02d50")]
+position = Vector2(-299, 2107)
+
+[node name="SimpleRocks" type="Node" parent="." unique_id=1277372746]
+
+[node name="SimpleRock" parent="SimpleRocks" unique_id=568820042 instance=ExtResource("28_8pjrr")]
+position = Vector2(497, 2268)
+
+[node name="SimpleRock2" parent="SimpleRocks" unique_id=1451659254 instance=ExtResource("28_8pjrr")]
+position = Vector2(712, 2429)
+
+[node name="SimpleRock3" parent="SimpleRocks" unique_id=1379053989 instance=ExtResource("28_8pjrr")]
+position = Vector2(-572, 2110)
+
+[node name="SimpleRock4" parent="SimpleRocks" unique_id=1591105709 instance=ExtResource("28_8pjrr")]
+position = Vector2(-442, 2175)

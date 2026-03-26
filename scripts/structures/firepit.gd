@@ -7,7 +7,6 @@ signal fuel_consumed(remaining_time: float)
 
 @export var max_fuel: float = 300.0 # Max fuel storage
 
-@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var interactive_object: InteractiveObjectComponent
 
 enum ObjectState { UNLIT, BURNING }

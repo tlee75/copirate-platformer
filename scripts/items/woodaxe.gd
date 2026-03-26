@@ -19,11 +19,7 @@ func _init():
 	attack_animation = "woodaxe_attack"
 	use_animation = "woodaxe_attack"
 	damage = 1
-	harvest_amount = 1
+	used_amount = 1
 	is_tool = true
+	is_weapon = true
 	tool_action = "chop"
-
-func extra_use_cleanup(_player):
-	var target = _player.attack_target
-	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("on_harvest_complete"):
-		target.on_harvest_complete()

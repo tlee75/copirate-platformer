@@ -1,52 +1,24 @@
 extends GameObject
 
-@export var full_texture: Texture2D
-@export var empty_texture: Texture2D
-@export var max_health: int = 1
-@export var regeneration_time: float = 30.0 
-@onready var sprite = $Sprite2D
-@onready var area = $Area2D
-
-enum BerryBushState { FULL, EMPTY }
-var state: int = BerryBushState.FULL
-var health: int = max_health
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	if full_texture:
-		$Sprite2D.texture = full_texture
+	# Setup harvest
+	category = "terrain"
+	max_harvest = 3
+	harvest_remaining = max_harvest
+	regeneration_time = 30.0 
+	is_harvestable = true
+	is_destructible = false
+	harvest_loot = "raspberry"
+	
+	target_actions = ["harvest"]
+	
+	# Start with normal idle animation
+	if animated_sprite:
+		animated_sprite.play("idle")
 
 	# Call parent _ready() which will setup hover detection
 	super._ready()
 
 func is_interactable() -> bool:
-	return state == BerryBushState.FULL
-
-
-# Interact action handler (for future use)
-func interact():
-	if state == BerryBushState.EMPTY:
-		return
-	state = BerryBushState.EMPTY
-	if empty_texture:
-		$Sprite2D.texture = empty_texture
-	
-	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("add_loot"):
-		player.add_loot("raspberry", 1)
-	
-	print("Harvesting berries - will regrow in ", regeneration_time, " seconds")
-	
-	# Register with ResourceManager for regeneration
-
-	ResourceManager.register_resource_regeneration(self, regeneration_time)
-
-
-func set_cooldown():
-	pass
-
-func regenerate():
-	state = BerryBushState.FULL
-	if full_texture:
-		$Sprite2D.texture = full_texture
-	print("Berry bush has regrown!")
+	return is_harvestable == true

@@ -14,7 +14,7 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") a
 
 var was_airborne: bool = false
 var is_trigger_action: bool = false
-var is_interacting: bool = false
+#var is_interacting: bool = false
 var cursor_area: Area2D
 var tilemap: TileMap
 var highlighted_tiles: Array[Vector2i] = []
@@ -28,7 +28,7 @@ var tile_size: float = 32.0
 var is_dead: bool = false
 var attack_target = null 
 var tool_target = null
-var interact_target = null
+#var interact_target = null
 var current_hover_target: GameObject = null
 var current_targeted_object: Variant = null
 
@@ -127,7 +127,8 @@ func _physics_process(delta):
 		return
 
 	# Do not allow movement while in the middle of an animation
-	if is_trigger_action or is_interacting:
+	#if is_trigger_action or is_interacting:
+	if is_trigger_action:
 		return
 
 	var vel: Vector2 = velocity
@@ -271,7 +272,9 @@ func _physics_process(delta):
 	# Update cursor area position based on mouse position
 	update_cursor_position()
 	
-	handle_interact_or_use_action()
+	handle_interact_action()
+	
+	handle_use_action()
 	
 	handle_attack_action()
 
@@ -285,51 +288,48 @@ func _physics_process(delta):
 	# Handle animations after physics update
 	handle_animations()
 
-func handle_interact_or_use_action():
-	# Interact/Use Action
+func handle_interact_action():
 	var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else PlayerInputHandler.is_player_menu_open
-	if Input.is_action_just_pressed("interact") and not any_menu_open:
-		if not is_interacting:
-			if is_interact_target():
-				is_interacting = true
-				print("Interact used by %s" % self.name)
-				if is_underwater:
-					$AnimatedSprite2D.play("swim_gather")
-				else:
-					$AnimatedSprite2D.play("interact")
-				# Disconnect any existing connections first, then connect
-				if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
-					$AnimatedSprite2D.frame_changed.disconnect(_on_interact_animation_finished)
-				$AnimatedSprite2D.animation_finished.connect(_on_interact_animation_finished)
-			elif not is_trigger_action:
-				print("Using quick access item")
-				var selected_stack = get_selected_quick_access_item()
-				if selected_stack and selected_stack.item:
-					if not can_use_item_in_current_environment(selected_stack.item):
-						var item_name = selected_stack.item.name if selected_stack.item.has_method("get_name") else str(selected_stack.item)
-						var environment_msg = "underwater" if is_underwater else "on land"
-						print("Cannot use ", item_name, " ", environment_msg, "!")
-						return
-					# Use the currently targeted object/tile from our targeting system
-					if current_targeted_object != null:
-						# Check if current target is valid for this tool
-						var tool_item = selected_stack.item
-						if is_valid_tool_target(current_targeted_object, tool_item):
-							tool_target = current_targeted_object
-							handle_quick_access_action(selected_stack, tool_target)
-						else:
-							print("Cannot use ", tool_item.name, " on this target")
-					# Use the item if there is a use animation
-					elif selected_stack.item.use_animation and selected_stack.item.use_animation != null:
-						handle_quick_access_action(selected_stack, null)
-					else:
-						print("The quick access item has no use animation or the target is invalid")
-				else:
-					print("There is no item in the selected slot, check for race condition with player input handler")
+	if not Input.is_action_just_pressed("interact") or any_menu_open or is_trigger_action:
+		return
+
+	var hands: GameItem = GameObjectsDatabase.game_objects_database.get("hands")
+	if hands and current_targeted_object != null and is_valid_tool_target(current_targeted_object, hands):
+		print("use hands")
+		hands.use(self, current_targeted_object, null)
+	else:
+		print("Nothing to use hands on")
+
+func handle_use_action():
+	var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else PlayerInputHandler.is_player_menu_open
+	if not Input.is_action_just_pressed("use_selected_item") or any_menu_open or is_trigger_action:
+		return
+
+	var selected_stack = get_selected_quick_access_item()
+	var selected_item = null
+	var target = null
+
+	# Determine if we should use the quick access item with or without a target
+	if selected_stack and selected_stack.item and can_use_item_in_current_environment(selected_stack.item):
+		if current_targeted_object != null and is_valid_tool_target(current_targeted_object, selected_stack.item):
+			selected_item = selected_stack.item
+			target = current_targeted_object
+		# Use item without target
+		elif selected_stack.item.use_animation:
+			selected_item = selected_stack.item
+			target = null
+
+	if selected_item:
+		if selected_stack and selected_item == selected_stack.item:
+			handle_quick_access_action(selected_stack, target)
+		else:
+			selected_item.use(self, target, null)
+	else:
+		print("Nothing to interact with / use")
 
 func try_use_item(stack: InventoryManager.ItemStack) -> bool:
 	"""Used by inventory UI to consume/use an item with player state validation."""
-	if is_dead or is_trigger_action or is_interacting:
+	if is_dead or is_trigger_action:
 		print("Cannot use item: player is busy or dead")
 		return false
 	if not can_use_item_in_current_environment(stack.item):
@@ -341,8 +341,8 @@ func try_use_item(stack: InventoryManager.ItemStack) -> bool:
 func is_valid_tool_target(target: Variant, tool_item) -> bool:
 	"""Check if the target is valid for this tool"""
 	if not tool_item or not tool_item.is_tool or tool_item.tool_action == "":
+		print("return false")
 		return false
-	
 	# Handle tile targets (Vector2i)
 	if typeof(target) == TYPE_VECTOR2I:
 		var tile_pos = target as Vector2i
@@ -402,7 +402,7 @@ func handle_quick_access_action(selected_stack, target):
 
 func handle_animations():
 	# Don't change animations while in the middle of an action or dead
-	if is_trigger_action or is_interacting or is_dead:
+	if is_trigger_action or is_dead:
 		return
 
 	var on_floor = is_on_floor()
@@ -477,16 +477,17 @@ func _on_ground_animation_finished():
 		else:
 			$AnimatedSprite2D.play("idle")
 
-func _on_interact_animation_finished():
-	# Disconnect the signal immediately to prevent interference
-	if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
-		$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
-
-	if interact_target and is_instance_valid(interact_target):
-		interact_target.interact()
-
-	# When attack animation finishes, end attack state
-	is_interacting = false
+#func _on_interact_animation_finished():
+	#print("_on_interact_animation_finished")
+	## Disconnect the signal immediately to prevent interference
+	#if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
+		#$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
+#
+	#if interact_target and is_instance_valid(interact_target):
+		#interact_target.interact()
+#
+	## When attack animation finishes, end attack state
+	#is_interacting = false
 
 func _on_death_animation_finished():
 	# Prevent subsequent cycles from re-pausing the game
@@ -707,24 +708,24 @@ func _on_stat_depleted(stat_name: String):
 		"thirst":
 			print("Player is dehydrated!")
 
-func is_interact_target():
-	"""Check if current targeted object is interactable"""
-	# Only allow interaction with the currently targeted object
-	if not current_targeted_object:
-		return false
-	
-	# Handle tile targets (Vector2i) - not interactable
-	if typeof(current_targeted_object) == TYPE_VECTOR2I:
-		return false
-	
-	# Handle object targets (Node2D)
-	if current_targeted_object is Node2D:
-		if current_targeted_object.has_method("is_interactable") and current_targeted_object.is_interactable():
-			interact_target = current_targeted_object
-			current_targeted_object.set_cooldown()
-			return true
-	
-	return false
+#func is_interact_target():
+	#"""Check if current targeted object is interactable"""
+	## Only allow interaction with the currently targeted object
+	#if not current_targeted_object:
+		#return false
+	#
+	## Handle tile targets (Vector2i) - not interactable
+	#if typeof(current_targeted_object) == TYPE_VECTOR2I:
+		#return false
+	#
+	## Handle object targets (Node2D)
+	#if current_targeted_object is Node2D:
+		#if current_targeted_object.has_method("is_interactable") and current_targeted_object.is_interactable():
+			#interact_target = current_targeted_object
+			#current_targeted_object.set_cooldown()
+			#return true
+	#
+	#return false
 
 func is_attack_target(target):
 	return target and target.has_method("is_attack_target") and target.is_attack_target()

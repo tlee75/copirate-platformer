@@ -1,6 +1,19 @@
 extends Node2D
 class_name GameObject
 
+@export var max_harvest: int
+@export var regeneration_time: float 
+
+@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+
+# Harvesting specific properties for Raspberry bush, coconut trees, etc
+var harvest_remaining: int
+var is_harvestable: bool
+var is_destructible: bool
+var harvest_loot: String = ""
+var loot_table: Array
+var player: Player
+
 # Core properties
 var category: String = ""
 var description: String = ""
@@ -122,6 +135,69 @@ func get_hover_scale_multiplier() -> float:
 	else:
 		return 1.00  # 3% larger for structures
 
+func set_cooldown():
+	pass
+
 func is_interactable() -> bool:
 	"""Override this in subclasses"""
 	return true
+
+## Interact action handler
+#func interact():
+	#is_harvestable = false
+	#if animated_sprite:
+		#animated_sprite.play("idle_empty")
+	#
+	#player = get_tree().get_first_node_in_group("player")
+	#if player and player.has_method("add_loot"):
+		#player.add_loot(harvest_loot, 1)
+	#
+	#print("Harvesting ", harvest_loot, " - will regrow in ", regeneration_time, " seconds")
+	#
+	## Register with ResourceManager for regeneration
+	#ResourceManager.register_resource_regeneration(self, regeneration_time)
+
+func regenerate():
+	is_harvestable = true
+	if animated_sprite:
+		animated_sprite.play("idle")
+	print(name, " has regrown!")
+
+func tool_used(used_amount: int):
+	if is_harvestable and harvest_remaining > 0:
+		if animated_sprite:
+			animated_sprite.play("hit_empty")
+	
+		print(name, " harvest: ", harvest_remaining, "/", max_harvest)
+		player = get_tree().get_first_node_in_group("player")
+		if player and player.has_method("add_loot"):
+			player.add_loot(harvest_loot, 1)	
+
+		harvest_remaining -= used_amount
+	else:
+		print("non harvestable object: ", self.name)
+
+# Handle destruction after the hit animation has completed
+func use_finished_callback(damage: int):
+	print("use_finished_callback")
+	
+	if is_harvestable:
+		if harvest_remaining > 0:
+			animated_sprite.play("idle")			
+		else:
+			animated_sprite.play("idle_empty")
+		
+		# Break and drop loot
+		if harvest_remaining <= 0 and is_destructible and damage > 0:		
+			# Play destruction animation if available
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("break"):
+				animated_sprite.play("break")
+				# Wait for animation to finish, then remove object
+				await animated_sprite.animation_finished
+			else:
+				print("WARN: Unable to find break animation")
+			
+			LootDropper.drop_loot(loot_table, self)
+			print(name, " has been destroyed")
+			
+			queue_free()

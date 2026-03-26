@@ -12,7 +12,7 @@ class_name GameItem
 @export var is_tool = false
 @export var is_weapon: bool = false
 @export var damage: int = 0
-@export var harvest_amount: int = 0
+@export var used_amount: int = 0
 @export var description: String = ""  # Item description - set by individual item scripts
 @export var craft_time: float = 3.0  # Time in seconds to craft this item
 @export var target_range: float = 50.0      # Maximum targeting range
@@ -70,9 +70,9 @@ func _on_attack_frame_changed(player):
 	var anim = anim_sprite.animation
 	var frame = anim_sprite.frame
 	if anim in self.hit_frames and frame in self.hit_frames[anim]:
-		handle_attack_frame(player, anim, frame)
+		handle_attack_hit_frame(player, anim, frame)
 
-func handle_attack_frame(player, anim, frame):
+func handle_attack_hit_frame(player, anim, frame):
 	print("%s attack by %s with animation %s on frame %s" % [self.name, player.name, anim, frame])
 	var target = player.attack_target
 	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("take_damage"):
@@ -92,19 +92,23 @@ func _on_use_frame_changed(player):
 	var anim = anim_sprite.animation
 	var frame = anim_sprite.frame
 	if "hit_frames" in self and anim in self.hit_frames and frame in self.hit_frames[anim]:
-		handle_use_frame(player, anim, frame)
+		handle_use_hit_frame(player, anim, frame)
 
-func handle_use_frame(player, _anim, _frame):
+func handle_use_hit_frame(player, _anim, _frame):
 	var target = player.attack_target
-	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and self.harvest_amount > 0 and target.has_method("harvest"):
-		target.harvest(harvest_amount)
-		print("Harvested ", target.name, " for ", harvest_amount)
+	if not target:
+		print ("No target to use")
+	elif typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("tool_used"):
+		target.tool_used(used_amount)
+		print("Tool used ", target.name, " for ", used_amount)
 	else:
-		print("Cannot harvest target")
+		print("Cannot use target: ", target.name)
 
 func _on_use_animation_finished(player):
 	print("_on_use_animation_finished")
 	player.is_trigger_action = false
+	if typeof(player.attack_target) == TYPE_OBJECT and is_instance_valid(player.attack_target) and player.attack_target.has_method("use_finished_callback"):
+		player.attack_target.use_finished_callback(self.damage)
 	extra_use_cleanup(player)
 	player.attack_target = null
 	
