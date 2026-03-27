@@ -4,7 +4,7 @@ class_name GameObject
 @export var max_harvest: int
 @export var regeneration_time: float 
 
-@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+var animated_sprite: AnimatedSprite2D
 
 # Harvesting specific properties for Raspberry bush, coconut trees, etc
 var harvest_remaining: int
@@ -45,7 +45,11 @@ func _ready():
 func _find_sprite_node():
 	"""Automatically find the sprite node in children"""
 	for child in get_children():
-		if child is Sprite2D or child is AnimatedSprite2D:
+		if child is AnimatedSprite2D:
+			sprite_node = child
+			animated_sprite = child
+			break
+		elif child is Sprite2D:
 			sprite_node = child
 			break
 	
@@ -131,9 +135,9 @@ func get_hover_color() -> Color:
 func get_hover_scale_multiplier() -> float:
 	"""Override this in subclasses for custom scale amounts"""
 	if category == "terrain":
-		return 1.00  # 5% larger for terrain
+		return 1.05  # 5% larger for terrain
 	else:
-		return 1.00  # 3% larger for structures
+		return 1.03  # 3% larger for structures
 
 func set_cooldown():
 	pass

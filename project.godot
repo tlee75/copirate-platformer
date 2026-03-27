@@ -32,8 +32,7 @@ LootDropper="*uid://cujj30rbfwk60"
 
 [display]
 
-window/stretch/mode="viewport"
-window/stretch/aspect="expand"
+window/stretch/mode="canvas_items"
 
 [gui]
 

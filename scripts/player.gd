@@ -314,8 +314,9 @@ func handle_use_action():
 		print("using hands")
 	elif Input.is_action_just_pressed("use_selected_item"):
 		selected_stack = get_selected_quick_access_item()
-		selected_item = selected_stack.item
-		print("using selected item: ", selected_item.name)
+		if selected_stack and selected_stack.item:
+			selected_item = selected_stack.item
+			print("using selected item: ", selected_item.name)
 
 	# Determine if we should use the item with or without a target
 	if selected_item and can_use_item_in_current_environment(selected_item):
@@ -503,9 +504,6 @@ func _on_death_animation_finished():
 			get_tree().paused = true
 
 func update_cursor_position():
-	# Only check mouse bounds occasionally to prevent rapid warping
-	if Engine.get_physics_frames() % 3 == 0:
-		keep_mouse_in_screen()
 	
 	# New smart targeting system
 	update_crosshair_targeting()
@@ -522,23 +520,6 @@ func update_cursor_position():
 	if cursor_area.has_node("Crosshair"):
 		var crosshair = cursor_area.get_node("Crosshair")
 		crosshair.position = Vector2.ZERO  # Keep crosshair centered on cursor area
-
-func keep_mouse_in_screen():
-	"""Prevent mouse from leaving the screen bounds with buffer"""
-	# Get current screen size (updates dynamically with window resize)
-	var screen_size = DisplayServer.window_get_size()
-	var mouse_pos = get_viewport().get_mouse_position()
-	
-	# Add buffer to prevent cursor from going slightly outside
-	var buffer = 5.0
-	var clamped_pos = Vector2(
-		clamp(mouse_pos.x, buffer, screen_size.x - buffer),
-		clamp(mouse_pos.y, buffer, screen_size.y - buffer)
-	)
-	
-	# Only warp if the position actually changed
-	if mouse_pos.distance_to(clamped_pos) > 1.0:
-		Input.warp_mouse(clamped_pos)
 
 func create_highlight_texture():
 	# Create the highlight texture once and reuse it
@@ -708,25 +689,6 @@ func _on_stat_depleted(stat_name: String):
 			print("Player is starving!")
 		"thirst":
 			print("Player is dehydrated!")
-
-#func is_interact_target():
-	#"""Check if current targeted object is interactable"""
-	## Only allow interaction with the currently targeted object
-	#if not current_targeted_object:
-		#return false
-	#
-	## Handle tile targets (Vector2i) - not interactable
-	#if typeof(current_targeted_object) == TYPE_VECTOR2I:
-		#return false
-	#
-	## Handle object targets (Node2D)
-	#if current_targeted_object is Node2D:
-		#if current_targeted_object.has_method("is_interactable") and current_targeted_object.is_interactable():
-			#interact_target = current_targeted_object
-			#current_targeted_object.set_cooldown()
-			#return true
-	#
-	#return false
 
 func is_attack_target(target):
 	return target and target.has_method("is_attack_target") and target.is_attack_target()

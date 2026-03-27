@@ -2,7 +2,7 @@ extends GameObject
 
 func _ready():
 	is_harvestable = true
-	harvest_loot = "stick"
+	harvest_loot = "scallop_shell"
 	harvest_remaining = 1
 	max_harvest = 1
 	target_actions = ["harvest"]
@@ -19,4 +19,3 @@ func get_hover_color() -> Color:
 
 func get_hover_scale_multiplier() -> float:
 	return 1.5  # 50% bigger on hover — very obvious on tiny sprites
-	

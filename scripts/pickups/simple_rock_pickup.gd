@@ -1,16 +1,22 @@
-extends Area2D
+extends GameObject
 
 func _ready():
-	$AnimatedSprite2D.play("idle")
+	is_harvestable = true
+	harvest_loot = "simple_rock"
+	harvest_remaining = 1
+	max_harvest = 1
+	target_actions = ["harvest"]
+	super._ready()
 
-	# Connect area entered signal for collection
-	body_entered.connect(_on_body_entered)
+func is_interactable() -> bool:
+	return true
 
-func _on_body_entered(body):
-	# If player touches item, add to inventory
-	if body.is_in_group("player"):
-		if body.add_loot("simple_rock", 1):
-			print("item added to inventory!")
-			queue_free()
-		else:
-			print("Inventory full! Cannot pick up item.")
+func use_finished_callback():
+	queue_free()
+
+func get_hover_color() -> Color:
+	return Color(1.8, 1.8, 0.4, 1.0)  # Bright yellow glow — hard to miss
+
+func get_hover_scale_multiplier() -> float:
+	return 1.5  # 50% bigger on hover — very obvious on tiny sprites
+	
