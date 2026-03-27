@@ -142,53 +142,52 @@ func is_interactable() -> bool:
 	"""Override this in subclasses"""
 	return true
 
-## Interact action handler
-#func interact():
-	#is_harvestable = false
-	#if animated_sprite:
-		#animated_sprite.play("idle_empty")
-	#
-	#player = get_tree().get_first_node_in_group("player")
-	#if player and player.has_method("add_loot"):
-		#player.add_loot(harvest_loot, 1)
-	#
-	#print("Harvesting ", harvest_loot, " - will regrow in ", regeneration_time, " seconds")
-	#
-	## Register with ResourceManager for regeneration
-	#ResourceManager.register_resource_regeneration(self, regeneration_time)
-
 func regenerate():
 	is_harvestable = true
+	harvest_remaining = max_harvest
 	if animated_sprite:
-		animated_sprite.play("idle")
+		animated_sprite.play("idle_full")
 	print(name, " has regrown!")
 
 func tool_used(used_amount: int):
-	if is_harvestable and harvest_remaining > 0:
+	if is_harvestable:
 		if animated_sprite:
-			animated_sprite.play("hit_empty")
-	
+			if harvest_remaining > 0:
+				if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_full"):	
+					animated_sprite.play("hit_full")
+				else:
+					print("WARN: Missing the hit_full animation for ", self.name)
+			else:
+				if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_empty"):	
+					animated_sprite.play("hit_empty")
+				else:
+					print("WARN: Missing the hit_empty animation for ", self.name)
+		else:
+			print("Animated sprite object not found for ", self.name)
+					
 		print(name, " harvest: ", harvest_remaining, "/", max_harvest)
 		player = get_tree().get_first_node_in_group("player")
 		if player and player.has_method("add_loot"):
 			player.add_loot(harvest_loot, 1)	
 
 		harvest_remaining -= used_amount
-	else:
-		print("non harvestable object: ", self.name)
+
 
 # Handle destruction after the hit animation has completed
-func use_finished_callback(damage: int):
+func use_finished_callback():
 	print("use_finished_callback")
 	
 	if is_harvestable:
+		# Reset animation after hit
 		if harvest_remaining > 0:
-			animated_sprite.play("idle")			
+			animated_sprite.play("idle_full")			
 		else:
 			animated_sprite.play("idle_empty")
+			is_harvestable = false
+			ResourceManager.register_resource_regeneration(self, regeneration_time)
 		
 		# Break and drop loot
-		if harvest_remaining <= 0 and is_destructible and damage > 0:		
+		if harvest_remaining <= 0 and is_destructible:		
 			# Play destruction animation if available
 			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("break"):
 				animated_sprite.play("break")
@@ -201,3 +200,6 @@ func use_finished_callback(damage: int):
 			print(name, " has been destroyed")
 			
 			queue_free()
+	elif has_method("interact"):
+		# Call method only in subclass
+		call("interact")

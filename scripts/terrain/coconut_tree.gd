@@ -15,14 +15,14 @@ func _ready():
 	is_destructible = true
 	
 	# Setup loot table when the coconut tree is chopped down
-	target_actions = ["chop", "harvest"]
+	target_actions = ["chop"]
 	loot_table = [
 		[stick_scene, 1.0, 2, 4]
 	]
 
 	# Start with normal idle animation
 	if animated_sprite:
-		animated_sprite.play("idle")
+		animated_sprite.play("idle_full")
 
 	# Call parent _ready() to setup hover detection
 	super._ready()

@@ -14,7 +14,6 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") a
 
 var was_airborne: bool = false
 var is_trigger_action: bool = false
-#var is_interacting: bool = false
 var cursor_area: Area2D
 var tilemap: TileMap
 var highlighted_tiles: Array[Vector2i] = []
@@ -127,7 +126,6 @@ func _physics_process(delta):
 		return
 
 	# Do not allow movement while in the middle of an animation
-	#if is_trigger_action or is_interacting:
 	if is_trigger_action:
 		return
 
@@ -272,7 +270,7 @@ func _physics_process(delta):
 	# Update cursor area position based on mouse position
 	update_cursor_position()
 	
-	handle_interact_action()
+	#handle_interact_action()
 	
 	handle_use_action()
 	
@@ -288,38 +286,53 @@ func _physics_process(delta):
 	# Handle animations after physics update
 	handle_animations()
 
-func handle_interact_action():
-	var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else PlayerInputHandler.is_player_menu_open
-	if not Input.is_action_just_pressed("interact") or any_menu_open or is_trigger_action:
-		return
-
-	var hands: GameItem = GameObjectsDatabase.game_objects_database.get("hands")
-	if hands and current_targeted_object != null and is_valid_tool_target(current_targeted_object, hands):
-		print("use hands")
-		hands.use(self, current_targeted_object, null)
-	else:
-		print("Nothing to use hands on")
+## Interact is just a special way of using the hands tool to interact with things
+#func handle_interact_action():
+	#var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else PlayerInputHandler.is_player_menu_open
+	#if not Input.is_action_just_pressed("interact") or any_menu_open or is_trigger_action:
+		#return
+#
+	#var hands: GameItem = GameObjectsDatabase.game_objects_database.get("hands")
+	#if hands and current_targeted_object != null and is_valid_tool_target(current_targeted_object, hands):
+		#print("use hands")
+		#hands.use(self, current_targeted_object, null)
+	#else:
+		#print("Nothing to use hands on")
 
 func handle_use_action():
 	var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else PlayerInputHandler.is_player_menu_open
-	if not Input.is_action_just_pressed("use_selected_item") or any_menu_open or is_trigger_action:
+	if not Input.is_action_just_pressed("interact") and not Input.is_action_just_pressed("use_selected_item") or any_menu_open or is_trigger_action:
 		return
 
-	var selected_stack = get_selected_quick_access_item()
 	var selected_item = null
 	var target = null
+	var selected_stack = null
 
-	# Determine if we should use the quick access item with or without a target
-	if selected_stack and selected_stack.item and can_use_item_in_current_environment(selected_stack.item):
-		if current_targeted_object != null and is_valid_tool_target(current_targeted_object, selected_stack.item):
-			selected_item = selected_stack.item
+	# If dedicated interact key is pressed, hard code to the hands tool
+	if Input.is_action_just_pressed("interact"):
+		selected_item = GameObjectsDatabase.game_objects_database.get("hands")
+		print("using hands")
+	elif Input.is_action_just_pressed("use_selected_item"):
+		selected_stack = get_selected_quick_access_item()
+		selected_item = selected_stack.item
+		print("using selected item: ", selected_item.name)
+
+	# Determine if we should use the item with or without a target
+	if selected_item and can_use_item_in_current_environment(selected_item):
+		if current_targeted_object != null and is_valid_tool_target(current_targeted_object, selected_item):
+			print("has target")
 			target = current_targeted_object
-		# Use item without target
-		elif selected_stack.item.use_animation:
-			selected_item = selected_stack.item
+		# Use item without target if item has a use_animation declared
+		elif selected_item.use_animation:
+			print("use without target: ", selected_item.use_animation)
 			target = null
+		else:
+			print('else')
+	else:
+		print("not selected_stack or selected_stack.item or can use item in current env")
 
 	if selected_item:
+		# If quick access item and it's associated stack is selected
 		if selected_stack and selected_item == selected_stack.item:
 			handle_quick_access_action(selected_stack, target)
 		else:
@@ -476,18 +489,6 @@ func _on_ground_animation_finished():
 			$AnimatedSprite2D.play(target_anim)
 		else:
 			$AnimatedSprite2D.play("idle")
-
-#func _on_interact_animation_finished():
-	#print("_on_interact_animation_finished")
-	## Disconnect the signal immediately to prevent interference
-	#if $AnimatedSprite2D.animation_finished.is_connected(_on_interact_animation_finished):
-		#$AnimatedSprite2D.animation_finished.disconnect(_on_interact_animation_finished)
-#
-	#if interact_target and is_instance_valid(interact_target):
-		#interact_target.interact()
-#
-	## When attack animation finishes, end attack state
-	#is_interacting = false
 
 func _on_death_animation_finished():
 	# Prevent subsequent cycles from re-pausing the game

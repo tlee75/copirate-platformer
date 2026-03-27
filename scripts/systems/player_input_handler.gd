@@ -48,7 +48,7 @@ func _input(event):
 		print("DEBUG: player_menu_toggle pressed")
 		
 		# Do not allow the player menu to interrupt an animation
-		if player and (player.is_trigger_action or player.is_interacting or (not player.is_on_floor() and not player.is_underwater)):
+		if player and (player.is_trigger_action or (not player.is_on_floor() and not player.is_underwater)):
 			print("DEBUG: Player animation blocking menu toggle")
 			return
 		

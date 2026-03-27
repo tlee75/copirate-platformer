@@ -102,13 +102,13 @@ func handle_use_hit_frame(player, _anim, _frame):
 		target.tool_used(used_amount)
 		print("Tool used ", target.name, " for ", used_amount)
 	else:
-		print("Cannot use target: ", target.name)
+		print("Cannot use target: ", target)
 
 func _on_use_animation_finished(player):
 	print("_on_use_animation_finished")
 	player.is_trigger_action = false
 	if typeof(player.attack_target) == TYPE_OBJECT and is_instance_valid(player.attack_target) and player.attack_target.has_method("use_finished_callback"):
-		player.attack_target.use_finished_callback(self.damage)
+		player.attack_target.use_finished_callback()
 	extra_use_cleanup(player)
 	player.attack_target = null
 	

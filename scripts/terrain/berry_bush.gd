@@ -6,7 +6,7 @@ func _ready():
 	category = "terrain"
 	max_harvest = 3
 	harvest_remaining = max_harvest
-	regeneration_time = 30.0 
+	regeneration_time = 5.0 
 	is_harvestable = true
 	is_destructible = false
 	harvest_loot = "raspberry"
@@ -15,7 +15,7 @@ func _ready():
 	
 	# Start with normal idle animation
 	if animated_sprite:
-		animated_sprite.play("idle")
+		animated_sprite.play("idle_full")
 
 	# Call parent _ready() which will setup hover detection
 	super._ready()

@@ -36,10 +36,7 @@ func _init():
 	target_spread = 20.0
 	tool_action = "dig"
 
-func handle_use_frame(player, anim, frame):
-	handle_attack_frame(player, anim, frame)
-
-func handle_attack_frame(player, anim, frame):
+func handle_use_hit_frame(player, anim, frame):
 	var target = player.attack_target
 	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("take_damage"):
 		target.take_damage(damage)

@@ -33,6 +33,8 @@ func _ready():
 	
 	state = ObjectState.UNLIT
 
+	target_actions = ["harvest"]
+
 	# Add interactive object component
 	interactive_object = InteractiveObjectComponent.new()
 	interactive_object.object_name = "Firepit"
