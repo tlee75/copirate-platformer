@@ -27,7 +27,7 @@ var tile_size: float = 32.0
 var is_dead: bool = false
 var attack_target = null 
 var tool_target = null
-#var interact_target = null
+var last_frame_on_floor: bool = true
 var current_hover_target: GameObject = null
 var current_targeted_object: Variant = null
 
@@ -177,6 +177,14 @@ func _physics_process(delta):
 		water_surface_y = -1
 		is_underwater = false
 		player_stats.set_underwater_status(is_underwater)
+
+	# Detect walking off a ledge (became airborne without pressing jump)
+	var on_floor_now = is_on_floor()
+	if not on_floor_now and last_frame_on_floor and not Input.is_action_just_pressed("jump"):
+		var is_running = Input.is_key_pressed(KEY_SHIFT)
+		was_running_when_jumped = is_running
+		jump_speed = RUN_SPEED if is_running else WALK_SPEED
+	last_frame_on_floor = on_floor_now
 
 	if not is_on_floor():
 		if is_underwater:
