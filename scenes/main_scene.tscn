@@ -52,6 +52,7 @@ resource_name = "surface_water"
 texture = ExtResource("5_lhwp2")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -9.145689, 16, -9.061784, 16, 16, -16, 16)
 0:0/0/custom_data_0 = true
 0:0/0/custom_data_3 = "surface"
 
@@ -102,7 +103,7 @@ texture_region_size = Vector2i(32, 32)
 texture = ExtResource("11_4bgka")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -9.145689, 16, -9.061784, 16, 16, -16, 16)
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(16, -8, 16, 16, -16, 16, -16, -8)
 
 [sub_resource type="TileSet" id="TileSet_gwrsa"]
 tile_size = Vector2i(32, 32)

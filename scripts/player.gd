@@ -5,13 +5,14 @@ class_name Player
 const WALK_SPEED := 100.0
 const RUN_SPEED := 250.0
 const JUMP_VELOCITY := -400.0
+const STEP_HEIGHT: float = 10.0  # Max height in pixels to auto-step over
 
 @export var max_cursor_distance: float = 80.0  # Adjustable in editor
 @export var default_interact_range: float = 80.0   # Default interaction range
 @export var default_interact_spread: float = 20.0  # Default interaction spread
 
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") as float
-
+var _step_cooldown: float = 0.0
 var was_airborne: bool = false
 var is_trigger_action: bool = false
 var cursor_area: Area2D
@@ -285,9 +286,10 @@ func _physics_process(delta):
 	handle_attack_action()
 
 	# Update physics first
-	velocity = vel
 	move_and_slide()
-
+	_step_cooldown = max(0.0, _step_cooldown - get_physics_process_delta_time())
+	try_step_up(vel)
+	
 	# Update collision shape orientation for swimming
 	update_collision_orientation()
 
@@ -704,6 +706,31 @@ func is_attack_target(target):
 func is_tile_target(tile_pos: Vector2i):
 	var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
 	return tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable")
+
+func try_step_up(velocity: Vector2) -> void:
+	"""Automatically snap up over short ledges when walking into them"""
+	if not is_on_floor() or velocity.x == 0:
+		return
+
+	var move_dir = sign(velocity.x)
+
+	# Is there a wall blocking us at current height?
+	if not test_move(global_transform, Vector2(move_dir * 2, 0)):
+		return
+
+	# Is the space above us clear?
+	if test_move(global_transform, Vector2(0, -STEP_HEIGHT)):
+		return
+
+	# Is the space ahead of us clear at the elevated height?
+	var raised_transform = global_transform
+	raised_transform.origin.y -= STEP_HEIGHT
+	if test_move(raised_transform, Vector2(move_dir * 2, 0)):
+		return
+
+	# All checks passed — step up
+	global_position.y -= STEP_HEIGHT
+	_step_cooldown = 0.1
 
 func get_attack_target():
 	var targets = []
