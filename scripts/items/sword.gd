@@ -16,9 +16,8 @@ func _init():
 	underwater_compatible = false
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 2}
-	attack_animation = "sword_attack"
 	damage = 1
 	is_weapon = true
 	target_range = 60.0
 	target_spread = 12.0
-	
+	use_animation = "sword_attack"

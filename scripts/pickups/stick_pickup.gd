@@ -8,9 +8,6 @@ func _ready():
 	target_actions = ["harvest"]
 	super._ready()
 
-func is_interactable() -> bool:
-	return true
-
 func use_finished_callback():
 	queue_free()
 

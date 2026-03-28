@@ -13,12 +13,11 @@ func _process(_delta):
 	if player:
 		var water_depth = player.get_water_depth()
 
-		if water_depth == 0:
-			text = "Depth: Surface water"
-			visible = true
-		elif water_depth > 0:
-			text = "Depth: %d tiles below surface" % water_depth
+		if not player.is_underwater:
+			visible = false
+		elif water_depth <= 0:
+			text = "Depth: Sea level"
 			visible = true
 		else:
-			text = "At or above water level"
+			text = "Depth: %d tiles" % water_depth
 			visible = true

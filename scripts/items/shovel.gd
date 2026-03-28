@@ -20,7 +20,6 @@ var hit_frames = {
 }
 
 func _init():
-	attack_animation = "shovel_attack"
 	use_animation = "shovel_attack"
 	name = "Shovel"
 	icon = load("res://assets/sprite-man/shovel_icon_01.png")

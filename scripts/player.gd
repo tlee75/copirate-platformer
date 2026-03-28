@@ -29,6 +29,7 @@ var is_dead: bool = false
 var attack_target = null 
 var tool_target = null
 var last_frame_on_floor: bool = true
+var _water_jump_active: bool = false
 var current_hover_target: GameObject = null
 var current_targeted_object: Variant = null
 
@@ -41,8 +42,9 @@ var player_stats: PlayerStats
 # Water movement effects
 var swim_speed: float = 150.0
 var is_underwater: bool = false
-var water_surface_y: int = -1
-var water_depth: int = -1
+var is_at_breathable_surface: bool = false
+var water_depth: int = 0
+@export var sea_level_y: int = 68  # Set in editor to the y tile coordinate of sea level
 
 # Animation hit frame definition for animations without an item script
 var default_hit_frames = {
@@ -159,24 +161,27 @@ func _physics_process(delta):
 		return
 
 	if is_on_water_tile():
-		if water_surface_y == -1:
-			water_surface_y = find_water_surface_y()
-		water_depth = tile_pos.y - water_surface_y
-		if water_depth == 0:
+		water_depth = tile_pos.y - sea_level_y
+		# Check if the tile above is breathable (open air or breathable tile)
+		var above_data = tilemap.get_cell_tile_data(0, tile_pos + Vector2i(0, -1))
+		is_at_breathable_surface = not above_data or (above_data.has_custom_data("breathable") and above_data.get_custom_data("breathable"))
+		if is_at_breathable_surface:
 			player_stats.set_underwater_status(false)
 			var tile_below = tile_pos + Vector2i(0, 1)
 			var tile_data_below = tilemap.get_cell_tile_data(0, tile_below)
 			var is_water_below = tile_data_below and tile_data_below.has_custom_data("is_water") and tile_data_below.get_custom_data("is_water")
-			if is_water_below: # Determine if we're underwater or standing in surface water
+			if is_water_below:
 				is_underwater = true
 			else:
-				is_underwater = false # Surface water
+				is_underwater = false
 		else:
 			is_underwater = true
 			player_stats.set_underwater_status(is_underwater)
 	else:
-		water_surface_y = -1
+		water_depth = 0
+		is_at_breathable_surface = false
 		is_underwater = false
+		_water_jump_active = false
 		player_stats.set_underwater_status(is_underwater)
 
 	# Detect walking off a ledge (became airborne without pressing jump)
@@ -242,53 +247,56 @@ func _physics_process(delta):
 		vertical_dir -= 1
 	if down_pressed:
 		vertical_dir += 1
-	
-	if vertical_dir != 0:
+
+	# Jump — runs before vertical swim so the flag prevents swim from overriding it
+	if Input.is_action_just_pressed("jump") and (is_on_floor() and not is_underwater or (is_underwater and is_at_breathable_surface)):
+		vel.y = JUMP_VELOCITY
+		was_running_when_jumped = Input.is_key_pressed(KEY_SHIFT)
+		jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
 		if is_underwater:
+			_water_jump_active = true
+
+	# Clear water jump flag once the upward arc is over
+	if _water_jump_active and vel.y >= 0:
+		_water_jump_active = false
+
+	if vertical_dir != 0:
+		if is_underwater and not _water_jump_active:
 			var tile_pixel_y = tile_pos.y * tile_size
 			var offset_in_tile = global_position.y - tile_pixel_y # 0 = top of tile, tile_size = bottom
 			var near_top = offset_in_tile < 5.0 # Threshold to adjust in pixels
-			
-			# Swimming up/down when underwater
+	
+	# Swimming up/down when underwater
 			var is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
 			var current_swim_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
-			
-			# Prevent swimming above water surface
-			if vertical_dir < 0 and water_depth == 0 and near_top and not Input.is_action_just_pressed("jump"):
-				vel.y = 0 # Stop upward movement at surface
+	
+	# Stop at water surface when swimming up
+			if vertical_dir < 0 and is_at_breathable_surface and near_top:
+				vel.y = 0
 			else:
 				vel.y = vertical_dir * current_swim_speed
-			
-			# Normalize diagonal movement
-			if dir != 0 and vertical_dir !=0:
+	
+	# Normalize diagonal movement
+			if dir != 0 and vertical_dir != 0:
 				var movement_vector = Vector2(vel.x, vel.y)
 				movement_vector = movement_vector.normalized() * current_swim_speed
 				vel.x = movement_vector.x
 				vel.y = movement_vector.y
-		else:
-			# Climbing placeholder for on land
+		elif not is_underwater:
+	# Climbing placeholder for on land
 			if Input.is_action_just_pressed("move_up") or Input.is_action_just_pressed("move_down"):
 				print("Trying to climb ", "up" if vertical_dir < 0 else "down", " - no climable serface found")
-
-	# Jump input - detect just pressed for the jump action
-	if Input.is_action_just_pressed("jump") and (is_on_floor() and not is_underwater or (is_underwater and water_depth == 0)):
-		vel.y = JUMP_VELOCITY
-		was_running_when_jumped = Input.is_key_pressed(KEY_SHIFT)
-		jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
 
 	# Update cursor area position based on mouse position
 	update_cursor_position()
 	
-	#handle_interact_action()
-	
 	handle_use_action()
-	
-	handle_attack_action()
 
 	# Update physics first
 	move_and_slide()
+	velocity = vel
 	_step_cooldown = max(0.0, _step_cooldown - get_physics_process_delta_time())
-	try_step_up(vel)
+	try_step_up()
 	
 	# Update collision shape orientation for swimming
 	update_collision_orientation()
@@ -296,60 +304,43 @@ func _physics_process(delta):
 	# Handle animations after physics update
 	handle_animations()
 
-## Interact is just a special way of using the hands tool to interact with things
-#func handle_interact_action():
-	#var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else PlayerInputHandler.is_player_menu_open
-	#if not Input.is_action_just_pressed("interact") or any_menu_open or is_trigger_action:
-		#return
-#
-	#var hands: GameItem = GameObjectsDatabase.game_objects_database.get("hands")
-	#if hands and current_targeted_object != null and is_valid_tool_target(current_targeted_object, hands):
-		#print("use hands")
-		#hands.use(self, current_targeted_object, null)
-	#else:
-		#print("Nothing to use hands on")
-
 func handle_use_action():
 	var any_menu_open = ui_manager.is_any_menu_open() if ui_manager else PlayerInputHandler.is_player_menu_open
-	if not Input.is_action_just_pressed("interact") and not Input.is_action_just_pressed("use_selected_item") or any_menu_open or is_trigger_action:
+	if any_menu_open or is_trigger_action:
 		return
 
-	var selected_item = null
-	var target = null
-	var selected_stack = null
+	if PlacementManager.placement_active:
+		return
 
-	# If dedicated interact key is pressed, hard code to the hands tool
-	if Input.is_action_just_pressed("interact"):
-		selected_item = GameObjectsDatabase.game_objects_database.get("hands")
-		print("using hands")
-	elif Input.is_action_just_pressed("use_selected_item"):
-		selected_stack = get_selected_quick_access_item()
-		if selected_stack and selected_stack.item:
-			selected_item = selected_stack.item
-			print("using selected item: ", selected_item.name)
+	# LEFT CLICK — activate selected quick access item (or melee fallback)
+	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_quick_access() and not is_mouse_over_inventory():
+		var selected_stack = get_selected_quick_access_item()
+		var item = selected_stack.item if selected_stack else null
+		var target = current_targeted_object
 
-	# Determine if we should use the item with or without a target
-	if selected_item and can_use_item_in_current_environment(selected_item):
-		if current_targeted_object != null and is_valid_tool_target(current_targeted_object, selected_item):
-			print("has target")
-			target = current_targeted_object
-		# Use item without target if item has a use_animation declared
-		elif selected_item.use_animation:
-			print("use without target: ", selected_item.use_animation)
-			target = null
-		else:
-			print('else')
-	else:
-		print("not selected_stack or selected_stack.item or can use item in current env")
+		# Priority 1: Selected item handles the target directly
+		if item and can_use_item_in_current_environment(item) and target != null and is_valid_target(target, item):
+			item.use(self, target, selected_stack)
+			return
 
-	if selected_item:
-		# If quick access item and it's associated stack is selected
-		if selected_stack and selected_item == selected_stack.item:
-			handle_quick_access_action(selected_stack, target)
-		else:
-			selected_item.use(self, target, null)
-	else:
-		print("Nothing to interact with / use")
+		# Priority 2: Fallback items handle the target (melee, then hands)
+		if target != null:
+			var melee = GameObjectsDatabase.game_objects_database.get("melee")
+			if melee and is_valid_target(target, melee):
+				melee.use(self, target, null)
+				return
+			var hands = GameObjectsDatabase.game_objects_database.get("hands")
+			if hands and is_valid_target(target, hands):
+				hands.use(self, target, null)
+				return
+
+		# Priority 3: No target (or no fallback handled it) — use selected item by itself
+		if not item:
+			item = GameObjectsDatabase.game_objects_database.get("melee")
+			selected_stack = null
+		if item and can_use_item_in_current_environment(item) and item.use_animation != "":
+			item.use(self, null, selected_stack)
+		return
 
 func try_use_item(stack: InventoryManager.ItemStack) -> bool:
 	"""Used by inventory UI to consume/use an item with player state validation."""
@@ -362,67 +353,42 @@ func try_use_item(stack: InventoryManager.ItemStack) -> bool:
 	stack.item.use(self, null, stack)
 	return true
 
-func is_valid_tool_target(target: Variant, tool_item) -> bool:
-	"""Check if the target is valid for this tool"""
-	if not tool_item or not tool_item.is_tool or tool_item.tool_action == "":
-		print("return false")
+func is_valid_target(target: Variant, item: GameItem) -> bool:
+	"""Check if the target is valid for this item (tool use, attack, or both)"""
+	if target == null:
 		return false
-	# Handle tile targets (Vector2i)
+	# Tile targets — need a matching tool_action
 	if typeof(target) == TYPE_VECTOR2I:
-		var tile_pos = target as Vector2i
-		var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
-		if tile_data:
-			match tool_item.tool_action:
-				"dig":
-					return tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable")
-				# Add other tile tool actions here as needed
+		if item.tool_action == "":
+			return false
+		var tile_data = tilemap.get_cell_tile_data(0, target as Vector2i)
+		if not tile_data:
+			return false
+		match item.tool_action:
+			"dig":
+				return tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable")
 		return false
-	
-	# Handle object targets (Node2D)
-	elif target is GameObject:
-		return check_object_tool_compatibility(target, tool_item.tool_action)
-	
+	# Object targets
+	if typeof(target) == TYPE_OBJECT and is_instance_valid(target):
+		# Tool compatible?
+		if item.tool_action != "" and target is GameObject and check_object_tool_compatibility(target, item.tool_action):
+			return true
+		# Attackable?
+		if item.damage > 0 and target.has_method("take_damage"):
+			return true
 	return false
 
-func handle_attack_action():
-	if PlacementManager.placement_active:
-		return # Placement manager handles input
-	
-	# Main Hand Action - left mouse button (but not when clicking on UI)
-	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_quick_access() and not is_mouse_over_inventory():
-		print("left click")
-		# Only perform an action if one is not already in progress
-		if not is_trigger_action:
-			print("not trigger action")
-
-			var main_hand_item = InventoryManager.get_equipped_item("main_hand")
-			if main_hand_item:
-				if not can_use_item_in_current_environment(main_hand_item):
-					var environment_msg = "underwater" if is_underwater else "on land"
-					print("Cannot use ", main_hand_item.name, " ", environment_msg, "!")
-					return
-				# Detect targets
-				attack_target = get_attack_target()
-				handle_mainhand_action(main_hand_item, attack_target)
-			else:
-				# Fallback to melee item attack
-				var melee_item = GameObjectsDatabase.game_objects_database["melee"]
-				attack_target = get_attack_target()
-				melee_item.attack(self, attack_target)
-				
-func handle_mainhand_action(item, target):
-	if not item.has_method("attack"):
-		print("WARNING: Item ", item.name, " is missing attack methods!")
-	if not item.damage or item.damage <= 0:
-		print("WARNING: Item ", item.name, " is missing damage attribute or damage is zero!")
-	if typeof(target) == TYPE_OBJECT:
-		item.attack(self, target)
-	else:
-		item.attack(self, null)
-
-func handle_quick_access_action(selected_stack, target):
-	var item = selected_stack.item
-	item.use(self, target, selected_stack)
+func _can_any_action_handle(target, selected_item) -> bool:
+	"""Check if the selected item, hands, or melee can do anything with this target"""
+	if selected_item and is_valid_target(target, selected_item):
+		return true
+	var hands = GameObjectsDatabase.game_objects_database.get("hands")
+	if hands and is_valid_target(target, hands):
+		return true
+	var melee = GameObjectsDatabase.game_objects_database.get("melee")
+	if melee and is_valid_target(target, melee):
+		return true
+	return false
 
 func handle_animations():
 	# Don't change animations while in the middle of an action or dead
@@ -633,16 +599,6 @@ func is_on_water_tile() -> bool:
 		return tile_data.get_custom_data("is_water")
 	return false
 
-func find_water_surface_y() -> int:
-	var tile_pos = tilemap.local_to_map(global_position)
-	var check_pos = tile_pos
-	while true:
-		check_pos.y -= 1
-		var tile_data = tilemap.get_cell_tile_data(0, check_pos)
-		if not tile_data or not tile_data.has_custom_data("is_water") or not tile_data.get_custom_data("is_water"):
-			return check_pos.y + 1 # The tile just below the first non-water tile
-	return tile_pos.y
-
 func get_water_depth() -> int:
 	return water_depth
 
@@ -707,9 +663,9 @@ func is_tile_target(tile_pos: Vector2i):
 	var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
 	return tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable")
 
-func try_step_up(velocity: Vector2) -> void:
+func try_step_up() -> void:
 	"""Automatically snap up over short ledges when walking into them"""
-	if not is_on_floor() or velocity.x == 0:
+	if not is_on_floor() or velocity.x == 0 or is_underwater:
 		return
 
 	var move_dir = sign(velocity.x)
@@ -792,61 +748,58 @@ func update_crosshair_targeting():
 	
 	# PRIORITY 1: Direct cursor position checks
 	
-	# 1.1 Direct attackable target (mainhand weapon OR melee default)
-	var mainhand_item = InventoryManager.get_equipped_item("main_hand")
-	var attack_item = mainhand_item
+	# Get selected quick access item for targeting
+	var quick_stack = get_selected_quick_access_item()
+	var selected_item = quick_stack.item if quick_stack else null
 	
-	if not mainhand_item or not mainhand_item.is_weapon:
-		# Use melee as default when no weapon equipped
-		attack_item = GameObjectsDatabase.game_objects_database["melee"]
+	# 1.1 Direct tool target (selected item's tool_action)
+	if selected_item and selected_item.tool_action != "":
+		var tool_target = get_tool_target_at_position(mouse_pos, selected_item)
+		if tool_target != null:
+			if typeof(tool_target) == TYPE_VECTOR2I:
+				snap_crosshair_to_tile(tool_target)
+			else:
+				snap_crosshair_to_target(tool_target)
+			return
 	
+	# 1.2 Direct attackable target (selected item damage, or melee fallback)
+	var attack_item = selected_item if (selected_item and selected_item.damage > 0) else GameObjectsDatabase.game_objects_database["melee"]
 	if attack_item:
 		var target = get_attackable_at_position(mouse_pos, attack_item.target_range)
 		if target:
 			snap_crosshair_to_target(target)
 			return
 
-	# 1.2 Direct interactable object  
+	# 1.3 Direct interactable object (only if some action can handle it)
 	var interactable = get_interactable_at_position(mouse_pos, default_interact_range)
-	if interactable:
+	if interactable and _can_any_action_handle(interactable, selected_item):
 		snap_crosshair_to_target(interactable)
 		return
 	
-	# 1.3 Direct tool targeting
-	var quick_stack = get_selected_quick_access_item()
-	if quick_stack and quick_stack.item and quick_stack.item.is_tool and quick_stack.item.tool_action != "":
-		var tool_target = get_tool_target_at_position(mouse_pos, quick_stack.item)
+	# PRIORITY 2: Raycast path targeting
+
+	# 2.1 Raycast tool targets (selected item)
+	if selected_item and selected_item.tool_action != "":
+		var tool_target = raycast_tool_targets(player_pos, direction, selected_item)
 		if tool_target != null:
 			if typeof(tool_target) == TYPE_VECTOR2I:
 				snap_crosshair_to_tile(tool_target)
 			else:
 				snap_crosshair_to_target(tool_target)
 			return
-	
-	# PRIORITY 2: Raycast path targeting
-	
-	# 2.1 Raycast attackable targets (weapon spread)
+
+	# 2.2 Raycast attackable targets (selected item or melee fallback)
 	if attack_item:
 		var raycast_target = raycast_attackable_targets(player_pos, direction, attack_item)
 		if raycast_target:
 			snap_crosshair_to_target(raycast_target)
 			return
-	
-	# 2.2 Raycast interactable objects (default spread)  
+
+	# 2.3 Raycast interactable objects (only if some action can handle it)
 	var obj_target = raycast_interactable_objects(player_pos, direction, default_interact_range, default_interact_spread)
-	if obj_target:
+	if obj_target and _can_any_action_handle(obj_target, selected_item):
 		snap_crosshair_to_target(obj_target)
 		return
-	
-	# 2.3 Raycast tool targets
-	if quick_stack and quick_stack.item and quick_stack.item.is_tool:
-		var tool_target = raycast_tool_targets(player_pos, direction, quick_stack.item)
-		if tool_target != null:
-			if typeof(tool_target) == TYPE_VECTOR2I:
-				snap_crosshair_to_tile(tool_target)
-			else:
-				snap_crosshair_to_target(tool_target)
-			return
 	
 	# FALLBACK: Position at mouse location (no range limit)
 	cursor_area.position = mouse_pos - player_pos

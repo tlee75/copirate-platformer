@@ -8,7 +8,6 @@ var hit_frames = {
 }
 
 func _init():
-	attack_animation = "punch"
 	use_animation = "punch"
 	name = "Melee"
 	icon = load("res://assets/sprite-man/unarmed_icon_01.png")

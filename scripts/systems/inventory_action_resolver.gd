@@ -43,7 +43,7 @@ func get_available_actions(stack: InventoryManager.ItemStack) -> Array[ActionDat
 		actions.append(ActionData.new(ActionType.USE, "Consume", "E/A"))
 
 	# Equip/Unequip
-	if item.category in ["weapon", "armor", "helmet", "chest", "legs", "hands", "feet", "shield", "accessory"]:
+	if item.category in ["armor", "helmet", "chest", "legs", "hands", "feet", "shield", "accessory"]:
 		if stack.is_equipped():
 			actions.append(ActionData.new(ActionType.EQUIP, "Unequip", "R/X"))
 		else:
@@ -116,8 +116,11 @@ func _execute_use_action(stack: InventoryManager.ItemStack) -> bool:
 				return false
 			return player.try_use_item(stack)
 		
-		"weapon", "armor", "helmet", "chest", "legs", "hands", "feet", "shield", "accessory":
+		"armor", "helmet", "chest", "legs", "hands", "feet", "shield", "accessory":
 			return InventoryManager.toggle_equip_item_stack(stack)
+		
+		"weapon":
+			return InventoryManager.assign_to_next_quick_access_slot(stack)
 		
 		"tool":
 			# Tools just move to quick access

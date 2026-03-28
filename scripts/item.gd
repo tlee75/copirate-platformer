@@ -23,26 +23,11 @@ var category: String = ""
 var icon: Texture2D
 var craft_requirements: Dictionary = {}
 var cooked_result_item_name: String = ""  # What this item becomes when cooked
-var attack_animation = ""
 var use_animation = ""
 var pending_item_stack: InventoryManager.ItemStack = null
 
 func is_consumable() -> bool:
 	return false
-
-func attack(player, target):
-	if attack_animation == "" or attack_animation == null:
-		print("WARNING: Item '%s' has no attack_animation set!" % self.name)
-		return
-	# Store the target for use in the hit frame callback
-	player.attack_target = target
-	player.is_trigger_action = true
-	var anim_sprite = player.get_node("AnimatedSprite2D")
-	extra_attack_startup(player)
-	cleanup_connections(player)
-	anim_sprite.frame_changed.connect(_on_attack_frame_changed.bind(player))
-	anim_sprite.animation_finished.connect(_on_attack_animation_finished.bind(player))
-	anim_sprite.play(attack_animation)
 
 func use(player, target, item_stack = null):
 	if use_animation == "" or use_animation == null:
@@ -65,28 +50,6 @@ func use(player, target, item_stack = null):
 	else:
 		pending_item_stack = null
 
-func _on_attack_frame_changed(player):
-	var anim_sprite = player.get_node("AnimatedSprite2D")
-	var anim = anim_sprite.animation
-	var frame = anim_sprite.frame
-	if anim in self.hit_frames and frame in self.hit_frames[anim]:
-		handle_attack_hit_frame(player, anim, frame)
-
-func handle_attack_hit_frame(player, anim, frame):
-	print("%s attack by %s with animation %s on frame %s" % [self.name, player.name, anim, frame])
-	var target = player.attack_target
-	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("take_damage"):
-		target.take_damage(damage)
-	else:
-		# No target: play swing sound, animation, or feedback
-		print("%s swing: no target hit" % self.name)
-
-func _on_attack_animation_finished(player):
-	player.is_trigger_action = false
-	player.attack_target = null
-	extra_attack_cleanup(player)
-	cleanup_connections(player)
-
 func _on_use_frame_changed(player):
 	var anim_sprite = player.get_node("AnimatedSprite2D")
 	var anim = anim_sprite.animation
@@ -97,12 +60,24 @@ func _on_use_frame_changed(player):
 func handle_use_hit_frame(player, _anim, _frame):
 	var target = player.attack_target
 	if not target:
-		print ("No target to use")
-	elif typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("tool_used"):
-		target.tool_used(used_amount)
-		print("Tool used ", target.name, " for ", used_amount)
-	else:
-		print("Cannot use target: ", target)
+		return
+	if typeof(target) == TYPE_OBJECT and is_instance_valid(target):
+		# Priority 1: Tool action on compatible targets
+		if _is_tool_compatible(target):
+			target.tool_used(used_amount)
+			return
+		# Priority 2: Damage on attackable targets
+		if damage > 0 and target.has_method("take_damage"):
+			target.take_damage(damage)
+			return
+
+func _is_tool_compatible(target) -> bool:
+	"""Check if this item's tool_action matches the target's declared target_actions"""
+	if tool_action == "":
+		return false
+	if "target_actions" in target and target.target_actions is Array:
+		return tool_action in target.target_actions
+	return false
 
 func _on_use_animation_finished(player):
 	print("_on_use_animation_finished")
@@ -119,13 +94,7 @@ func _on_use_animation_finished(player):
 		pending_item_stack = null
 	cleanup_connections(player)
 
-func extra_attack_startup(_player):
-	pass
-
 func extra_use_startup(_player, _slot_data):
-	pass
-
-func extra_attack_cleanup(_player):
 	pass
 
 func extra_use_cleanup(_player):
@@ -134,11 +103,7 @@ func extra_use_cleanup(_player):
 
 func cleanup_connections(user):
 	var anim_sprite = user.get_node("AnimatedSprite2D")
-	if anim_sprite.frame_changed.is_connected(Callable(self, "_on_attack_frame_changed")):
-		anim_sprite.frame_changed.disconnect(Callable(self, "_on_attack_frame_changed"))
 	if anim_sprite.frame_changed.is_connected(Callable(self, "_on_use_frame_changed")):
 		anim_sprite.frame_changed.disconnect(Callable(self, "_on_use_frame_changed"))
-	if anim_sprite.animation_finished.is_connected(Callable(self, "_on_attack_animation_finished")):
-		anim_sprite.animation_finished.disconnect(Callable(self, "_on_attack_animation_finished"))
 	if anim_sprite.animation_finished.is_connected(Callable(self, "_on_use_animation_finished")):
 		anim_sprite.animation_finished.disconnect(Callable(self, "_on_use_animation_finished"))
