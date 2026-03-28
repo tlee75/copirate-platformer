@@ -43,8 +43,8 @@ func _ready():
 	print("DEBUG: PlayerMenu._ready() completed")
 
 	# Add some test equipment items for testing
-	if InventoryManager:
-		InventoryManager.debug_add_test_items()
+	#if InventoryManager:
+		#InventoryManager.debug_add_test_items()
 
 
 func _on_tab_changed(tab_index: int):
