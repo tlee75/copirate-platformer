@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://c665se5n8hwv7"]
+
+[ext_resource type="Texture2D" uid="uid://3fsdpvy5c0dq" path="res://assets/terrain/granite_stone_pile_full_1.png" id="1_kr4dd"]
+[ext_resource type="Script" uid="uid://dlwm0sstigd5r" path="res://scripts/terrain/granite_rock_pile.gd" id="1_sbyvp"]
+[ext_resource type="Texture2D" uid="uid://csiafjc5ao2g6" path="res://assets/terrain/granite_stone_pile_empty_1.png" id="2_e37ec"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qx1of"]
+atlas = ExtResource("2_e37ec")
+region = Rect2(0, 0, 72, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sbyvp"]
+atlas = ExtResource("1_kr4dd")
+region = Rect2(0, 0, 72, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_e37ec"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"hit_full",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qx1of")
+}],
+"loop": false,
+"name": &"idle_empty",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sbyvp")
+}],
+"loop": false,
+"name": &"idle_full",
+"speed": 1.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qx1of"]
+
+[node name="GraniteRockPile" type="Node2D" unique_id=1919999788]
+script = ExtResource("1_sbyvp")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1640287966]
+sprite_frames = SubResource("SpriteFrames_e37ec")
+animation = &"idle_full"
+
+[node name="Area2D" type="Area2D" parent="." unique_id=4475509]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1221119481]
+shape = SubResource("CircleShape2D_qx1of")
