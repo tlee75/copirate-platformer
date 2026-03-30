@@ -11,18 +11,21 @@ var hit_cooldown: float = 0.0
 
 func _ready():
 	category = "obstacle"
-	max_harvest = 3
-	harvest_remaining = max_harvest
 	is_harvestable = true
 	is_destructible = true
 	regeneration_time = 0.0  # Crates don't regenerate
 
-	loot_table = {
-		"smash": [
-			{ "item": gold_coin_scene, "type": "drop", "chance": 1.0, "min": 1, "max": 3 }
-		],
-		"punch": []  # Melee can target it but no loot from punching
-	}
+	var default_loot = [{ "item": gold_coin_scene, "type": "drop", "chance": 1.0, "min": 1, "max": 3 }]
+
+	var all_attacks = {
+			"melee": default_loot, 
+			"dig": default_loot, 
+			"chop": default_loot,
+			"slice": default_loot,
+			"mine": default_loot
+		}
+
+	loot_table = all_attacks
 
 	if animated_sprite:
 		animated_sprite.play("idle")

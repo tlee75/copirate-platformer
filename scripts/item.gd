@@ -11,12 +11,12 @@ class_name GameItem
 @export var cook_time: float = 0.0  # Time in seconds to cook
 @export var is_tool = false
 @export var is_weapon: bool = false
-@export var used_amount: int = 0
 @export var description: String = ""  # Item description - set by individual item scripts
 @export var craft_time: float = 3.0  # Time in seconds to craft this item
 @export var target_range: float = 50.0      # Maximum targeting range
 @export var target_spread: float = 10.0     # Targeting spread width  
 @export var target_action: String = ""        # "dig", "chop", "mine", etc.
+@export var harvest_efficiency: float = 1.0   # 0.0-1.0, chance to retrieve loot per hit
 
 var category: String = ""
 var icon: Texture2D
@@ -63,7 +63,7 @@ func handle_use_hit_frame(player, _anim, _frame):
 	if typeof(target) == TYPE_OBJECT and is_instance_valid(target):
 		# Priority 1: Tool action on compatible targets
 		if _is_target_compatible(target):
-			target.activate_use(target_action, used_amount)
+			target.activate_use(target_action, harvest_efficiency)
 			return
 
 func _is_target_compatible(target) -> bool:

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cqfe0i3jnrxp5"]
 
-[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_84da2"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_84da2"]
 [ext_resource type="Texture2D" uid="uid://bjco2ruk6pc6a" path="res://assets/sprite-man/shovel_idle_02-64.png" id="2_081d1"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g60nu"]
@@ -466,6 +466,7 @@ size = Vector2(32, 12)
 size = Vector2(32, 12)
 
 [node name="Shovel" type="RigidBody2D" unique_id=1999998750]
+collision_layer = 8
 script = ExtResource("1_84da2")
 idle_animation = "idle"
 
@@ -482,6 +483,7 @@ position = Vector2(1, 0)
 shape = SubResource("RectangleShape2D_g60nu")
 
 [node name="PickupArea" type="Area2D" parent="." unique_id=1141596724]
+collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=285383495]
 position = Vector2(1, 0)

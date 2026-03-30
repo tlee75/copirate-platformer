@@ -4,8 +4,6 @@ extends GameObject
 func _ready():
 	# Setup harvest
 	category = "terrain"
-	max_harvest = 3
-	harvest_remaining = max_harvest
 	regeneration_time = 5.0 
 	is_harvestable = true
 	is_destructible = false

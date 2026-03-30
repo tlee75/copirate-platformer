@@ -7,10 +7,11 @@ class_name GameObject
 var animated_sprite: AnimatedSprite2D
 
 # Harvesting specific properties for Raspberry bush, coconut trees, etc
-var harvest_remaining: int
 var is_harvestable: bool
 var is_destructible: bool
 var loot_table: Dictionary = {}
+var loot_pool: Array = []
+var _total_harvest_count: int = 0
 var player: Player
 var _last_target_action: String = ""
 
@@ -40,6 +41,9 @@ func _ready():
 	
 	# Setup hover detection
 	setup_hover_detection()
+	
+	await get_tree().process_frame
+	_generate_loot_pool()
 
 func _find_sprite_node():
 	"""Automatically find the sprite node in children"""
@@ -169,86 +173,112 @@ func is_interactable() -> bool:
 
 func regenerate():
 	is_harvestable = true
-	harvest_remaining = max_harvest
+	loot_pool.clear()
+	_generate_loot_pool()
 	if animated_sprite:
 		animated_sprite.play("idle_full")
 	print(name, " has regrown!")
 
-func activate_use(target_action: String, used_amount: int):
-	if is_harvestable:
-		if animated_sprite:
-			if harvest_remaining == max_harvest:
-				if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_full"):
-					animated_sprite.play("hit_full")
-				else:
-					print("WARN: Missing the hit_full animation for ", self.name)
-			elif harvest_remaining > 0 and harvest_remaining < max_harvest:
-				if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_partial"):
-					animated_sprite.play("hit_partial")
-				else:
-					print("WARN: Missing the hit_partial animation for ", self.name)
-			else:
-				print("harvest_remaining: ", harvest_remaining)
-				print("max_harvest: ", max_harvest)
-				if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_empty"):
-					animated_sprite.play("hit_empty")
-				else:
-					print("WARN: Missing the hit_empty animation for ", self.name)
-				is_harvestable = false
-		else:
-			print("Animated sprite object not found for ", self.name)
-					
-		print(name, " harvest: ", harvest_remaining, "/", max_harvest)
-		player = get_tree().get_first_node_in_group("player")
-		if player and player.has_method("add_loot"):
-			if loot_table.has(target_action):
-				for entry in loot_table[target_action]:
-					if entry.get("type") == "harvest":
-						var quantity = randi_range(entry.get("min", 1), entry.get("max", 1))
-						if randf() <= entry.get("chance", 1.0):
-							player.add_loot(entry["item"], quantity)
-							
-		harvest_remaining -= used_amount
+func _generate_loot_pool():
+	"""Pre-roll all loot at spawn time. Called once in _ready()."""
+	_total_harvest_count = 0
+	for action_key in loot_table:
+		for entry in loot_table[action_key]:
+			if randf() <= entry.get("chance", 1.0):
+				var qty = randi_range(entry.get("min", 1), entry.get("max", 1))
+				loot_pool.append({
+					"item": entry["item"],
+					"type": entry["type"],
+					"quantity": qty,
+					"action": action_key
+				})
+				if entry.get("type") == "harvest":
+					_total_harvest_count += qty
 
+func _harvest_pool_remaining() -> int:
+	"""Count how many harvest items remain in the loot pool."""
+	var count = 0
+	for loot in loot_pool:
+		if loot["type"] == "harvest":
+			count += loot["quantity"]
+	return count
+
+func has_loot_for_action(target_action: String) -> bool:
+	"""Check if the pool still has any loot for this action."""
+	for loot in loot_pool:
+		if loot["action"] == target_action:
+			return true
+	return false
+
+func activate_use(target_action: String, efficiency: float = 1.0):
+	if not is_harvestable:
+		return
+	
+	var harvest_remaining = _harvest_pool_remaining()
+	
+	# Play hit animation based on how much harvest loot is left
+	if animated_sprite:
+		if harvest_remaining <= 0:
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_empty"):
+				animated_sprite.play("hit_empty")
+		elif harvest_remaining == _total_harvest_count:
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_full"):
+				animated_sprite.play("hit_full")
+		else:
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_partial"):
+				animated_sprite.play("hit_partial")
+			elif animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_full"):
+				animated_sprite.play("hit_full")
+	
+	# Give harvest loot from pool based on efficiency
+	player = get_tree().get_first_node_in_group("player")
+	if player and player.has_method("add_loot"):
+		var to_remove = []
+		for i in range(loot_pool.size()):
+			var loot = loot_pool[i]
+			if loot["type"] == "harvest" and loot["action"] == target_action:
+				if randf() <= efficiency:
+					player.add_loot(loot["item"], loot["quantity"])
+					to_remove.append(i)
+		to_remove.reverse()
+		for i in to_remove:
+			loot_pool.remove_at(i)
+	
+	_last_target_action = target_action
+	print(name, " pool remaining: ", _harvest_pool_remaining(), "/", _total_harvest_count)
 
 # Handle destruction after the hit animation has completed
 func use_finished_callback():
 	print("use_finished_callback")
 	
-	if is_harvestable:
-		
-		# Let the hit animation finish before resetting to idle
-		if animated_sprite and animated_sprite.is_playing():
+	# Let the hit animation finish before deciding next state
+	if animated_sprite and animated_sprite.is_playing():
+		await animated_sprite.animation_finished
+	
+	var harvest_remaining = _harvest_pool_remaining()
+	
+	if harvest_remaining > 0:
+		# Still has harvest loot — go back to idle
+		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("idle_full"):
+			animated_sprite.play("idle_full")
+		return
+	
+	# Harvest depleted
+	is_harvestable = false
+	
+	if is_destructible:
+		# Play break animation if available
+		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("break"):
+			animated_sprite.play("break")
 			await animated_sprite.animation_finished
 		
-		# Reset animation after hit
-		if harvest_remaining > 0:
-			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("idle_full"):
-				animated_sprite.play("idle_full")
-			else:
-				print("WARN: Missing idle_full animation")
-		else:
-			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("idle_empty"):
-				animated_sprite.play("idle_empty")
-			else:
-				print("WARN: Missing idle_empty animation")
-			is_harvestable = false
+		# Drop remaining "drop" type loot from pool
+		LootDropper.drop_loot(loot_table, self, _last_target_action)
+		print(name, " has been destroyed")
+		queue_free()
+	else:
+		# Not destructible — show empty state, register for regeneration
+		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("idle_empty"):
+			animated_sprite.play("idle_empty")
+		if regeneration_time > 0.0:
 			ResourceManager.register_resource_regeneration(self, regeneration_time)
-		
-		# Break and drop loot
-		if harvest_remaining <= 0 and is_destructible:
-			# Play destruction animation if available
-			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("break"):
-				animated_sprite.play("break")
-				# Wait for animation to finish, then remove object
-				await animated_sprite.animation_finished
-			else:
-				print("WARN: Unable to find break animation")
-			
-			LootDropper.drop_loot(loot_table, self, _last_target_action)
-			print(name, " has been destroyed")
-			
-			queue_free()
-	elif has_method("interact"):
-		# Call method only in subclass
-		call("interact")

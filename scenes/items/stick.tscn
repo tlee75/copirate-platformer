@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ckk3o0r7wv6tc"]
 
-[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_jknlk"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_jknlk"]
 [ext_resource type="Texture2D" uid="uid://ccugwlq6w38fk" path="res://assets/terrain/stick_01_48x64.png" id="2_7rqfo"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7rqfo"]

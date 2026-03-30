@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://buc368tv0cjic"]
 
 [ext_resource type="Texture2D" uid="uid://bx53dw6l7dqtk" path="res://assets/sprite-man/pick_axe_idle_01-62.png" id="1_40cab"]
-[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_66hhi"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_66hhi"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2ikqw"]
 atlas = ExtResource("1_40cab")

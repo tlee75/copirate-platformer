@@ -37,7 +37,7 @@ func _init():
 func handle_use_hit_frame(player, anim, frame):
 	var target = player.attack_target
 	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and _is_target_compatible(target):
-		target.activate_use(target_action, used_amount)
+		target.activate_use(target_action, harvest_efficiency)
 	elif typeof(target) == TYPE_VECTOR2I:
 		var hit_frame_list = self.hit_frames.get(anim, [])
 		if hit_frame_list.size() > 0 and frame == hit_frame_list[-1]:
@@ -47,6 +47,13 @@ func handle_use_hit_frame(player, anim, frame):
 			if tile_data and tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
 				# Always replace with dirt hole immediately (instant feedback)
 				tilemap.set_cell(0, tile_pos, DIRT_HOLE_SOURCE_ID, Vector2i(DIRT_HOLE_X, DIRT_HOLE_Y))
+				
+				# Nudge any frozen pickups sitting on this tile so they fall
+				var tile_world_pos = tilemap.map_to_local(tile_pos)
+				for pickup in player.get_tree().get_nodes_in_group("pickups"):
+					if pickup is Pickup and pickup.freeze:
+						if pickup.global_position.distance_to(tile_world_pos) < 40.0:
+							pickup.nudge()
 				
 				# Get loot
 				var dig_item_key = "dirt"

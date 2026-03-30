@@ -4,7 +4,18 @@ extends Node
 # Loot table format: { "action_type": [{ "item": PackedScene, "type": "drop", "chance": 1.0, "min": 1, "max": 4 }, ...] }
 
 func drop_loot(loot_table: Dictionary, origin: Node2D, target_action: String = "") -> void:
-	# Determine which action keys to process
+	# Use pre-calculated loot_pool if available on the origin
+	if "loot_pool" in origin and origin.loot_pool.size() > 0:
+		for loot in origin.loot_pool:
+			if loot["type"] != "drop":
+				continue
+			var item_scene: PackedScene = loot["item"]
+			for i in loot["quantity"]:
+				_spawn_item(item_scene, i, origin)
+		origin.loot_pool.clear()
+		return
+	
+	# Fallback to old loot_table behavior for non-GameObject origins
 	var action_keys: Array = []
 	if target_action != "" and loot_table.has(target_action):
 		action_keys = [target_action]

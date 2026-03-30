@@ -17,7 +17,7 @@ func _init():
 	craft_requirements = {"Gold Coin": 3}
 	craft_time = 5.0  # seconds to craft
 	use_animation = "woodaxe_attack"
-	used_amount = 1
 	is_tool = true
 	is_weapon = true
 	target_action = "chop"
+	harvest_efficiency = 0.5

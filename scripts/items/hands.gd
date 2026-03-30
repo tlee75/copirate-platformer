@@ -15,4 +15,4 @@ func _init():
 	use_animation = "interact"
 	land_compatible = true
 	underwater_compatible = true
-	used_amount = 1
+	harvest_efficiency = 1.0

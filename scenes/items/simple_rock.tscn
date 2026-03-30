@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b5y8lh6n7kve"]
 
 [ext_resource type="Texture2D" uid="uid://dlne7731xhxu3" path="res://assets/terrain/simple_rock_icon_01.png" id="1_dcqta"]
-[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_r777w"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_r777w"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lff38"]
 radius = 4.0

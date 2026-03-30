@@ -379,7 +379,7 @@ func is_valid_target(target: Variant, item: GameItem) -> bool:
 	# Object targets
 	if typeof(target) == TYPE_OBJECT and is_instance_valid(target):
 		# Tool compatible?
-		if item.target_action != "" and target is GameObject and check_object_tool_compatibility(target, item.target_action):
+		if item.target_action != "" and target is GameObject and check_object_compatibility(target, item.target_action):
 			return true
 	return false
 
@@ -853,9 +853,9 @@ func _find_valid_tile_at(world_pos: Vector2, target_action: String) -> Vector2i:
 				return tile_pos
 	return Vector2i(-999, -999)
 
-func check_object_tool_compatibility(obj: GameObject, target_action: String) -> bool:
+func check_object_compatibility(obj: GameObject, target_action: String) -> bool:
 	"""Check if an object can be targeted by this tool action"""
-	return target_action in obj.loot_table
+	return target_action in obj.loot_table and obj.has_loot_for_action(target_action)
 
 func snap_crosshair_to_target(target: Node2D, show_crosshair: bool = true):
 	"""Position crosshair at target's location and manage hover effects"""

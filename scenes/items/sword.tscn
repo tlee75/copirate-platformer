@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://gc64jn5o6v6i"]
 
-[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_i5ed0"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_i5ed0"]
 [ext_resource type="Texture2D" uid="uid://e1llfwuhlfno" path="res://assets/sprite-man/short_sword_idle_01-64.png" id="2_n355p"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_s4ec8"]

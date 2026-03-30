@@ -7,19 +7,22 @@ extends GameObject
 func _ready():
 	# Setup harvest
 	category = "terrain"
-	max_harvest = 3
-	harvest_remaining = max_harvest
 	regeneration_time = 5.0
 	is_harvestable = true
 	is_destructible = true
 
+	var coconut_loot = { "item": "coconut", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 }
+	var stick_loot = { "item": "stick", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 }
 	loot_table = {
 		"chop": [
-			{ "item": "coconut", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 },
-			{ "item": "stick", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 },
-			{ "item": stick_scene, "type": "drop", "chance": 1.0, "min": 2, "max": 4 }
+			coconut_loot,
+			stick_loot,
+			{ "item": stick_scene, "type": "drop", "chance": 1.0, "min": 1, "max": 3 }
 		],
-		"punch": [{"item": "coconut", "type": "harvest", "chance": 1.0, "min": 1, "max": 1}]
+		"melee": [
+			coconut_loot,
+			stick_loot
+			]
 	}
 
 	# Start with normal idle animation

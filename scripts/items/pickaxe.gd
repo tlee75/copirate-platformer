@@ -18,3 +18,5 @@ func _init():
 	craft_time = 5.0  # seconds to craft
 	use_animation = "pickaxe_attack"
 	is_tool = true
+	harvest_efficiency = 0.5
+	target_action = "mine"
