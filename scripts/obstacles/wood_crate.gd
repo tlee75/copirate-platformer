@@ -15,17 +15,15 @@ func _ready():
 	is_destructible = true
 	regeneration_time = 0.0  # Crates don't regenerate
 
-	var default_loot = [{ "item": gold_coin_scene, "type": "drop", "chance": 1.0, "min": 1, "max": 3 }]
-
-	var all_attacks = {
-			"melee": default_loot, 
-			"dig": default_loot, 
-			"chop": default_loot,
-			"slice": default_loot,
-			"mine": default_loot
-		}
-
-	loot_table = all_attacks
+	max_harvests = 3
+	var default_loot = [{ "item": gold_coin_scene, "type": "drop", "min": 1, "max": 3 }]
+	loot_table = {
+		"melee": default_loot,
+		"dig": default_loot,
+		"chop": default_loot,
+		"slice": default_loot,
+		"mine": default_loot
+	}
 
 	if animated_sprite:
 		animated_sprite.play("idle")

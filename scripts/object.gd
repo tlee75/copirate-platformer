@@ -1,17 +1,16 @@
 extends Node2D
 class_name GameObject
 
-@export var max_harvest: int
+@export var max_harvests: int = 0
 @export var regeneration_time: float
 
 var animated_sprite: AnimatedSprite2D
 
-# Harvesting specific properties for Raspberry bush, coconut trees, etc
+# Harvesting specific properties
 var is_harvestable: bool
 var is_destructible: bool
 var loot_table: Dictionary = {}
-var loot_pool: Array = []
-var _total_harvest_count: int = 0
+var harvests_remaining: int = 0
 var player: Player
 var _last_target_action: String = ""
 
@@ -43,7 +42,7 @@ func _ready():
 	setup_hover_detection()
 	
 	await get_tree().process_frame
-	_generate_loot_pool()
+	harvests_remaining = max_harvests
 
 func _find_sprite_node():
 	"""Automatically find the sprite node in children"""
@@ -173,55 +172,49 @@ func is_interactable() -> bool:
 
 func regenerate():
 	is_harvestable = true
-	loot_pool.clear()
-	_generate_loot_pool()
+	harvests_remaining = max_harvests
 	if animated_sprite:
 		animated_sprite.play("idle_full")
 	print(name, " has regrown!")
 
-func _generate_loot_pool():
-	"""Pre-roll all loot at spawn time. Called once in _ready()."""
-	_total_harvest_count = 0
-	for action_key in loot_table:
-		for entry in loot_table[action_key]:
-			if randf() <= entry.get("chance", 1.0):
-				var qty = randi_range(entry.get("min", 1), entry.get("max", 1))
-				loot_pool.append({
-					"item": entry["item"],
-					"type": entry["type"],
-					"quantity": qty,
-					"action": action_key
-				})
-				if entry.get("type") == "harvest":
-					_total_harvest_count += qty
-
-func _harvest_pool_remaining() -> int:
-	"""Count how many harvest items remain in the loot pool."""
-	var count = 0
-	for loot in loot_pool:
-		if loot["type"] == "harvest":
-			count += loot["quantity"]
-	return count
-
-func has_loot_for_action(target_action: String) -> bool:
-	"""Check if the pool still has any loot for this action."""
-	for loot in loot_pool:
-		if loot["action"] == target_action:
-			return true
-	return false
+func _pick_harvest_item(target_action: String) -> String:
+	"""Weighted random pick from this action's harvest entries."""
+	if not loot_table.has(target_action):
+		return ""
+	var harvest_entries = []
+	var weights = []
+	for entry in loot_table[target_action]:
+		if entry.get("type") == "harvest":
+			harvest_entries.append(entry)
+			weights.append(entry.get("weight", 1.0))
+	if harvest_entries.is_empty():
+		return ""
+	var total = 0.0
+	for w in weights:
+		total += w
+	var roll = randf() * total
+	var cumulative = 0.0
+	for i in range(weights.size()):
+		cumulative += weights[i]
+		if roll <= cumulative:
+			return harvest_entries[i]["item"]
+	return harvest_entries[-1]["item"]
 
 func activate_use(target_action: String, efficiency: float = 1.0):
 	if not is_harvestable:
 		return
 	
-	var harvest_remaining = _harvest_pool_remaining()
+	# Decrement harvests
+	harvests_remaining -= 1
 	
-	# Play hit animation based on how much harvest loot is left
+	# Play hit animation
 	if animated_sprite:
-		if harvest_remaining <= 0:
+		if harvests_remaining <= 0:
 			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_empty"):
 				animated_sprite.play("hit_empty")
-		elif harvest_remaining == _total_harvest_count:
+			elif animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_full"):
+				animated_sprite.play("hit_full")
+		elif harvests_remaining == max_harvests - 1:
 			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_full"):
 				animated_sprite.play("hit_full")
 		else:
@@ -230,40 +223,31 @@ func activate_use(target_action: String, efficiency: float = 1.0):
 			elif animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_full"):
 				animated_sprite.play("hit_full")
 	
-	# Give harvest loot from pool based on efficiency
-	player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("add_loot"):
-		var to_remove = []
-		for i in range(loot_pool.size()):
-			var loot = loot_pool[i]
-			if loot["type"] == "harvest" and loot["action"] == target_action:
-				if randf() <= efficiency:
-					player.add_loot(loot["item"], loot["quantity"])
-					to_remove.append(i)
-		to_remove.reverse()
-		for i in to_remove:
-			loot_pool.remove_at(i)
+	# Roll for harvest loot
+	if randf() <= efficiency:
+		var item_name = _pick_harvest_item(target_action)
+		if item_name != "":
+			player = get_tree().get_first_node_in_group("player")
+			if player and player.has_method("add_loot"):
+				player.add_loot(item_name, 1)
 	
 	_last_target_action = target_action
-	print(name, " pool remaining: ", _harvest_pool_remaining(), "/", _total_harvest_count)
+	print(name, " harvests remaining: ", harvests_remaining, "/", max_harvests)
 
 # Handle destruction after the hit animation has completed
 func use_finished_callback():
-	print("use_finished_callback")
-	
 	# Let the hit animation finish before deciding next state
 	if animated_sprite and animated_sprite.is_playing():
 		await animated_sprite.animation_finished
 	
-	var harvest_remaining = _harvest_pool_remaining()
-	
-	if harvest_remaining > 0:
-		# Still has harvest loot — go back to idle
-		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("idle_full"):
-			animated_sprite.play("idle_full")
+	if harvests_remaining > 0:
+		# Still has harvests — go back to idle
+		if animated_sprite and animated_sprite.sprite_frames:
+			if animated_sprite.sprite_frames.has_animation("idle_full"):
+				animated_sprite.play("idle_full")
 		return
 	
-	# Harvest depleted
+	# Harvests depleted
 	is_harvestable = false
 	
 	if is_destructible:
@@ -272,12 +256,12 @@ func use_finished_callback():
 			animated_sprite.play("break")
 			await animated_sprite.animation_finished
 		
-		# Drop remaining "drop" type loot from pool
+	# Drop loot from loot_table
 		LootDropper.drop_loot(loot_table, self, _last_target_action)
 		print(name, " has been destroyed")
 		queue_free()
 	else:
-		# Not destructible — show empty state, register for regeneration
+		# Not destructible — show empty state
 		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("idle_empty"):
 			animated_sprite.play("idle_empty")
 		if regeneration_time > 0.0:

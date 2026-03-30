@@ -10,19 +10,17 @@ func _ready():
 	regeneration_time = 5.0
 	is_harvestable = true
 	is_destructible = true
-
-	var coconut_loot = { "item": "coconut", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 }
-	var stick_loot = { "item": "stick", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 }
+	max_harvests = 10
 	loot_table = {
 		"chop": [
-			coconut_loot,
-			stick_loot,
-			{ "item": stick_scene, "type": "drop", "chance": 1.0, "min": 1, "max": 3 }
+			{ "item": "coconut", "type": "harvest", "weight": 2.0 },
+			{ "item": "stick", "type": "harvest", "weight": 1.0 },
+			{ "item": stick_scene, "type": "drop", "min": 1, "max": 3 }
 		],
 		"melee": [
-			coconut_loot,
-			stick_loot
-			]
+			{ "item": "coconut", "type": "harvest", "weight": 1.0 },
+			{ "item": "stick", "type": "harvest", "weight": 2.0 }
+		]
 	}
 
 	# Start with normal idle animation

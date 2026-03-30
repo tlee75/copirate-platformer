@@ -7,9 +7,10 @@ func _ready():
 	regeneration_time = 5.0 
 	is_harvestable = true
 	is_destructible = false
+	max_harvests = 5
 	loot_table = {
 		"interact": [
-			{ "item": "raspberry", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 }
+			{ "item": "raspberry", "type": "harvest", "weight": 1.0 }
 		]
 	}
 	

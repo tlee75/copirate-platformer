@@ -7,10 +7,11 @@ func _ready():
 	regeneration_time = 5.0 
 	is_harvestable = true
 	is_destructible = false
+	max_harvests = 2
 	loot_table = {
 		"interact": [
-			{ "item": "simple_rock", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 },
-			{ "item": "stick", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 }
+			{ "item": "simple_rock", "type": "harvest", "weight": 1.0 },
+			{ "item": "stick", "type": "harvest", "weight": 1.0 }
 		]
 	}
 	# Start with normal idle animation

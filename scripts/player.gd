@@ -855,7 +855,7 @@ func _find_valid_tile_at(world_pos: Vector2, target_action: String) -> Vector2i:
 
 func check_object_compatibility(obj: GameObject, target_action: String) -> bool:
 	"""Check if an object can be targeted by this tool action"""
-	return target_action in obj.loot_table and obj.has_loot_for_action(target_action)
+	return target_action in obj.loot_table and obj.harvests_remaining > 0
 
 func snap_crosshair_to_target(target: Node2D, show_crosshair: bool = true):
 	"""Position crosshair at target's location and manage hover effects"""

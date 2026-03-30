@@ -67,6 +67,20 @@ animations = [{
 "texture": SubResource("AtlasTexture_easd3")
 }],
 "loop": false,
+"name": &"hit_empty",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mhhac")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cpet5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_easd3")
+}],
+"loop": false,
 "name": &"hit_full",
 "speed": 10.0
 }, {

@@ -20,4 +20,4 @@ func _init():
 	is_tool = true
 	is_weapon = true
 	target_action = "chop"
-	harvest_efficiency = 0.5
+	harvest_efficiency = 0.6
