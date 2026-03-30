@@ -33,6 +33,7 @@ func _on_landed(_body):
 func nudge():
 	"""Called externally when the ground underneath may have changed."""
 	_nudge_cooldown = 0.3
+	sleeping = false
 	linear_velocity = Vector2.ZERO
 
 func _on_player_entered(body):

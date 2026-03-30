@@ -51,7 +51,7 @@ func handle_use_hit_frame(player, anim, frame):
 				# Nudge any frozen pickups sitting on this tile so they fall
 				var tile_world_pos = tilemap.map_to_local(tile_pos)
 				for pickup in player.get_tree().get_nodes_in_group("pickups"):
-					if pickup is Pickup and pickup.freeze:
+					if pickup is Pickup and pickup.sleeping:
 						if pickup.global_position.distance_to(tile_world_pos) < 40.0:
 							pickup.nudge()
 				
