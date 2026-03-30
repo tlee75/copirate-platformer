@@ -9,16 +9,18 @@ func _ready():
 	category = "terrain"
 	max_harvest = 3
 	harvest_remaining = max_harvest
-	regeneration_time = 5.0 
-	harvest_loot = "coconut"
+	regeneration_time = 5.0
 	is_harvestable = true
 	is_destructible = true
-	
-	# Setup loot table when the coconut tree is chopped down
-	target_actions = ["chop"]
-	loot_table = [
-		[stick_scene, 1.0, 2, 4]
-	]
+
+	loot_table = {
+		"chop": [
+			{ "item": "coconut", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 },
+			{ "item": "stick", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 },
+			{ "item": stick_scene, "type": "drop", "chance": 1.0, "min": 2, "max": 4 }
+		],
+		"punch": [{"item": "coconut", "type": "harvest", "chance": 1.0, "min": 1, "max": 1}]
+	}
 
 	# Start with normal idle animation
 	if animated_sprite:
@@ -26,6 +28,3 @@ func _ready():
 
 	# Call parent _ready() to setup hover detection
 	super._ready()
-
-func is_interactable() -> bool:
-	return is_harvestable == true

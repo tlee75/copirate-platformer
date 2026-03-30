@@ -2,7 +2,7 @@ extends Node2D
 class_name GameObject
 
 @export var max_harvest: int
-@export var regeneration_time: float 
+@export var regeneration_time: float
 
 var animated_sprite: AnimatedSprite2D
 
@@ -10,14 +10,13 @@ var animated_sprite: AnimatedSprite2D
 var harvest_remaining: int
 var is_harvestable: bool
 var is_destructible: bool
-var harvest_loot: String = ""
-var loot_table: Array
+var loot_table: Dictionary = {}
 var player: Player
+var _last_target_action: String = ""
 
 # Core properties
 var category: String = ""
 var description: String = ""
-var target_actions: Array[String] = []
 
 # Crafting properties (only used by structures)
 var craftable: bool = false
@@ -139,12 +138,34 @@ func get_hover_scale_multiplier() -> float:
 	else:
 		return 1.03  # 3% larger for structures
 
+func get_crosshair_radius() -> float:
+	"""Return world-space radius for the targeting crosshair, derived from sprite size."""
+	if sprite_node:
+		var size: Vector2
+		if sprite_node is AnimatedSprite2D:
+			var frames = sprite_node.sprite_frames
+			if frames:
+				var texture = frames.get_frame_texture(sprite_node.animation, sprite_node.frame)
+				if texture:
+					size = texture.get_size()
+				else:
+					return 28.0
+			else:
+				return 28.0
+		else:
+			var rect: Rect2 = sprite_node.get_rect()
+			size = rect.size
+		var local_longest: float = max(abs(size.x), abs(size.y))
+		var world_longest: float = local_longest * max(abs(scale.x), abs(scale.y))
+		return clamp(world_longest * 0.10, 8.0, 20.0)
+	return 28.0
+
 func set_cooldown():
 	pass
 
 func is_interactable() -> bool:
 	"""Override this in subclasses"""
-	return true
+	return false
 
 func regenerate():
 	is_harvestable = true
@@ -153,27 +174,40 @@ func regenerate():
 		animated_sprite.play("idle_full")
 	print(name, " has regrown!")
 
-func tool_used(used_amount: int):
+func activate_use(target_action: String, used_amount: int):
 	if is_harvestable:
 		if animated_sprite:
-			if harvest_remaining > 0:
-				if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_full"):	
+			if harvest_remaining == max_harvest:
+				if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_full"):
 					animated_sprite.play("hit_full")
 				else:
 					print("WARN: Missing the hit_full animation for ", self.name)
+			elif harvest_remaining > 0 and harvest_remaining < max_harvest:
+				if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_partial"):
+					animated_sprite.play("hit_partial")
+				else:
+					print("WARN: Missing the hit_partial animation for ", self.name)
 			else:
-				if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_empty"):	
+				print("harvest_remaining: ", harvest_remaining)
+				print("max_harvest: ", max_harvest)
+				if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("hit_empty"):
 					animated_sprite.play("hit_empty")
 				else:
 					print("WARN: Missing the hit_empty animation for ", self.name)
+				is_harvestable = false
 		else:
 			print("Animated sprite object not found for ", self.name)
 					
 		print(name, " harvest: ", harvest_remaining, "/", max_harvest)
 		player = get_tree().get_first_node_in_group("player")
 		if player and player.has_method("add_loot"):
-			player.add_loot(harvest_loot, 1)	
-
+			if loot_table.has(target_action):
+				for entry in loot_table[target_action]:
+					if entry.get("type") == "harvest":
+						var quantity = randi_range(entry.get("min", 1), entry.get("max", 1))
+						if randf() <= entry.get("chance", 1.0):
+							player.add_loot(entry["item"], quantity)
+							
 		harvest_remaining -= used_amount
 
 
@@ -182,16 +216,27 @@ func use_finished_callback():
 	print("use_finished_callback")
 	
 	if is_harvestable:
+		
+		# Let the hit animation finish before resetting to idle
+		if animated_sprite and animated_sprite.is_playing():
+			await animated_sprite.animation_finished
+		
 		# Reset animation after hit
 		if harvest_remaining > 0:
-			animated_sprite.play("idle_full")			
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("idle_full"):
+				animated_sprite.play("idle_full")
+			else:
+				print("WARN: Missing idle_full animation")
 		else:
-			animated_sprite.play("idle_empty")
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("idle_empty"):
+				animated_sprite.play("idle_empty")
+			else:
+				print("WARN: Missing idle_empty animation")
 			is_harvestable = false
 			ResourceManager.register_resource_regeneration(self, regeneration_time)
 		
 		# Break and drop loot
-		if harvest_remaining <= 0 and is_destructible:		
+		if harvest_remaining <= 0 and is_destructible:
 			# Play destruction animation if available
 			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("break"):
 				animated_sprite.play("break")
@@ -200,7 +245,7 @@ func use_finished_callback():
 			else:
 				print("WARN: Unable to find break animation")
 			
-			LootDropper.drop_loot(loot_table, self)
+			LootDropper.drop_loot(loot_table, self, _last_target_action)
 			print(name, " has been destroyed")
 			
 			queue_free()

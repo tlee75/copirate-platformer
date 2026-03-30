@@ -9,10 +9,12 @@ func _ready():
 	regeneration_time = 5.0 
 	is_harvestable = true
 	is_destructible = false
-	harvest_loot = "simple_rock"
-	
-	target_actions = ["harvest"]
-	
+	loot_table = {
+		"interact": [
+			{ "item": "simple_rock", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 },
+			{ "item": "stick", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 }
+		]
+	}
 	# Start with normal idle animation
 	if animated_sprite:
 		animated_sprite.play("idle_full")

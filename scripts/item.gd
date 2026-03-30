@@ -11,13 +11,12 @@ class_name GameItem
 @export var cook_time: float = 0.0  # Time in seconds to cook
 @export var is_tool = false
 @export var is_weapon: bool = false
-@export var damage: int = 0
 @export var used_amount: int = 0
 @export var description: String = ""  # Item description - set by individual item scripts
 @export var craft_time: float = 3.0  # Time in seconds to craft this item
 @export var target_range: float = 50.0      # Maximum targeting range
 @export var target_spread: float = 10.0     # Targeting spread width  
-@export var tool_action: String = ""        # "dig", "chop", "mine", etc.
+@export var target_action: String = ""        # "dig", "chop", "mine", etc.
 
 var category: String = ""
 var icon: Texture2D
@@ -63,20 +62,16 @@ func handle_use_hit_frame(player, _anim, _frame):
 		return
 	if typeof(target) == TYPE_OBJECT and is_instance_valid(target):
 		# Priority 1: Tool action on compatible targets
-		if _is_tool_compatible(target):
-			target.tool_used(used_amount)
-			return
-		# Priority 2: Damage on attackable targets
-		if damage > 0 and target.has_method("take_damage"):
-			target.take_damage(damage)
+		if _is_target_compatible(target):
+			target.activate_use(target_action, used_amount)
 			return
 
-func _is_tool_compatible(target) -> bool:
-	"""Check if this item's tool_action matches the target's declared target_actions"""
-	if tool_action == "":
+func _is_target_compatible(target) -> bool:
+	"""Check if this item's target_action matches a key in the target's loot_table"""
+	if target_action == "":
 		return false
-	if "target_actions" in target and target.target_actions is Array:
-		return tool_action in target.target_actions
+	if "loot_table" in target and target.loot_table is Dictionary:
+		return target.loot_table.has(target_action)
 	return false
 
 func _on_use_animation_finished(player):

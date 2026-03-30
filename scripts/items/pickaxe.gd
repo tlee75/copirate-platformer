@@ -17,5 +17,4 @@ func _init():
 	craft_requirements = {"Gold Coin": 3}
 	craft_time = 5.0  # seconds to craft
 	use_animation = "pickaxe_attack"
-	damage = 1
 	is_tool = true

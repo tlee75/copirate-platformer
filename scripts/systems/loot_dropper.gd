@@ -1,18 +1,29 @@
 extends Node
 
 # LootDropper: Autoload for spawning loot item pickups into the world.
-# Loot table entry format: [PackedScene, drop_chance (0.0-1.0), min_qty, max_qty]
+# Loot table format: { "action_type": [{ "item": PackedScene, "type": "drop", "chance": 1.0, "min": 1, "max": 4 }, ...] }
 
-func drop_loot(loot_table: Array, origin: Node2D) -> void:
-	for entry in loot_table:
-		var item_scene: PackedScene = entry[0]
-		var drop_chance: float = entry[1]
-		var min_qty: int = entry[2]
-		var max_qty: int = entry[3]
-		if randf() <= drop_chance:
-			var quantity = randi_range(min_qty, max_qty)
-			for i in quantity:
-				_spawn_item(item_scene, i, origin)
+func drop_loot(loot_table: Dictionary, origin: Node2D, target_action: String = "") -> void:
+	# Determine which action keys to process
+	var action_keys: Array = []
+	if target_action != "" and loot_table.has(target_action):
+		action_keys = [target_action]
+	else:
+		action_keys = loot_table.keys()
+	
+	for action_key in action_keys:
+		var entries = loot_table[action_key]
+		for entry in entries:
+			if entry.get("type") != "drop":
+				continue
+			var item_scene: PackedScene = entry["item"]
+			var drop_chance: float = entry.get("chance", 1.0)
+			var min_qty: int = entry.get("min", 1)
+			var max_qty: int = entry.get("max", 1)
+			if randf() <= drop_chance:
+				var quantity = randi_range(min_qty, max_qty)
+				for i in quantity:
+					_spawn_item(item_scene, i, origin)
 
 func _spawn_item(item_scene: PackedScene, offset_index: int, origin: Node2D) -> void:
 	if not item_scene:

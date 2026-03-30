@@ -30,15 +30,14 @@ func _init():
 	land_compatible = true
 	craft_requirements = {"Gold Coin": 2}
 	is_tool = true
-	damage = 1
 	target_range = 60.0
 	target_spread = 20.0
-	tool_action = "dig"
+	target_action = "dig"
 
 func handle_use_hit_frame(player, anim, frame):
 	var target = player.attack_target
-	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("take_damage"):
-		target.take_damage(damage)
+	if typeof(target) == TYPE_OBJECT and is_instance_valid(target) and _is_target_compatible(target):
+		target.activate_use(target_action, used_amount)
 	elif typeof(target) == TYPE_VECTOR2I:
 		var hit_frame_list = self.hit_frames.get(anim, [])
 		if hit_frame_list.size() > 0 and frame == hit_frame_list[-1]:

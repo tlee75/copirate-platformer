@@ -3,9 +3,9 @@
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/main_scene.gd" id="1_4bgka"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_02d50"]
 [ext_resource type="PackedScene" uid="uid://dj61g2jpyma7a" path="res://scenes/items/background.tscn" id="2_pgk25"]
-[ext_resource type="Texture2D" uid="uid://xbvs700g2epd" path="res://resources/crosshair.tres" id="3_pgk25"]
 [ext_resource type="Texture2D" uid="uid://4io08vc866pq" path="res://assets/terrain/surface_water_32x32_2.png" id="4_k67gn"]
 [ext_resource type="Texture2D" uid="uid://rn4b115e07qc" path="res://assets/terrain/ground_06_32x32.png" id="4_kkokr"]
+[ext_resource type="Script" uid="uid://2x7cp60c8y67" path="res://scripts/ui/crosshair_display.gd" id="4_lhwp2"]
 [ext_resource type="Texture2D" uid="uid://b3j7lmrwbayum" path="res://assets/terrain/surface_water_32x32.png" id="5_lhwp2"]
 [ext_resource type="Texture2D" uid="uid://c53mci2tdo8x4" path="res://assets/terrain/underwater_02_32x32.png" id="6_l40q6"]
 [ext_resource type="Texture2D" uid="uid://c1a5iiig0aiyn" path="res://assets/terrain/seafloor_32x32.png" id="7_iav3h"]
@@ -144,11 +144,9 @@ position = Vector2(33, 0)
 [node name="CursorCollision" type="CollisionShape2D" parent="Player/CursorArea" unique_id=2102533359]
 shape = SubResource("RectangleShape2D_ru564")
 
-[node name="Crosshair" type="Sprite2D" parent="Player/CursorArea" unique_id=876755716]
-modulate = Color(1, 1, 1, 0.7)
-position = Vector2(8.940697e-07, 0)
-scale = Vector2(0.8, 0.8)
-texture = ExtResource("3_pgk25")
+[node name="Crosshair" type="Node2D" parent="Player" unique_id=2105619620]
+position = Vector2(33, 0)
+script = ExtResource("4_lhwp2")
 
 [node name="TileMap" type="TileMap" parent="." unique_id=1709114340]
 tile_set = SubResource("TileSet_gwrsa")
@@ -322,3 +320,6 @@ position = Vector2(-2608, 2304)
 
 [node name="GraniteRockPile" parent="SimpleRocks" unique_id=1919999788 instance=ExtResource("32_kkokr")]
 position = Vector2(-416, 2168)
+
+[node name="WoodCrate" parent="." unique_id=1440005507 instance=ExtResource("19_267kh")]
+position = Vector2(-64, 2152)

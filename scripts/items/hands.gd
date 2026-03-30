@@ -11,7 +11,7 @@ func _init():
 	category = "unarmed"
 	is_tool = true
 	is_weapon = false
-	tool_action = "harvest"
+	target_action = "interact"
 	use_animation = "interact"
 	land_compatible = true
 	underwater_compatible = true

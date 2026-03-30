@@ -33,7 +33,9 @@ func _ready():
 	
 	state = ObjectState.UNLIT
 
-	target_actions = ["harvest"]
+	loot_table = {
+		"interact": []
+	}
 
 	# Add interactive object component
 	interactive_object = InteractiveObjectComponent.new()

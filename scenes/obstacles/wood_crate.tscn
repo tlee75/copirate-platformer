@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://crl38kj8otjtc"]
+[gd_scene format=3 uid="uid://crl38kj8otjtc"]
 
 [ext_resource type="Texture2D" uid="uid://cufivuekexdn6" path="res://assets/structures/crate_hit_01-8.png" id="1_aqu1o"]
 [ext_resource type="Script" uid="uid://douoo83atpggs" path="res://scripts/obstacles/wood_crate.gd" id="1_p4eel"]
@@ -67,7 +67,21 @@ animations = [{
 "texture": SubResource("AtlasTexture_easd3")
 }],
 "loop": false,
-"name": &"hit",
+"name": &"hit_full",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mhhac")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cpet5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_easd3")
+}],
+"loop": false,
+"name": &"hit_partial",
 "speed": 10.0
 }, {
 "frames": [{
@@ -75,23 +89,22 @@ animations = [{
 "texture": SubResource("AtlasTexture_tcjsg")
 }],
 "loop": false,
-"name": &"idle",
+"name": &"idle_full",
 "speed": 1.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_77nhs"]
 size = Vector2(206, 246)
 
-[node name="WoodCrate" type="StaticBody2D"]
+[node name="WoodCrate" type="StaticBody2D" unique_id=80302474]
 scale = Vector2(0.15, 0.15)
 script = ExtResource("1_p4eel")
-hit_cooldown_time = 0.5
 gold_coin_scene = ExtResource("2_hfctv")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1771662587]
 sprite_frames = SubResource("SpriteFrames_jxeky")
-animation = &"break"
+animation = &"idle_full"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=728806632]
 position = Vector2(4, -2)
 shape = SubResource("RectangleShape2D_77nhs")

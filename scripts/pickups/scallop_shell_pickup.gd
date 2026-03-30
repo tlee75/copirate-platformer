@@ -2,10 +2,13 @@ extends GameObject
 
 func _ready():
 	is_harvestable = true
-	harvest_loot = "scallop_shell"
 	harvest_remaining = 1
 	max_harvest = 1
-	target_actions = ["harvest"]
+	loot_table = {
+		"interact": [
+			{ "item": "scallop_shell", "type": "harvest", "chance": 1.0, "min": 1, "max": 1 }
+		]
+	}
 	super._ready()
 
 func use_finished_callback():
