@@ -1,7 +1,10 @@
 [gd_scene format=3 uid="uid://b5y8lh6n7kve"]
 
 [ext_resource type="Texture2D" uid="uid://dlne7731xhxu3" path="res://assets/terrain/simple_rock_icon_01.png" id="1_dcqta"]
-[ext_resource type="Script" uid="uid://p5n6d6hnxqrc" path="res://scripts/pickups/simple_rock_pickup.gd" id="1_r777w"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_r777w"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lff38"]
+radius = 4.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_r777w"]
 atlas = ExtResource("1_dcqta")
@@ -21,8 +24,12 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_47idf"]
 radius = 4.0
 
-[node name="SimpleRock" type="Node2D" unique_id=2120698065]
+[node name="SimpleRock" type="RigidBody2D" unique_id=115639006]
+collision_layer = 8
 script = ExtResource("1_r777w")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2018155443]
+shape = SubResource("CircleShape2D_lff38")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1359467036]
 z_index = 1
@@ -30,7 +37,8 @@ scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_lff38")
 animation = &"idle"
 
-[node name="Area2D" type="Area2D" parent="." unique_id=632366018]
+[node name="PickupArea" type="Area2D" parent="." unique_id=632366018]
+collision_layer = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=990894535]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=990894535]
 shape = SubResource("CircleShape2D_47idf")

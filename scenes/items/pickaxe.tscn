@@ -1,7 +1,7 @@
-[gd_scene load_steps=67 format=3 uid="uid://buc368tv0cjic"]
+[gd_scene format=3 uid="uid://buc368tv0cjic"]
 
-[ext_resource type="Script" uid="uid://u2oatw2wfluw" path="res://scripts/pickups/pickaxe_pickup.gd" id="1_2ikqw"]
-[ext_resource type="Texture2D" uid="uid://bbuwoibkprf4m" path="res://assets/sprite-man/pick_axe_idle_01-62.png" id="1_40cab"]
+[ext_resource type="Texture2D" uid="uid://bx53dw6l7dqtk" path="res://assets/sprite-man/pick_axe_idle_01-62.png" id="1_40cab"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_66hhi"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2ikqw"]
 atlas = ExtResource("1_40cab")
@@ -448,15 +448,27 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gw7q8"]
 size = Vector2(18, 27)
 
-[node name="PickAxe" type="Area2D"]
-script = ExtResource("1_2ikqw")
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aaufx"]
+size = Vector2(18, 27)
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="PickAxe" type="RigidBody2D" unique_id=2071294093]
+collision_layer = 8
+script = ExtResource("1_66hhi")
+idle_animation = "pickaxe_idle"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1743514357]
 z_index = 1
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_s4se8")
 animation = &"pickaxe_idle"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=607886858]
 position = Vector2(1, 1.5)
 shape = SubResource("RectangleShape2D_gw7q8")
+
+[node name="PickupArea" type="Area2D" parent="." unique_id=1513322222]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=1449556787]
+position = Vector2(1, 1.5)
+shape = SubResource("RectangleShape2D_aaufx")

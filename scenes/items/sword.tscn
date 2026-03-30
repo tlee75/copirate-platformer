@@ -1,7 +1,7 @@
-[gd_scene load_steps=69 format=3 uid="uid://gc64jn5o6v6i"]
+[gd_scene format=3 uid="uid://gc64jn5o6v6i"]
 
-[ext_resource type="Script" uid="uid://dhnrxu4hloio4" path="res://scripts/pickups/sword_pickup.gd" id="1_xccsb"]
-[ext_resource type="Texture2D" uid="uid://bh8jemultsh80" path="res://assets/sprite-man/short_sword_idle_01-64.png" id="2_n355p"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_i5ed0"]
+[ext_resource type="Texture2D" uid="uid://e1llfwuhlfno" path="res://assets/sprite-man/short_sword_idle_01-64.png" id="2_n355p"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_s4ec8"]
 atlas = ExtResource("2_n355p")
@@ -462,15 +462,27 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mcaqy"]
 size = Vector2(31, 8)
 
-[node name="Sword" type="Area2D"]
-script = ExtResource("1_xccsb")
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_l3uod"]
+size = Vector2(31, 8)
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="Sword" type="RigidBody2D" unique_id=2073572910]
+collision_layer = 8
+script = ExtResource("1_i5ed0")
+idle_animation = "sword_idle"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=251182433]
 z_index = 1
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_63by1")
 animation = &"sword_idle"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1667050767]
 position = Vector2(0.5, 0)
 shape = SubResource("RectangleShape2D_mcaqy")
+
+[node name="PickupArea" type="Area2D" parent="." unique_id=340392420]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=363475297]
+position = Vector2(0.5, 0)
+shape = SubResource("RectangleShape2D_l3uod")

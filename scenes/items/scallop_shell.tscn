@@ -1,19 +1,44 @@
 [gd_scene format=3 uid="uid://bbnkwhcolpqai"]
 
-[ext_resource type="Script" uid="uid://ua1nnfdioqip" path="res://scripts/pickups/scallop_shell_pickup.gd" id="1_lp747"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_lp747"]
 [ext_resource type="Texture2D" uid="uid://cid6tcmpdaxim" path="res://assets/terrain/scallop_shell_1.png" id="1_yhsfb"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_lp747"]
+atlas = ExtResource("1_yhsfb")
+region = Rect2(0, 0, 64, 42)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bngxs"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lp747")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lp747"]
+radius = 8.062258
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_dtufp"]
-radius = 20.024984
+radius = 8.0
 
-[node name="ScallopShell" type="Node2D" unique_id=2041329492]
-scale = Vector2(0.25, 0.25)
+[node name="ScallopShell" type="RigidBody2D" unique_id=727383569]
+collision_layer = 8
 script = ExtResource("1_lp747")
+idle_animation = "idle"
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1835628003]
-texture = ExtResource("1_yhsfb")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1591090522]
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("SpriteFrames_bngxs")
+animation = &"idle"
 
-[node name="Area2D" type="Area2D" parent="." unique_id=1034274324]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1141766359]
+shape = SubResource("CircleShape2D_lp747")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1607719569]
+[node name="PickupArea" type="Area2D" parent="." unique_id=1034274324]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=1607719569]
 shape = SubResource("CircleShape2D_dtufp")

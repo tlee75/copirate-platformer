@@ -1,7 +1,11 @@
 [gd_scene format=3 uid="uid://ckk3o0r7wv6tc"]
 
-[ext_resource type="Script" uid="uid://cnt0uxtpajki6" path="res://scripts/pickups/stick_pickup.gd" id="1_jknlk"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_jknlk"]
 [ext_resource type="Texture2D" uid="uid://ccugwlq6w38fk" path="res://assets/terrain/stick_01_48x64.png" id="2_7rqfo"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7rqfo"]
+radius = 7.018362
+height = 27.728748
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tkx6t"]
 atlas = ExtResource("2_7rqfo")
@@ -19,22 +23,30 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jknlk"]
-radius = 7.5000005
-height = 74.84954
+radius = 7.0183625
+height = 27.531525
 
-[node name="Stick" type="Node2D" unique_id=2138355126]
-scale = Vector2(0.4, 0.4)
+[node name="Stick" type="RigidBody2D" unique_id=1029079583]
+collision_layer = 8
 script = ExtResource("1_jknlk")
+idle_animation = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=863372043]
+rotation = 0.6632251
+scale = Vector2(0.99999994, 0.99999994)
+shape = SubResource("CapsuleShape2D_7rqfo")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1709785156]
 z_index = 1
+position = Vector2(0, -4.9999995)
+scale = Vector2(0.4, 0.4)
 sprite_frames = SubResource("SpriteFrames_hhyfn")
 animation = &"idle"
 
-[node name="Area2D" type="Area2D" parent="." unique_id=37615427]
+[node name="PickupArea" type="Area2D" parent="." unique_id=37615427]
+collision_layer = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1584704745]
-position = Vector2(2.0489095e-07, 2.4999995)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=1584704745]
 rotation = 0.6632251
 scale = Vector2(0.99999976, 0.99999976)
 shape = SubResource("CapsuleShape2D_jknlk")

@@ -25,7 +25,7 @@
 [ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/items/shovel.tscn" id="21_duuju"]
 [ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/items/sword.tscn" id="22_8dxha"]
 [ext_resource type="PackedScene" uid="uid://bqjbr0fr548wk" path="res://scenes/terrain/berry_bush.tscn" id="23_j4epa"]
-[ext_resource type="PackedScene" uid="uid://bau4ht0cid8a1" path="res://scenes/items/wood_axe.tscn" id="25_5nybl"]
+[ext_resource type="PackedScene" uid="uid://bau4ht0cid8a1" path="res://scenes/items/woodaxe.tscn" id="25_5nybl"]
 [ext_resource type="Script" uid="uid://31qjwgftkyrw" path="res://scripts/systems/water_flow_manager.gd" id="27_j2yw6"]
 [ext_resource type="PackedScene" uid="uid://b5y8lh6n7kve" path="res://scenes/items/simple_rock.tscn" id="28_8pjrr"]
 [ext_resource type="Script" uid="uid://duwg2nwj6sc2e" path="res://scripts/systems/placement_manager.gd" id="29_0xxsb"]
@@ -240,7 +240,7 @@ position = Vector2(-80, 2088)
 position = Vector2(5, 2086)
 
 [node name="Sword" parent="." unique_id=1231607444 instance=ExtResource("22_8dxha")]
-position = Vector2(60, 2083)
+position = Vector2(64, 2088)
 
 [node name="Resources" type="Node" parent="." unique_id=1510119859]
 
@@ -269,6 +269,12 @@ position = Vector2(-2744, 2240)
 [node name="ScallopShell3" parent="Resources" unique_id=2041329492 instance=ExtResource("30_pgk25")]
 position = Vector2(344, 2176)
 
+[node name="ScallopShell4" parent="Resources" unique_id=727383569 instance=ExtResource("30_pgk25")]
+position = Vector2(-216, 2040)
+
+[node name="SimpleRock" parent="Resources" unique_id=115639006 instance=ExtResource("28_8pjrr")]
+position = Vector2(-112, 2032)
+
 [node name="WoodAxe" parent="." unique_id=715209706 instance=ExtResource("25_5nybl")]
 position = Vector2(-42, 2088)
 
@@ -287,7 +293,7 @@ position = Vector2(-930, 2043)
 position = Vector2(-803, 2043)
 
 [node name="CoconutTree" parent="CoconutTrees" unique_id=1453547572 instance=ExtResource("30_02d50")]
-position = Vector2(-299, 2107)
+position = Vector2(-259, 2107)
 
 [node name="CoconutTree4" parent="CoconutTrees" unique_id=420696797 instance=ExtResource("30_02d50")]
 position = Vector2(-3533, 2044)

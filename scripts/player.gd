@@ -700,6 +700,7 @@ func get_attack_target():
 
 func add_loot(item_name: String, amount: int):
 	# Implement inventory logic
+	print("item_name: ", item_name)
 	var game_item = GameObjectsDatabase.game_objects_database[item_name]
 	if InventoryManager.add_item(game_item, amount):
 		# Find the stack for this item

@@ -1,7 +1,7 @@
-[gd_scene load_steps=69 format=3 uid="uid://cqfe0i3jnrxp5"]
+[gd_scene format=3 uid="uid://cqfe0i3jnrxp5"]
 
-[ext_resource type="Script" uid="uid://cgtdgbhaohcoo" path="res://scripts/pickups/shovel_pickup.gd" id="1_d01uh"]
-[ext_resource type="Texture2D" uid="uid://b7iap0wkc104f" path="res://assets/sprite-man/shovel_idle_02-64.png" id="2_081d1"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups/pickups.gd" id="1_84da2"]
+[ext_resource type="Texture2D" uid="uid://bjco2ruk6pc6a" path="res://assets/sprite-man/shovel_idle_02-64.png" id="2_081d1"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g60nu"]
 atlas = ExtResource("2_081d1")
@@ -462,10 +462,14 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g60nu"]
 size = Vector2(32, 12)
 
-[node name="Shovel" type="Area2D"]
-script = ExtResource("1_d01uh")
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tr10c"]
+size = Vector2(32, 12)
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="Shovel" type="RigidBody2D" unique_id=1999998750]
+script = ExtResource("1_84da2")
+idle_animation = "idle"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1572145348]
 z_index = 1
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_081d1")
@@ -473,6 +477,12 @@ animation = &"idle"
 frame = 63
 frame_progress = 1.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1919824587]
 position = Vector2(1, 0)
 shape = SubResource("RectangleShape2D_g60nu")
+
+[node name="PickupArea" type="Area2D" parent="." unique_id=1141596724]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=285383495]
+position = Vector2(1, 0)
+shape = SubResource("RectangleShape2D_tr10c")
