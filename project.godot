@@ -35,6 +35,7 @@ GDAIMCPRuntime="*uid://dcne7ryelpxmn"
 [display]
 
 window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [gui]
 
