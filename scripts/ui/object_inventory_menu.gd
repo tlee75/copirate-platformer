@@ -267,7 +267,7 @@ func _transfer_from_player_to_object(player_stack: InventoryManager.ItemStack):
 		return
 	
 	if interactive_obj.add_item(player_stack.item, 1):
-		InventoryManager.remove_items_by_name(player_stack.item.name, 1)
+		InventoryManager.remove_items_by_key(player_stack.item.registry_key, 1)
 		_refresh_displays()
 		print("Successfully transferred 1x ", player_stack.item.name, " to ", current_object_name)
 	else:

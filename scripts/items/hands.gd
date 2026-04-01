@@ -17,3 +17,12 @@ func _init():
 	underwater_compatible = true
 	harvest_efficiency = 1.0
 	droppable = false
+
+func handle_use_hit_frame(player, _anim, _frame):
+	var target = player.attack_target
+	if not target or typeof(target) != TYPE_OBJECT or not is_instance_valid(target):
+		return
+	if target is GameObject and target.has_method("interact") and target.is_interactable():
+		target.interact()
+	elif _is_target_compatible(target):
+		target.activate_use(target_action, harvest_efficiency)
