@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://6xilgovco188"]
+
+[ext_resource type="Script" uid="uid://bnlnhkdmfjrwe" path="res://scripts/ui/notification_display.gd" id="1_jtl7i"]
+
+[node name="NotificationDisplay" type="MarginContainer" unique_id=1150600938]
+anchors_preset = -1
+anchor_left = 0.65
+anchor_top = 0.02
+anchor_right = 0.98
+anchor_bottom = 0.5
+mouse_filter = 2
+script = ExtResource("1_jtl7i")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=416426450]
+layout_mode = 2
+mouse_filter = 2

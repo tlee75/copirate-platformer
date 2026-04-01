@@ -399,9 +399,13 @@ func drop_item_stack(stack: ItemStack, amount: int = -1) -> bool:
 	if amount == -1:
 		amount = stack.quantity
 	
-	# TODO: Spawn item in world
+	# Spawn item in world near the player
+	if not LootDropper.drop_single_item(stack.item, amount):
+		print("Drop failed for ", stack.item.name, " - item kept in inventory")
+		return false
+
 	print("Dropping ", amount, "x ", stack.item.name)
-	
+
 	return remove_stack(stack, amount)
 
 # ============================================================================

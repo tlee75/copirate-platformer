@@ -18,6 +18,7 @@ class_name GameItem
 @export var target_action: String = ""        # "dig", "chop", "mine", etc.
 @export var harvest_efficiency: float = 1.0   # 0.0-1.0, chance to retrieve loot per hit
 
+var registry_key: String = ""
 var category: String = ""
 var icon: Texture2D
 var craft_requirements: Dictionary = {}

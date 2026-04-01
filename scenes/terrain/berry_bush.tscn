@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://bqjbr0fr548wk"]
 
 [ext_resource type="Script" uid="uid://cuywkiresdse3" path="res://scripts/terrain/berry_bush.gd" id="1_xykto"]
-[ext_resource type="Texture2D" uid="uid://liin03aikx5" path="res://assets/terrain/raspberry_bush_full_hit_1.png" id="2_gh1bw"]
-[ext_resource type="Texture2D" uid="uid://bfk54kbnj7bae" path="res://assets/terrain/raspberry_bush_idle_1.png" id="4_gh1bw"]
-[ext_resource type="Texture2D" uid="uid://c57xy0glcrrl8" path="res://assets/terrain/raspberry_bush_empty_idle_1.png" id="5_8alli"]
+[ext_resource type="Texture2D" uid="uid://liin03aikx5" path="res://assets/terrain/raspberry_bush/raspberry_bush_full_hit_1.png" id="2_gh1bw"]
+[ext_resource type="Texture2D" uid="uid://bfk54kbnj7bae" path="res://assets/terrain/raspberry_bush/raspberry_bush_idle_1.png" id="4_gh1bw"]
+[ext_resource type="Texture2D" uid="uid://c57xy0glcrrl8" path="res://assets/terrain/raspberry_bush/raspberry_bush_empty_idle_1.png" id="5_8alli"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_02u4t"]
 atlas = ExtResource("2_gh1bw")
@@ -228,7 +228,6 @@ radius = 39.0
 
 [node name="BerryBush" type="Node2D" unique_id=820907367]
 script = ExtResource("1_xykto")
-max_harvest = 3
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=966161551]
 scale = Vector2(0.8, 0.8)

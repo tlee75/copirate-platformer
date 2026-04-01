@@ -9,4 +9,4 @@ func _init():
 	stack_size = 99
 	category = "resource"
 	craftable = false
-	icon = load("res://assets/terrain/scallop_shell_1.png")
+	icon = load("res://assets/resources/scallop_shell_1.png")

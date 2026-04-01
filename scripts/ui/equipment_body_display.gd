@@ -116,14 +116,14 @@ func _set_button_style(button: Button, has_equipment: bool):
 
 func _get_slot_display_name(slot_type: String) -> String:
 	var display_names = {
-		"helmet": "Helmet",
+		"helmet": "Head",
 		"chest": "Chest",
 		"legs": "Legs", 
 		"feet": "Boots",
 		"main_hand": "Weapon",
 		"off_hand": "Shield",
 		"hands": "Gloves",
-		"accessory_1": "Ring"
+		"accessory_1": "Accessory"
 	}
 	return display_names.get(slot_type, slot_type.capitalize())
 

@@ -25,7 +25,10 @@ func _ready():
 
 	# Start with normal idle animation
 	if animated_sprite:
+		print('play')
 		animated_sprite.play("idle_full")
+	else:
+		print("else")
 
 	# Call parent _ready() to setup hover detection
 	super._ready()

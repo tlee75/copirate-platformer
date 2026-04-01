@@ -9,7 +9,7 @@ func _init():
 	stack_size = 99
 	category = "resource"
 	craftable = false
-	icon = load("res://assets/terrain/simple_rock_icon_01.png")
+	icon = load("res://assets/resources/simple_rock_icon_01.png")
 	fuel_value = 0
 	underwater_compatible = false
 	land_compatible = false

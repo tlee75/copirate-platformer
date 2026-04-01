@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bcbmqwa8ofwfq"]
+[gd_scene format=3 uid="uid://bcbmqwa8ofwfq"]
 
 [ext_resource type="Script" uid="uid://bb2w6ivxttklu" path="res://scripts/ui/player_menu.gd" id="1_bsps8"]
 [ext_resource type="PackedScene" uid="uid://b8kgpkram46gn" path="res://scenes/ui/inventory_category_filter.tscn" id="1_nuief"]
@@ -15,7 +15,7 @@
 [ext_resource type="Script" uid="uid://c666a3ith77qq" path="res://scripts/ui/crafting_action_panel.gd" id="12_g7xmk"]
 [ext_resource type="Script" uid="uid://cu72nxdts8spt" path="res://scripts/ui/building_action_panel.gd" id="12_w17s6"]
 
-[node name="PlayerMenu" type="Control"]
+[node name="PlayerMenu" type="Control" unique_id=1065976584]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,7 +28,7 @@ size_flags_vertical = 3
 mouse_force_pass_scroll_events = false
 script = ExtResource("1_bsps8")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=1018969471]
 self_modulate = Color(0.09803922, 0.09803922, 0.09803922, 0.9019608)
 layout_mode = 1
 anchors_preset = -1
@@ -38,7 +38,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_force_pass_scroll_events = false
 
-[node name="TabContainer" type="TabContainer" parent="."]
+[node name="TabContainer" type="TabContainer" parent="." unique_id=1248873326]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -46,54 +46,55 @@ anchor_bottom = 1.0
 offset_bottom = 4.0
 grow_horizontal = 2
 grow_vertical = 2
-current_tab = 0
+current_tab = 3
 
-[node name="Inventory" type="VBoxContainer" parent="TabContainer"]
+[node name="Inventory" type="VBoxContainer" parent="TabContainer" unique_id=35074546]
+visible = false
 layout_mode = 2
 theme_override_constants/separation = 15
 metadata/_tab_index = 0
 
-[node name="HeaderSection" type="Control" parent="TabContainer/Inventory"]
+[node name="HeaderSection" type="Control" parent="TabContainer/Inventory" unique_id=172686292]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_filter = 1
 
-[node name="InventoryCategoryFilter" parent="TabContainer/Inventory/HeaderSection" instance=ExtResource("1_nuief")]
+[node name="InventoryCategoryFilter" parent="TabContainer/Inventory/HeaderSection" unique_id=2029307281 instance=ExtResource("1_nuief")]
 layout_mode = 1
 
-[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Inventory"]
+[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Inventory" unique_id=1109574031]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="InventoryItemList" parent="TabContainer/Inventory/ContentSection" instance=ExtResource("2_bsps8")]
+[node name="InventoryItemList" parent="TabContainer/Inventory/ContentSection" unique_id=1090114544 instance=ExtResource("2_bsps8")]
 layout_mode = 2
 mouse_filter = 0
 
-[node name="InventoryItemDetail" parent="TabContainer/Inventory/ContentSection" instance=ExtResource("3_ldtye")]
+[node name="InventoryItemDetail" parent="TabContainer/Inventory/ContentSection" unique_id=780401954 instance=ExtResource("3_ldtye")]
 layout_mode = 2
 script = ExtResource("6_erru2")
 
-[node name="FooterSection" type="Control" parent="TabContainer/Inventory"]
+[node name="FooterSection" type="Control" parent="TabContainer/Inventory" unique_id=862299520]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 mouse_filter = 1
 
-[node name="InventoryActionPanel" parent="TabContainer/Inventory/FooterSection" instance=ExtResource("4_xk7lq")]
+[node name="InventoryActionPanel" parent="TabContainer/Inventory/FooterSection" unique_id=154132880 instance=ExtResource("4_xk7lq")]
 layout_mode = 1
 script = ExtResource("8_7csag")
 
-[node name="Equipment" type="VBoxContainer" parent="TabContainer"]
+[node name="Equipment" type="VBoxContainer" parent="TabContainer" unique_id=263051020]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="HeaderSection" type="Control" parent="TabContainer/Equipment"]
+[node name="HeaderSection" type="Control" parent="TabContainer/Equipment" unique_id=1193592220]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="EquipmentCategoryFilter" type="Control" parent="TabContainer/Equipment/HeaderSection"]
+[node name="EquipmentCategoryFilter" type="Control" parent="TabContainer/Equipment/HeaderSection" unique_id=1988607889]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -102,7 +103,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("9_k8kjs")
 
-[node name="Background" type="ColorRect" parent="TabContainer/Equipment/HeaderSection/EquipmentCategoryFilter"]
+[node name="Background" type="ColorRect" parent="TabContainer/Equipment/HeaderSection/EquipmentCategoryFilter" unique_id=1158012403]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -112,7 +113,7 @@ offset_bottom = 616.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CategoryContainer" type="HBoxContainer" parent="TabContainer/Equipment/HeaderSection/EquipmentCategoryFilter"]
+[node name="CategoryContainer" type="HBoxContainer" parent="TabContainer/Equipment/HeaderSection/EquipmentCategoryFilter" unique_id=1296492612]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -120,45 +121,47 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Equipment"]
+[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Equipment" unique_id=1589835372]
 layout_mode = 2
 size_flags_vertical = 3
+split_offsets = PackedInt32Array(200)
 split_offset = 200
 
-[node name="EquipmentBodyDisplay" type="Control" parent="TabContainer/Equipment/ContentSection"]
+[node name="EquipmentBodyDisplay" type="Control" parent="TabContainer/Equipment/ContentSection" unique_id=108800365]
 layout_mode = 2
 script = ExtResource("10_t0p05")
 
-[node name="RightPanelSplit" type="HSplitContainer" parent="TabContainer/Equipment/ContentSection"]
+[node name="RightPanelSplit" type="HSplitContainer" parent="TabContainer/Equipment/ContentSection" unique_id=378727846]
 layout_mode = 2
+split_offsets = PackedInt32Array(200)
 split_offset = 200
 
-[node name="EquipmentItemList" parent="TabContainer/Equipment/ContentSection/RightPanelSplit" instance=ExtResource("2_bsps8")]
+[node name="EquipmentItemList" parent="TabContainer/Equipment/ContentSection/RightPanelSplit" unique_id=761273531 instance=ExtResource("2_bsps8")]
 layout_mode = 2
 
-[node name="EquipmentItemDetail" parent="TabContainer/Equipment/ContentSection/RightPanelSplit" instance=ExtResource("3_ldtye")]
+[node name="EquipmentItemDetail" parent="TabContainer/Equipment/ContentSection/RightPanelSplit" unique_id=1435751078 instance=ExtResource("3_ldtye")]
 layout_mode = 2
 script = ExtResource("6_erru2")
 
-[node name="FooterSection" type="Control" parent="TabContainer/Equipment"]
+[node name="FooterSection" type="Control" parent="TabContainer/Equipment" unique_id=1790724511]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 
-[node name="EquipmentActionPanel" parent="TabContainer/Equipment/FooterSection" instance=ExtResource("4_xk7lq")]
+[node name="EquipmentActionPanel" parent="TabContainer/Equipment/FooterSection" unique_id=327738504 instance=ExtResource("4_xk7lq")]
 layout_mode = 1
 script = ExtResource("8_7csag")
 
-[node name="Crafting" type="VBoxContainer" parent="TabContainer"]
+[node name="Crafting" type="VBoxContainer" parent="TabContainer" unique_id=1821282078]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="HeaderSection" type="Control" parent="TabContainer/Crafting"]
+[node name="HeaderSection" type="Control" parent="TabContainer/Crafting" unique_id=964568566]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="CraftingCategoryFilter" type="Control" parent="TabContainer/Crafting/HeaderSection"]
+[node name="CraftingCategoryFilter" type="Control" parent="TabContainer/Crafting/HeaderSection" unique_id=524272086]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -167,7 +170,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("9_qxx8k")
 
-[node name="Background" type="ColorRect" parent="TabContainer/Crafting/HeaderSection/CraftingCategoryFilter"]
+[node name="Background" type="ColorRect" parent="TabContainer/Crafting/HeaderSection/CraftingCategoryFilter" unique_id=1885568562]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -177,7 +180,7 @@ offset_bottom = 616.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CategoryContainer" type="HBoxContainer" parent="TabContainer/Crafting/HeaderSection/CraftingCategoryFilter"]
+[node name="CategoryContainer" type="HBoxContainer" parent="TabContainer/Crafting/HeaderSection/CraftingCategoryFilter" unique_id=1755231235]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -185,36 +188,35 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Crafting"]
+[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Crafting" unique_id=1545959031]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CraftingItemList" parent="TabContainer/Crafting/ContentSection" instance=ExtResource("2_bsps8")]
+[node name="CraftingItemList" parent="TabContainer/Crafting/ContentSection" unique_id=1936741220 instance=ExtResource("2_bsps8")]
 layout_mode = 2
 
-[node name="CraftingItemDetail" parent="TabContainer/Crafting/ContentSection" instance=ExtResource("3_ldtye")]
+[node name="CraftingItemDetail" parent="TabContainer/Crafting/ContentSection" unique_id=31403626 instance=ExtResource("3_ldtye")]
 layout_mode = 2
 script = ExtResource("12_2drhy")
 
-[node name="FooterSection" type="Control" parent="TabContainer/Crafting"]
+[node name="FooterSection" type="Control" parent="TabContainer/Crafting" unique_id=1405196347]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 
-[node name="CraftingActionPanel" parent="TabContainer/Crafting/FooterSection" instance=ExtResource("4_xk7lq")]
+[node name="CraftingActionPanel" parent="TabContainer/Crafting/FooterSection" unique_id=1178185086 instance=ExtResource("4_xk7lq")]
 layout_mode = 1
 script = ExtResource("12_g7xmk")
 
-[node name="Building" type="VBoxContainer" parent="TabContainer"]
-visible = false
+[node name="Building" type="VBoxContainer" parent="TabContainer" unique_id=2104065070]
 layout_mode = 2
 metadata/_tab_index = 3
 
-[node name="HeaderSection" type="Control" parent="TabContainer/Building"]
+[node name="HeaderSection" type="Control" parent="TabContainer/Building" unique_id=1324790048]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="BuildingCategoryFilter" type="Control" parent="TabContainer/Building/HeaderSection"]
+[node name="BuildingCategoryFilter" type="Control" parent="TabContainer/Building/HeaderSection" unique_id=13885363]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -223,7 +225,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("12_8rsko")
 
-[node name="Background" type="ColorRect" parent="TabContainer/Building/HeaderSection/BuildingCategoryFilter"]
+[node name="Background" type="ColorRect" parent="TabContainer/Building/HeaderSection/BuildingCategoryFilter" unique_id=1609626552]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -233,7 +235,7 @@ offset_bottom = 616.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CategoryContainer" type="HBoxContainer" parent="TabContainer/Building/HeaderSection/BuildingCategoryFilter"]
+[node name="CategoryContainer" type="HBoxContainer" parent="TabContainer/Building/HeaderSection/BuildingCategoryFilter" unique_id=1120139582]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -241,21 +243,21 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Building"]
+[node name="ContentSection" type="HSplitContainer" parent="TabContainer/Building" unique_id=1917080674]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BuildingItemList" parent="TabContainer/Building/ContentSection" instance=ExtResource("2_bsps8")]
+[node name="BuildingItemList" parent="TabContainer/Building/ContentSection" unique_id=864851173 instance=ExtResource("2_bsps8")]
 layout_mode = 2
 
-[node name="BuildingItemDetail" parent="TabContainer/Building/ContentSection" instance=ExtResource("3_ldtye")]
+[node name="BuildingItemDetail" parent="TabContainer/Building/ContentSection" unique_id=1022288099 instance=ExtResource("3_ldtye")]
 layout_mode = 2
 script = ExtResource("6_erru2")
 
-[node name="FooterSection" type="Control" parent="TabContainer/Building"]
+[node name="FooterSection" type="Control" parent="TabContainer/Building" unique_id=12988690]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 
-[node name="BuildingActionPanel" parent="TabContainer/Building/FooterSection" instance=ExtResource("4_xk7lq")]
+[node name="BuildingActionPanel" parent="TabContainer/Building/FooterSection" unique_id=1883666661 instance=ExtResource("4_xk7lq")]
 layout_mode = 1
 script = ExtResource("12_w17s6")

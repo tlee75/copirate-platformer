@@ -10,7 +10,7 @@ func _init():
 	stack_size = 99
 	category = "fuel"
 	craftable = false
-	icon = load("res://assets/terrain/stick_01_48x64.png")
+	icon = load("res://assets/resources/stick_01_48x64.png")
 	fuel_value = 5
 	underwater_compatible = false
 	land_compatible = false

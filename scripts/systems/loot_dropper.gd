@@ -32,11 +32,13 @@ func _spawn_item(item_scene: PackedScene, offset_index: int, origin: Node2D) -> 
 	instance.global_position = _find_spawn_position(origin.global_position, offset_index, origin)
 	origin.get_parent().add_child(instance)
 
-func _find_spawn_position(base_pos: Vector2, offset_index: int, origin: Node2D) -> Vector2:
+func _find_spawn_position(base_pos: Vector2, offset_index: int, origin: Node2D, spread: float = 8.0, avoid_pos: Vector2 = Vector2.INF, min_distance: float = 0.0) -> Vector2:
 	for _attempt in range(20):
-		var offset = Vector2(randf_range(-8, 8) + (offset_index * 4), randf_range(-8, 8))
+		var offset = Vector2(randf_range(-spread, spread) + (offset_index * 4), randf_range(-spread, spread))
 		var test_pos = base_pos + offset
 		if _is_position_clear(test_pos, origin):
+			if avoid_pos != Vector2.INF and test_pos.distance_to(avoid_pos) < min_distance:
+				continue
 			return test_pos
 	print("LootDropper: No clear spawn position found, using origin")
 	return base_pos
@@ -53,3 +55,22 @@ func _is_position_clear(pos: Vector2, origin: Node2D) -> bool:
 		if collider is TileMap or (collider is StaticBody2D and collider != origin):
 			return false
 	return true
+
+func drop_single_item(item: GameItem, quantity: int = 1) -> bool:
+	var item_scene = GameObjectsDatabase.get_pickup_scene(item.registry_key)
+	if not item_scene:
+		print("LootDropper: No pickup scene registered for '", item.registry_key, "'")
+		return false
+	
+	var player = get_tree().get_first_node_in_group("player")
+	if not player:
+		print("LootDropper: No player found to determine drop position")
+		return false
+	
+	var instance = item_scene.instantiate()
+	instance.global_position = _find_spawn_position(player.global_position + Vector2(0, 4), 0, player, 60.0, player.global_position, 40.0)
+	if instance is Pickup:
+		instance.quantity = quantity
+	player.get_parent().add_child(instance)
+	return true
+	
