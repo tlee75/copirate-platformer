@@ -16,7 +16,7 @@ var building_action_panel
 
 # Equipment tab components
 var equipment_category_filter
-var equipment_body_display  
+var equipment_body_display
 var equipment_item_list
 var equipment_item_detail: InventoryItemDetail
 var equipment_action_panel
@@ -66,7 +66,7 @@ func _on_tab_changed(tab_index: int):
 func _setup_ui_references():
 	tab_container = $TabContainer
 	inventory_tab = $TabContainer/Inventory
-	crafting_tab = $TabContainer/Crafting
+
 	equipment_tab = $TabContainer/Equipment
 	
 	# Set up inventory tab components
@@ -144,7 +144,7 @@ func _connect_signals():
 		equipment_item_list.item_selected.connect(_on_equipment_item_selected)
 	
 	if equipment_action_panel:
-		equipment_action_panel.action_requested.connect(_on_equipment_action_requested)	
+		equipment_action_panel.action_requested.connect(_on_equipment_action_requested)
 
 	# Building tab signals
 	if building_category_filter:
@@ -178,7 +178,7 @@ func _initialize_ui():
 	if category_filter:
 		category_filter.visible = true
 	if item_list:
-		item_list.visible = true  
+		item_list.visible = true
 	if item_detail:
 		item_detail.visible = true
 	if action_panel:
@@ -198,7 +198,7 @@ func open_menu():
 	# Update input handler
 	input_handler.set_player_menu_open(true)
 	
-	tab_container.current_tab = tab_container.current_tab
+	_on_tab_changed(tab_container.current_tab)
 
 	print("Player Menu opened - Default tab: ", get_current_tab())
 
@@ -253,6 +253,9 @@ func _on_category_selected(category: String):
 
 func _on_item_selected(stack: InventoryManager.ItemStack):
 	print("DEBUG: PlayerMenu._on_item_selected called for: ", stack.item.name)
+	
+	# Mark item as viewed
+	DiscoveryManager.mark_viewed(stack.item.registry_key)
 	
 	# Update detail panel
 	if item_detail:
@@ -348,7 +351,7 @@ func get_equipment_items_by_category(category: String) -> Array:
 func _is_equipment_item(item_category: String) -> bool:
 	"""Check if an item category represents equipment"""
 	var equipment_categories = [
-		"weapon", "helmet", "chest", "armor", "legs", "hands", "feet", "arms", 
+		"weapon", "helmet", "chest", "armor", "legs", "hands", "feet", "arms",
 		"shield", "accessory"
 	]
 	return item_category in equipment_categories
@@ -405,7 +408,7 @@ func _auto_select_first_item():
 		print("DEBUG: Items in item_list: ", items.size())
 		if items.size() > 0:
 			# Only select if nothing is currently selected
-			if item_list.get_selected_stack() == null: 
+			if item_list.get_selected_stack() == null:
 				var first_item = items[0]
 				print("DEBUG: Auto-selecting first item: ", first_item.item.name)
 				item_list.set_selected_index(0)
@@ -459,6 +462,8 @@ func _on_equipment_slot_selected(slot_type: String, item_stack):
 
 func _on_equipment_item_selected(stack: InventoryManager.ItemStack):
 	print("Equipment item selected: ", stack.item.name)
+	
+	DiscoveryManager.mark_viewed(stack.item.registry_key)
 	# Update equipment item detail panel
 	if equipment_item_detail:
 		equipment_item_detail.display_item(stack)
@@ -486,8 +491,9 @@ func get_craftable_items_by_category(category: String) -> Array[InventoryManager
 		# Only include GameItems, exclude GameObjects
 		if item is GameItem and item.craftable:
 			if category == "all" or item.category == category:
-				var temp_stack = InventoryManager.ItemStack.new(item, 1)
-				craftable_items.append(temp_stack)
+				if DiscoveryManager.are_prerequisites_met(item_key):
+					var temp_stack = InventoryManager.ItemStack.new(item, 1)
+					craftable_items.append(temp_stack)
 	return craftable_items
 
 func _on_crafting_category_selected(category: String):
@@ -512,6 +518,10 @@ func _on_crafting_category_selected(category: String):
 
 func _on_crafting_item_selected(stack: InventoryManager.ItemStack):
 	print("Crafting item selected: ", stack.item.name)
+	
+	# Ensure item is marked as viewed
+	DiscoveryManager.mark_viewed(stack.item.registry_key)
+	
 	# Update crafting item detail panel
 	var crafting_item_detail = $TabContainer/Crafting/ContentSection/CraftingItemDetail
 	if crafting_item_detail:
@@ -541,6 +551,9 @@ func _on_building_category_selected(category: String):
 
 func _on_building_item_selected(structure: GameObject):
 	print("Building item selected: ", structure.name)
+	
+	# Ensure building is marked as viewed
+	DiscoveryManager.mark_viewed(structure.registry_key)
 	
 	if building_item_detail:
 		building_item_detail.display_structure(structure)

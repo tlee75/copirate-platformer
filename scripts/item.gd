@@ -25,6 +25,7 @@ var craft_requirements: Dictionary = {}
 var cooked_result_item_name: String = ""  # What this item becomes when cooked
 var use_animation = ""
 var pending_item_stack: InventoryManager.ItemStack = null
+var discovery_prerequisites: Array[String] = []
 
 func is_consumable() -> bool:
 	return false

@@ -141,9 +141,9 @@ func _display_material_icons(item_or_structure):
 		name_label.add_theme_font_size_override("font_size", 10)
 		card.add_child(name_label)
 		
-		# Count label: "needed / available"
+		# Count label: "available / needed"
 		var count_label = Label.new()
-		count_label.text = str(required) + " / " + str(available)
+		count_label.text = str(available) + " / " + str(required)
 		count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		count_label.add_theme_font_size_override("font_size", 10)
 		if not has_enough:

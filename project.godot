@@ -31,6 +31,7 @@ CraftingManager="*res://scripts/systems/crafting_manager.gd"
 LootDropper="*uid://cujj30rbfwk60"
 NotificationManager="*uid://d3sd02xeb0tyr"
 GDAIMCPRuntime="*uid://dcne7ryelpxmn"
+DiscoveryManager="*uid://c4od0cq3ppo6x"
 
 [display]
 

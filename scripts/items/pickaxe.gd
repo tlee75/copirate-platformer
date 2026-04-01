@@ -20,3 +20,5 @@ func _init():
 	is_tool = true
 	harvest_efficiency = 0.5
 	target_action = "mine"
+	discovery_prerequisites = ["simple_rock", "stick"]
+	

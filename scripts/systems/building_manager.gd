@@ -8,7 +8,8 @@ func get_buildable_structures() -> Array[GameObject]:
 	for item_key in GameObjectsDatabase.game_objects_database:
 		var item = GameObjectsDatabase.game_objects_database[item_key]
 		if item is GameObject and item.craftable:
-			buildable_structures.append(item)
+			if DiscoveryManager.are_prerequisites_met(item_key):
+				buildable_structures.append(item)
 	return buildable_structures
 
 func get_buildable_structures_by_category(category: String) -> Array[GameObject]:
@@ -17,7 +18,8 @@ func get_buildable_structures_by_category(category: String) -> Array[GameObject]
 		var item = GameObjectsDatabase.game_objects_database[item_key]
 		if item is GameObject and item.craftable:
 			if category == "all" or item.category == category:
-				buildable_structures.append(item)
+				if DiscoveryManager.are_prerequisites_met(item_key):
+					buildable_structures.append(item)
 	return buildable_structures
 
 func has_build_materials(structure: GameObject) -> bool:

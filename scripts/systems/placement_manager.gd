@@ -53,6 +53,7 @@ func confirm_structure_placement():
 			var required = preview_structure_data.craft_requirements[resource_name]
 			InventoryManager.remove_items_by_name(resource_name, required)
 		preview_instance.modulate = Color(1, 1, 1, 1) # make fully visible
+		DiscoveryManager.discover(preview_structure_data.registry_key)
 		preview_instance = null
 		preview_structure_data = null
 		placement_active = false

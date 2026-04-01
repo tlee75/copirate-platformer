@@ -704,6 +704,8 @@ func add_loot(item_name: String, amount: int):
 	var game_item = GameObjectsDatabase.game_objects_database[item_name]
 	if InventoryManager.add_item(game_item, amount):
 		NotificationManager.notify(NotificationManager.NotificationType.ITEM_PICKUP, "pickup_" + item_name, "Picked up " + game_item.name)
+		DiscoveryManager.discover(item_name)
+		
 		# Find the stack for this item
 		var stack = InventoryManager.find_item_stack(game_item.name)
 		if stack and not stack.is_in_quick_access():

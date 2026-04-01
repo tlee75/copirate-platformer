@@ -17,6 +17,8 @@ var _last_target_action: String = ""
 # Core properties
 var category: String = ""
 var description: String = ""
+var registry_key: String = ""
+var discovery_prerequisites: Array[String] = []
 
 # Crafting properties (only used by structures)
 var craftable: bool = false

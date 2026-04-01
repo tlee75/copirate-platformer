@@ -37,9 +37,10 @@ func _register_structures_from_dir(path: String):
 			var structure_script = load(path + "/" + file)
 			var structure_instance = structure_script.new()
 			var key = file.get_basename()
+			structure_instance.registry_key = key
 			game_objects_database[key] = structure_instance
 	for subdir in dir.get_directories():
-		_register_items_from_dir(path + "/" + subdir)
+		_register_structures_from_dir(path + "/" + subdir)
 
 func _register_pickup_scenes(path: String):
 	var dir = DirAccess.open(path)

@@ -24,7 +24,7 @@ func _init():
 	craft_requirements = {"Simple Rock": 1}
 	scene_path = "res://scenes/structures/firepit.tscn"
 	placement_bottom_padding = -4.0  # Pixels to adjust bottom alignment
-
+	discovery_prerequisites = ["simple_rock"]
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

@@ -93,6 +93,9 @@ func refresh_display():
 			sep.color = Color(0.5, 0.5, 0.5, 0.5) # semi-transparent gray
 			sep.custom_minimum_size = Vector2(2, 60) # 2px wide, match button height
 			item_container.add_child(sep)
+		
+	# Reapply selection visual after rebuilding buttons
+	_update_selection_visual()
 
 func _create_slot_button(slot_index: int) -> Button:
 	"""Create individual slot button following dynamic paradigm"""
@@ -100,7 +103,7 @@ func _create_slot_button(slot_index: int) -> Button:
 	
 	# Set button properties
 	button.custom_minimum_size = Vector2(60, 60)
-	button.flat = true
+	button.flat = false
 	button.toggle_mode = false
 	
 	# Connect button signal
@@ -142,7 +145,7 @@ func _update_slot_button(button: Button, stack: InventoryManager.ItemStack, slot
 					img.resize(new_w, new_h, Image.INTERPOLATE_LANCZOS)
 					icon_texture = ImageTexture.create_from_image(img)
 			button.icon = icon_texture
-			button.text = "" 
+			button.text = ""
 		else:
 			button.text = ""
 	else:
@@ -199,12 +202,34 @@ func _update_selection_visual():
 		var button = slot_buttons[i]
 		if button:
 			if i == selected_slot:
-				# Selected appearance
-				button.add_theme_color_override("font_color", Color.YELLOW)
-				button.grab_focus()  
-				# TODO: Add border or background highlight
+				# Selected appearance - use a persistent border style
+				var style = StyleBoxFlat.new()
+				style.bg_color = Color(0.2, 0.2, 0.2, 0.4)
+				style.border_color = Color(1.0, 1.0, 1.0, 1.0)  # Yellow/gold border
+				style.border_width_left = 2
+				style.border_width_right = 2
+				style.border_width_top = 2
+				style.border_width_bottom = 2
+				style.corner_radius_top_left = 4
+				style.corner_radius_top_right = 4
+				style.corner_radius_bottom_left = 4
+				style.corner_radius_bottom_right = 4
+				style.content_margin_left = 2
+				style.content_margin_right = 2
+				style.content_margin_top = 2
+				style.content_margin_bottom = 2
+				button.add_theme_stylebox_override("normal", style)
+				button.add_theme_color_override("font_color", Color.WHITE)
 			else:
-				# Normal appearance
+				# Normal appearance - transparent background
+				var empty_style = StyleBoxFlat.new()
+				empty_style.bg_color = Color(0, 0, 0, 0)
+				empty_style.border_color = Color(0, 0, 0, 0)
+				empty_style.content_margin_left = 2
+				empty_style.content_margin_right = 2
+				empty_style.content_margin_top = 2
+				empty_style.content_margin_bottom = 2
+				button.add_theme_stylebox_override("normal", empty_style)
 				button.remove_theme_color_override("font_color")
 
 func get_selected_stack() -> InventoryManager.ItemStack:

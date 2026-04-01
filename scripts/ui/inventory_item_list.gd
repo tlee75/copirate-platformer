@@ -89,9 +89,22 @@ func _create_structure_button(structure: GameObject, index: int) -> Control:
 	if structure.icon:
 		button.icon = structure.icon
 	
+	# Highlight unviewed structures with a left border
+	if not DiscoveryManager.is_viewed(structure.registry_key):
+		var style = StyleBoxFlat.new()
+		style.bg_color = Color(0.15, 0.15, 0.15, 0.6)
+		style.border_color = Color(1.0, 0.85, 0.0, 1.0)  # Gold/yellow
+		style.border_width_left = 3
+		style.border_width_right = 0
+		style.border_width_top = 0
+		style.border_width_bottom = 0
+		style.content_margin_left = 8
+		button.add_theme_stylebox_override("normal", style)
+	
 	button.pressed.connect(func():
 		print("DEBUG: Structure button pressed for ", structure.name, " at index ", index)
 		selected_index = index
+		button.remove_theme_stylebox_override("normal")
 		structure_selected.emit(structure)
 	)
 	return button
@@ -136,6 +149,18 @@ func _create_item_button(stack: InventoryManager.ItemStack, index: int) -> Contr
 	button.custom_minimum_size = Vector2(0, 64)
 	if stack.item and stack.item.icon:
 		button.icon = stack.item.icon
+
+	# Highlight unviewed items with a left border
+	if stack.item and not DiscoveryManager.is_viewed(stack.item.registry_key):
+		var style = StyleBoxFlat.new()
+		style.bg_color = Color(0.15, 0.15, 0.15, 0.6)
+		style.border_color = Color(1.0, 0.85, 0.0, 1.0)  # Gold/yellow
+		style.border_width_left = 3
+		style.border_width_right = 0
+		style.border_width_top = 0
+		style.border_width_bottom = 0
+		style.content_margin_left = 8
+		button.add_theme_stylebox_override("normal", style)
 	
 	# Add comprehensive mouse event tracking
 	button.pressed.connect(func():
@@ -167,6 +192,9 @@ func _on_item_selected(index: int):
 	print("DEBUG: _on_item_selected called with index: ", index)
 	if index >= 0 and index < current_items.size():
 		selected_index = index
+		# Clear unviewed indicator on the clicked button
+		if index < item_buttons.size() and is_instance_valid(item_buttons[index]):
+			item_buttons[index].remove_theme_stylebox_override("normal")
 		print("DEBUG: Emitting item_selected signal for: ", current_items[index].item.name)
 		item_selected.emit(current_items[index])
 	else:
