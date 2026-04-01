@@ -2,11 +2,13 @@ extends Node
 
 var game_objects_database: Dictionary = {}
 var pickup_scenes: Dictionary = {}
+var items_by_name: Dictionary = {}
 
 func _ready():
 	_register_items_from_dir("res://scripts/items")
 	_register_structures_from_dir("res://scripts/structures")
 	_register_pickup_scenes("res://scenes/items")
+	_build_name_lookup()
 	print("Registered game objects: ", game_objects_database.keys())
 	print("Registered pickup scenes: ", pickup_scenes.keys())
 
@@ -51,3 +53,12 @@ func _register_pickup_scenes(path: String):
 
 func get_pickup_scene(registry_key: String) -> PackedScene:
 	return pickup_scenes.get(registry_key, null)
+
+func _build_name_lookup():
+	for key in game_objects_database:
+		var item = game_objects_database[key]
+		if item is GameItem:
+			items_by_name[item.name] = item
+
+func get_item_by_name(display_name: String) -> GameItem:
+	return items_by_name.get(display_name, null)

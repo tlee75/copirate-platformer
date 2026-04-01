@@ -30,6 +30,7 @@ BuildingManager="*res://scripts/systems/building_manager.gd"
 CraftingManager="*res://scripts/systems/crafting_manager.gd"
 LootDropper="*uid://cujj30rbfwk60"
 NotificationManager="*uid://d3sd02xeb0tyr"
+GDAIMCPRuntime="*uid://dcne7ryelpxmn"
 
 [display]
 

@@ -7,8 +7,7 @@ var item_category: Label
 var quantity_label: Label
 var stack_size_label: Label
 var status_label: Label
-var description_text: RichTextLabel
-
+var description_text: Label
 var current_stack: InventoryManager.ItemStack
 var input_handler: PlayerInputHandler
 
@@ -23,7 +22,7 @@ func _setup_ui_references():
 	quantity_label = $MainContainer/StatsContainer/QuantityLabel
 	stack_size_label = $MainContainer/StatsContainer/StackSizeLabel
 	status_label = $MainContainer/StatsContainer/StatusLabel
-	description_text = $MainContainer/DescriptionContainer/DescriptionText
+	description_text = $MainContainer/DescriptionContainer/DescriptionScroll/DescriptionText
 
 func _setup_empty_state():
 	_clear_display()
@@ -62,12 +61,7 @@ func display_item_or_structure(object, is_structure: bool = false):
 		display_craft_requirements(display_obj)
 	else:
 		display_item_stats(object)
-		# Check if item is craftable and show requirements
-		if display_obj.craftable and display_obj.craft_requirements.size() > 0:
-			display_craft_requirements(display_obj)
-		else:
-			# For non-craftable items, use the existing _set_item_description method
-			_set_item_description(display_obj)
+		_set_item_description(display_obj)
 	
 	visible = true
 
@@ -135,7 +129,7 @@ class StructureWrapper:
 	var icon:
 		get: return structure.icon
 	var name:
-		get: return structure.name  
+		get: return structure.name
 	var description:
 		get: return structure.description
 	var category:
@@ -144,38 +138,7 @@ class StructureWrapper:
 		get: return structure.craft_requirements
 
 func _set_item_description(item: GameItem):
-	var description = ""
-	
-	# Add the item's own description first
-	if item.description != "":
-		description += item.description + "\n\n"
-	else:
-		description += "[i]A " + item.category + " item.[/i]\n\n"
-	
-	# Add technical details
-	description += "[b]Technical Details:[/b]\n"
-	description += "• Stack Size: " + str(item.stack_size) + "\n"
-	
-	if "damage" in item and item.damage > 0:
-		description += "• Damage: " + str(item.damage) + "\n"
-	
-	if "underwater_compatible" in item:
-		description += "• Underwater Use: " + ("Yes" if item.underwater_compatible else "No") + "\n"
-	
-	if "land_compatible" in item:
-		description += "• Land Use: " + ("Yes" if item.land_compatible else "No") + "\n"
-	
-	# Add action information if input handler available
-	if input_handler and current_stack:
-		description += "\n[b]Available Actions:[/b]\n"
-		var actions = input_handler.get_available_actions_for_stack(current_stack)
-		for action in actions:
-			var action_text = "• " + action.label
-			if action.input_hint != "":
-				action_text += " [color=gray](" + action.input_hint + ")[/color]"
-			description += action_text + "\n"
-	
-	description_text.text = description
+	description_text.text = item.description if item.description != "" else "A " + item.category + " item."
 
 func _clear_display():
 	item_name.text = "No Item Selected"
@@ -183,7 +146,7 @@ func _clear_display():
 	quantity_label.text = ""
 	stack_size_label.visible = false
 	status_label.visible = false
-	description_text.text = "[i]Select an item to view its details.[/i]"
+	description_text.text = "Select an item to view its details."
 	current_stack = null
 	
 	# Clear icon
@@ -203,7 +166,7 @@ func clear_display():
 	$MainContainer/StatsContainer/QuantityLabel.text = ""
 	$MainContainer/StatsContainer/StackSizeLabel.text = ""
 	$MainContainer/StatsContainer/StatusLabel.text = ""
-	$MainContainer/DescriptionContainer/DescriptionText.text = ""
+	description_text.text = ""
 	visible = false
 
 func display_item_stats(object):

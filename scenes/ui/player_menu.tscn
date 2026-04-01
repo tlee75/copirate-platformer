@@ -199,6 +199,29 @@ layout_mode = 2
 layout_mode = 2
 script = ExtResource("12_2drhy")
 
+[node name="MaterialsSeparator" type="HSeparator" parent="TabContainer/Crafting/ContentSection/CraftingItemDetail/MainContainer/DescriptionContainer" parent_id_path=PackedInt32Array(31403626, 570756268) index="1" unique_id=737296020]
+layout_mode = 2
+
+[node name="MaterialsSection" type="VBoxContainer" parent="TabContainer/Crafting/ContentSection/CraftingItemDetail/MainContainer/DescriptionContainer" parent_id_path=PackedInt32Array(31403626, 570756268) index="2" unique_id=1032184133]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MaterialsTitle" type="Label" parent="TabContainer/Crafting/ContentSection/CraftingItemDetail/MainContainer/DescriptionContainer/MaterialsSection" unique_id=523485550]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Required Materials"
+
+[node name="MaterialsScrollContainer" type="ScrollContainer" parent="TabContainer/Crafting/ContentSection/CraftingItemDetail/MainContainer/DescriptionContainer/MaterialsSection" unique_id=730076693]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="MaterialsGrid" type="HFlowContainer" parent="TabContainer/Crafting/ContentSection/CraftingItemDetail/MainContainer/DescriptionContainer/MaterialsSection/MaterialsScrollContainer" unique_id=1247750289]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 8
+
 [node name="FooterSection" type="Control" parent="TabContainer/Crafting" unique_id=1405196347]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
@@ -252,7 +275,30 @@ layout_mode = 2
 
 [node name="BuildingItemDetail" parent="TabContainer/Building/ContentSection" unique_id=1022288099 instance=ExtResource("3_ldtye")]
 layout_mode = 2
-script = ExtResource("6_erru2")
+script = ExtResource("12_2drhy")
+
+[node name="HSeparator" type="HSeparator" parent="TabContainer/Building/ContentSection/BuildingItemDetail/MainContainer/DescriptionContainer" parent_id_path=PackedInt32Array(1022288099, 570756268) index="1" unique_id=1017187865]
+layout_mode = 2
+
+[node name="MaterialsSection" type="VBoxContainer" parent="TabContainer/Building/ContentSection/BuildingItemDetail/MainContainer/DescriptionContainer" parent_id_path=PackedInt32Array(1022288099, 570756268) index="2" unique_id=1948049267]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MaterialsTitle" type="Label" parent="TabContainer/Building/ContentSection/BuildingItemDetail/MainContainer/DescriptionContainer/MaterialsSection" unique_id=442174495]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Required Materials"
+
+[node name="MaterialsScrollContainer" type="ScrollContainer" parent="TabContainer/Building/ContentSection/BuildingItemDetail/MainContainer/DescriptionContainer/MaterialsSection" unique_id=760705766]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="MaterialsGrid" type="HFlowContainer" parent="TabContainer/Building/ContentSection/BuildingItemDetail/MainContainer/DescriptionContainer/MaterialsSection/MaterialsScrollContainer" unique_id=175511776]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 8
 
 [node name="FooterSection" type="Control" parent="TabContainer/Building" unique_id=12988690]
 custom_minimum_size = Vector2(0, 80)
@@ -261,3 +307,6 @@ layout_mode = 2
 [node name="BuildingActionPanel" parent="TabContainer/Building/FooterSection" unique_id=1883666661 instance=ExtResource("4_xk7lq")]
 layout_mode = 1
 script = ExtResource("12_w17s6")
+
+[editable path="TabContainer/Crafting/ContentSection/CraftingItemDetail"]
+[editable path="TabContainer/Building/ContentSection/BuildingItemDetail"]

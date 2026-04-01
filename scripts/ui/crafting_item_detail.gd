@@ -7,8 +7,9 @@ var item_category: Label
 var quantity_label: Label
 var stack_size_label: Label
 var status_label: Label
-var description_text: RichTextLabel
-
+var description_text: Label
+var materials_section: VBoxContainer
+var materials_grid: HFlowContainer
 var current_stack: InventoryManager.ItemStack
 var input_handler: PlayerInputHandler
 
@@ -23,7 +24,9 @@ func _setup_ui_references():
 	quantity_label = $MainContainer/StatsContainer/QuantityLabel
 	stack_size_label = $MainContainer/StatsContainer/StackSizeLabel
 	status_label = $MainContainer/StatsContainer/StatusLabel
-	description_text = $MainContainer/DescriptionContainer/DescriptionText
+	description_text = $MainContainer/DescriptionContainer/DescriptionScroll/DescriptionText
+	materials_section = $MainContainer/DescriptionContainer/MaterialsSection
+	materials_grid = $MainContainer/DescriptionContainer/MaterialsSection/MaterialsScrollContainer/MaterialsGrid
 
 func _setup_empty_state():
 	_clear_display()
@@ -50,7 +53,7 @@ func display_item_or_structure(object, is_structure: bool = false):
 	var display_obj = object
 	if object is InventoryManager.ItemStack:
 		display_obj = object.item
-		current_stack = object  # Store the stack reference
+		current_stack = object
 	
 	# Basic info
 	$MainContainer/ItemHeader/IconNameContainer/ItemIcon.texture = display_obj.icon
@@ -59,15 +62,18 @@ func display_item_or_structure(object, is_structure: bool = false):
 	
 	if is_structure:
 		display_structure_stats(display_obj)
-		display_craft_requirements(display_obj)
 	else:
 		display_item_stats(object)
-		# Check if item is craftable and show requirements
-		if display_obj.craftable and display_obj.craft_requirements.size() > 0:
-			display_craft_requirements(display_obj)
-		else:
-			# For non-craftable items, use the existing _set_item_description method
-			_set_item_description(display_obj)
+	
+	# Description goes in the top RichTextLabel
+	_set_description_text(display_obj, is_structure)
+	
+	# Materials go in the bottom icon grid
+	if display_obj.craft_requirements.size() > 0:
+		_display_material_icons(display_obj)
+		materials_section.visible = true
+	else:
+		materials_section.visible = false
 	
 	visible = true
 
@@ -82,48 +88,71 @@ func display_structure_stats(structure):
 	$MainContainer/StatsContainer/StatusLabel.text = status_text
 	$MainContainer/StatsContainer/StatusLabel.visible = true
 
-func display_craft_requirements(item_or_structure):
-	var desc_text = ""
-	
-	# First, show the item's own description (only for GameItems, not structures)
-	if item_or_structure is GameItem:
-		if item_or_structure.description != "":
-			desc_text += item_or_structure.description + "\n\n"
-		elif item_or_structure.has_method("get_description"):
-			desc_text += item_or_structure.get_description() + "\n\n"
-		
-		# Add technical details for GameItems
-		desc_text += "[b]Technical Details:[/b]\n"
-		desc_text += "• Stack Size: " + str(item_or_structure.stack_size) + "\n"
-		
-		if "damage" in item_or_structure and item_or_structure.damage > 0:
-			desc_text += "• Damage: " + str(item_or_structure.damage) + "\n"
-		
-		if "underwater_compatible" in item_or_structure:
-			desc_text += "• Underwater Use: " + ("Yes" if item_or_structure.underwater_compatible else "No") + "\n"
-		
-		if "land_compatible" in item_or_structure:
-			desc_text += "• Land Use: " + ("Yes" if item_or_structure.land_compatible else "No") + "\n"
-		
-		desc_text += "\n"
-	else:
-		# For structures (StructureWrapper), show basic info
-		if item_or_structure.has_method("get_description"):
-			desc_text += item_or_structure.get_description() + "\n\n"
-		elif "description" in item_or_structure and item_or_structure.description != "":
-			desc_text += item_or_structure.description + "\n\n"
+func _set_description_text(display_obj, is_structure: bool):
+	if is_structure:
+		if "description" in display_obj and display_obj.description != "":
+			description_text.text = display_obj.description
+		elif display_obj.has_method("get_description"):
+			description_text.text = display_obj.get_description()
 		else:
-			desc_text += "A buildable structure.\n\n"
+			description_text.text = "A buildable structure."
+	elif display_obj is GameItem:
+		if display_obj.description != "":
+			description_text.text = display_obj.description
+		elif display_obj.has_method("get_description"):
+			description_text.text = display_obj.get_description()
+		else:
+			description_text.text = "A " + display_obj.category + " item."
+
+func _display_material_icons(item_or_structure):
+	# Clear previous material cards
+	for child in materials_grid.get_children():
+		child.queue_free()
 	
-	# Add craft requirements (works for both GameItems and structures)
-	desc_text += "[b]Required Materials:[/b]\n"
 	for material_name in item_or_structure.craft_requirements:
 		var required = item_or_structure.craft_requirements[material_name]
 		var available = InventoryManager.get_total_item_count(material_name)
-		var status_icon = "✓" if available >= required else "✗"
-		desc_text += status_icon + " " + str(required) + "x " + material_name + " (" + str(available) + " available)\n"
-	
-	$MainContainer/DescriptionContainer/DescriptionText.text = desc_text
+		var has_enough = available >= required
+		
+		# Build a material card
+		var card = VBoxContainer.new()
+		card.custom_minimum_size = Vector2(64, 88)
+		card.alignment = BoxContainer.ALIGNMENT_CENTER
+		
+		# Icon with green/red modulate
+		var icon_container = CenterContainer.new()
+		var icon_rect = TextureRect.new()
+		icon_rect.custom_minimum_size = Vector2(32, 32)
+		icon_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		
+		# Look up the item icon from the pre-built dictionary
+		var material_item = GameObjectsDatabase.get_item_by_name(material_name)
+		if material_item and material_item.icon:
+			icon_rect.texture = material_item.icon
+		
+		icon_container.add_child(icon_rect)
+		card.add_child(icon_container)
+		
+		# Material name label
+		var name_label = Label.new()
+		name_label.text = material_name
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.add_theme_font_size_override("font_size", 10)
+		card.add_child(name_label)
+		
+		# Count label: "needed / available"
+		var count_label = Label.new()
+		count_label.text = str(required) + " / " + str(available)
+		count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		count_label.add_theme_font_size_override("font_size", 10)
+		if not has_enough:
+			count_label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3))
+		else:
+			count_label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
+		card.add_child(count_label)
+		
+		materials_grid.add_child(card)
 
 # Helper wrapper class to make structures compatible with existing display logic
 class StructureWrapper:
@@ -143,51 +172,24 @@ class StructureWrapper:
 	var craft_requirements:
 		get: return structure.craft_requirements
 
-func _set_item_description(item: GameItem):
-	var description = ""
-	
-	# Add the item's own description first
-	if item.description != "":
-		description += item.description + "\n\n"
-	else:
-		description += "[i]A " + item.category + " item.[/i]\n\n"
-	
-	# Add technical details
-	description += "[b]Technical Details:[/b]\n"
-	description += "• Stack Size: " + str(item.stack_size) + "\n"
-	
-	if "damage" in item and item.damage > 0:
-		description += "• Damage: " + str(item.damage) + "\n"
-	
-	if "underwater_compatible" in item:
-		description += "• Underwater Use: " + ("Yes" if item.underwater_compatible else "No") + "\n"
-	
-	if "land_compatible" in item:
-		description += "• Land Use: " + ("Yes" if item.land_compatible else "No") + "\n"
-	
-	# Add action information if input handler available
-	if input_handler and current_stack:
-		description += "\n[b]Available Actions:[/b]\n"
-		var actions = input_handler.get_available_actions_for_stack(current_stack)
-		for action in actions:
-			var action_text = "• " + action.label
-			if action.input_hint != "":
-				action_text += " [color=gray](" + action.input_hint + ")[/color]"
-			description += action_text + "\n"
-	
-	description_text.text = description
-
 func _clear_display():
 	item_name.text = "No Item Selected"
 	item_category.text = ""
 	quantity_label.text = ""
 	stack_size_label.visible = false
 	status_label.visible = false
-	description_text.text = "[i]Select an item to view its details.[/i]"
+	description_text.text = "Select an item to view its details."
 	current_stack = null
 	
 	# Clear icon
 	item_icon.texture = null
+	
+	# Clear material cards
+	if materials_grid:
+		for child in materials_grid.get_children():
+			child.queue_free()
+	if materials_section:
+		materials_section.visible = false
 
 func refresh_display():
 	if current_stack:
@@ -203,7 +205,14 @@ func clear_display():
 	$MainContainer/StatsContainer/QuantityLabel.text = ""
 	$MainContainer/StatsContainer/StackSizeLabel.text = ""
 	$MainContainer/StatsContainer/StatusLabel.text = ""
-	$MainContainer/DescriptionContainer/DescriptionText.text = ""
+	description_text.text = ""
+
+	# Clear material cards
+	if materials_grid:
+		for child in materials_grid.get_children():
+			child.queue_free()
+	if materials_section:
+		materials_section.visible = false
 	visible = false
 
 func display_item_stats(object):
