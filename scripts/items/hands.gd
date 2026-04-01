@@ -16,3 +16,4 @@ func _init():
 	land_compatible = true
 	underwater_compatible = true
 	harvest_efficiency = 1.0
+	droppable = false

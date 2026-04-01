@@ -17,14 +17,14 @@ func _setup_ui_references():
 func set_input_handler(handler: PlayerInputHandler):
 	input_handler = handler
 
-func display_actions_for_item(stack: InventoryManager.ItemStack, context: Dictionary = {}):
+func display_actions_for_item(stack: InventoryManager.ItemStack, _context: Dictionary = {}):
 	current_stack = stack
 	_clear_action_buttons()
 	
 	if not stack or not input_handler:
 		return
 	
-	var actions = input_handler.get_available_actions_for_stack(stack, context)
+	var actions = input_handler.get_available_actions_for_stack(stack)
 	_create_action_buttons(actions)
 
 func _clear_action_buttons():

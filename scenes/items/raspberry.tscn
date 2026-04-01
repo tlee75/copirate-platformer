@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://81iityq5w6h5"]
+
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_wnke0"]
+[ext_resource type="Texture2D" uid="uid://bv1v37vqke8ee" path="res://assets/consumables/raspberry_icon_01.png" id="2_wnke0"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_w26n2"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oscb5"]
+atlas = ExtResource("2_wnke0")
+region = Rect2(0, 0, 16, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hhyfn"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oscb5")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 1.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xxnk7"]
+
+[node name="Raspberry" type="RigidBody2D" unique_id=1029079583]
+collision_layer = 8
+script = ExtResource("1_wnke0")
+idle_animation = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=863372043]
+position = Vector2(-1.1920929e-07, 4)
+rotation = 0.6632251
+scale = Vector2(0.99999994, 0.99999994)
+shape = SubResource("CircleShape2D_w26n2")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1709785156]
+z_index = 1
+sprite_frames = SubResource("SpriteFrames_hhyfn")
+animation = &"idle"
+
+[node name="PickupArea" type="Area2D" parent="." unique_id=37615427]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=1584704745]
+position = Vector2(-1.1920929e-07, 4)
+rotation = 0.6632251
+scale = Vector2(0.99999976, 0.99999976)
+shape = SubResource("CircleShape2D_xxnk7")

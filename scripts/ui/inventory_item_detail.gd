@@ -88,6 +88,7 @@ func clear_display():
 	description_text.text = ""
 	visible = false
 
+@warning_ignore("unused_parameter")
 func display_item_stats(object):
 	# Implement your item stats display logic here
 	pass

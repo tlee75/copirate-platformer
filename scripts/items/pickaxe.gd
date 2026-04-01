@@ -14,11 +14,10 @@ func _init():
 	category = "tool"
 	underwater_compatible = false
 	land_compatible = true
-	craft_requirements = {"Gold Coin": 3}
+	material_requirements = {"gold_coin": 3}
 	craft_time = 5.0  # seconds to craft
 	use_animation = "pickaxe_attack"
 	is_tool = true
 	harvest_efficiency = 0.5
 	target_action = "mine"
-	discovery_prerequisites = ["simple_rock", "stick"]
 	

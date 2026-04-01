@@ -33,15 +33,12 @@ func are_prerequisites_met(registry_key: String) -> bool:
 	var game_object = GameObjectsDatabase.game_objects_database.get(registry_key, null)
 	if not game_object:
 		return true
-	
-	if not "discovery_prerequisites" in game_object:
+	if not "material_requirements" in game_object:
 		return true
-	
-	var prerequisites = game_object.discovery_prerequisites
-	if prerequisites.is_empty():
+	var requirements = game_object.material_requirements
+	if requirements.is_empty():
 		return true
-	
-	for prereq_key in prerequisites:
-		if not is_discovered(prereq_key):
+	for material_key in requirements:
+		if not is_discovered(material_key):
 			return false
 	return true

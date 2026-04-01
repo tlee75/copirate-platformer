@@ -186,10 +186,6 @@ func _update_status_display():
 	if current_object.has_method("get_current_state_description"):
 		status_text = current_object.get_current_state_description()
 	
-	# Add fuel/inventory info
-	if interactive_obj:
-		var fuel_count = interactive_obj.get_item_count("Stick")  # Example fuel item
-	
 	status_label.text = status_text
 
 func _on_action_button_pressed(action_name: String):
@@ -309,11 +305,11 @@ func _connect_object_signals():
 		if not current_object.fuel_consumed.is_connected(_on_fuel_consumed):
 			current_object.fuel_consumed.connect(_on_fuel_consumed)
 
-func _on_object_state_changed(new_state: int, description: String):
+func _on_object_state_changed(_new_state: int, _description: String):
 	"""Handle object state changes"""
 	_update_status_display()
 	_update_action_buttons()
 
-func _on_fuel_consumed(remaining_time: float):
+func _on_fuel_consumed(_remaining_time: float):
 	"""Handle fuel consumption updates"""
 	_update_status_display()

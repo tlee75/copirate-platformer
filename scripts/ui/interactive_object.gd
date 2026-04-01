@@ -69,7 +69,7 @@ func _has_space_for_item(item: GameItem, amount: int = 1) -> bool:
 	
 	# Check if we have empty slots for new stacks
 	var empty_slots = inventory_slots - inventory.size()
-	var stacks_needed = (remaining + item.stack_size - 1) / item.stack_size
+	var stacks_needed = (remaining + item.stack_size - 1.0) / item.stack_size
 	
 	return empty_slots >= stacks_needed
 

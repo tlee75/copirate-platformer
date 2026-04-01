@@ -8,9 +8,9 @@ func can_craft_item(item: GameItem) -> bool:
 		return false
 	
 	# Check if player has required materials
-	for material_name in item.craft_requirements:
-		var required = item.craft_requirements[material_name]
-		var available = InventoryManager.get_total_item_count(material_name)
+	for material_key in item.material_requirements:
+		var required = item.material_requirements[material_key]
+		var available = InventoryManager.get_total_item_count_by_key(material_key)
 		if available < required:
 			return false
 	return true
@@ -21,9 +21,9 @@ func craft_item(item: GameItem) -> bool:
 		return false
 	
 	# Consume materials
-	for material_name in item.craft_requirements:
-		var required = item.craft_requirements[material_name]
-		InventoryManager.remove_items_by_name(material_name, required)
+	for material_key in item.material_requirements:
+		var required = item.material_requirements[material_key]
+		InventoryManager.remove_items_by_key(material_key, required)
 	
 	# Add crafted item to inventory
 	InventoryManager.add_item(item, 1)

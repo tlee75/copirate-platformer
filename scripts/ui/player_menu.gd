@@ -503,7 +503,7 @@ func _on_crafting_category_selected(category: String):
 	var craftable_items = get_craftable_items_by_category(category)
 	
 	# Update crafting item list
-	var crafting_item_list = $TabContainer/Crafting/ContentSection/CraftingItemList
+	crafting_item_list = $TabContainer/Crafting/ContentSection/CraftingItemList
 	if crafting_item_list and crafting_item_list.has_method("refresh_items"):
 		crafting_item_list.refresh_items(craftable_items)
 		print("Updated crafting list with ", craftable_items.size(), " items")
@@ -523,12 +523,12 @@ func _on_crafting_item_selected(stack: InventoryManager.ItemStack):
 	DiscoveryManager.mark_viewed(stack.item.registry_key)
 	
 	# Update crafting item detail panel
-	var crafting_item_detail = $TabContainer/Crafting/ContentSection/CraftingItemDetail
+	crafting_item_detail = $TabContainer/Crafting/ContentSection/CraftingItemDetail
 	if crafting_item_detail:
 		crafting_item_detail.display_item(stack)
 	
 	# Update crafting action panel (if you want craft buttons)
-	var crafting_action_panel = $TabContainer/Crafting/FooterSection/CraftingActionPanel
+	crafting_action_panel = $TabContainer/Crafting/FooterSection/CraftingActionPanel
 	if crafting_action_panel:
 		crafting_action_panel.display_actions_for_item(stack, {"crafting_mode": true})
 

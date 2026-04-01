@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bgipw05toj78w" path="res://scripts/main_scene.gd" id="1_4bgka"]
 [ext_resource type="PackedScene" uid="uid://d2jekmqnix52y" path="res://scenes/player.tscn" id="2_02d50"]
-[ext_resource type="PackedScene" uid="uid://dj61g2jpyma7a" path="res://scenes/items/background.tscn" id="2_pgk25"]
+[ext_resource type="PackedScene" uid="uid://dj61g2jpyma7a" path="res://scenes/background.tscn" id="2_lhwp2"]
 [ext_resource type="Texture2D" uid="uid://4io08vc866pq" path="res://assets/terrain/tiles/surface_water_32x32_2.png" id="4_k67gn"]
 [ext_resource type="Texture2D" uid="uid://rn4b115e07qc" path="res://assets/terrain/tiles/ground_06_32x32.png" id="4_kkokr"]
 [ext_resource type="Script" uid="uid://2x7cp60c8y67" path="res://scripts/ui/crosshair_display.gd" id="4_lhwp2"]
@@ -135,7 +135,7 @@ sources/4 = SubResource("TileSetAtlasSource_3mjum")
 [node name="Platformer" type="Node2D" unique_id=984357904]
 script = ExtResource("1_4bgka")
 
-[node name="Background" parent="." unique_id=276389768 instance=ExtResource("2_pgk25")]
+[node name="Background" parent="." unique_id=276389768 instance=ExtResource("2_lhwp2")]
 
 [node name="Player" parent="." unique_id=1352661183 groups=["player"] instance=ExtResource("2_02d50")]
 z_index = 1
@@ -272,7 +272,7 @@ position = Vector2(-2744, 2240)
 position = Vector2(87, 2177)
 
 [node name="SimpleRock" parent="Resources" unique_id=115639006 instance=ExtResource("28_8pjrr")]
-position = Vector2(334, 2238)
+position = Vector2(-111, 2103)
 
 [node name="WoodAxe" parent="." unique_id=715209706 instance=ExtResource("25_5nybl")]
 position = Vector2(-42, 2088)

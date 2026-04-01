@@ -18,12 +18,11 @@ var _last_target_action: String = ""
 var category: String = ""
 var description: String = ""
 var registry_key: String = ""
-var discovery_prerequisites: Array[String] = []
 
 # Crafting properties (only used by structures)
 var craftable: bool = false
 var icon: Texture2D
-var craft_requirements: Dictionary = {}
+var material_requirements: Dictionary = {}
 var scene_path: String = ""
 var placement_bottom_padding = 0
 
@@ -71,15 +70,17 @@ func setup_hover_detection():
 	original_modulate = sprite_node.modulate
 	original_scale = scale
 
-
+@warning_ignore("unused_parameter")
 func _on_area_entered(area: Area2D):
 	"""No longer used - hover handled by targeting system"""
 	pass
 
+@warning_ignore("unused_parameter")
 func _on_area_exited(area: Area2D):
 	"""No longer used - hover handled by targeting system"""
 	pass
 
+@warning_ignore("unused_parameter")
 func _is_player_cursor_area(area: Area2D) -> bool:
 	"""No longer used - hover handled by targeting system"""
 	return false

@@ -188,6 +188,7 @@ func _is_crafting_available() -> bool:
 func _try_add_to_firepit(stack: InventoryManager.ItemStack) -> bool:
 	# TODO: Implement firepit interaction
 	# For now, return false - this would find nearby firepit and add fuel
+	print(stack)
 	return false
 
 # Get action by input action name (for input mapping)

@@ -526,7 +526,7 @@ func create_tile_highlight_optimized(tile_pos: Vector2i):
 	var map_tile_size = tilemap.tile_set.tile_size
 	
 	# Position the highlight at the tile's world position
-	var world_pos = Vector2(tile_pos.x * map_tile_size.x + map_tile_size.x/2, tile_pos.y * map_tile_size.y + map_tile_size.y/2)
+	var world_pos = Vector2(tile_pos.x * map_tile_size.x + map_tile_size.x/2.0, tile_pos.y * map_tile_size.y + map_tile_size.y/2.0)
 	highlight.global_position = world_pos
 	
 	# Use the pre-created texture (much faster!)
@@ -1013,11 +1013,11 @@ func update_tile_highlights_for_target(target_tile: Vector2i):
 	if target_tile != Vector2i(-999, -999):
 		create_tile_highlight_optimized(target_tile)
 
-func set_crosshair_visibility(visible: bool):
+func set_crosshair_visibility(is_crosshair_visible: bool):
 	"""Show or hide the crosshair + symbol"""
 	if has_node("Crosshair"):
 		var crosshair = get_node("Crosshair")
-		crosshair.visible = visible
+		crosshair.visible = is_crosshair_visible
 
 func set_hover_target(target: GameObject):
 	"""Set a new hover target and manage hover effects"""

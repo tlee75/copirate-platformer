@@ -23,9 +23,9 @@ func get_buildable_structures_by_category(category: String) -> Array[GameObject]
 	return buildable_structures
 
 func has_build_materials(structure: GameObject) -> bool:
-	for material_name in structure.craft_requirements:
-		var required_amount = structure.craft_requirements[material_name]
-		var available_amount = InventoryManager.get_total_item_count(material_name)
+	for material_key in structure.material_requirements:
+		var required_amount = structure.material_requirements[material_key]
+		var available_amount = InventoryManager.get_total_item_count_by_key(material_key)
 		if available_amount < required_amount:
 			return false
 	return true
@@ -44,9 +44,9 @@ func start_building(structure: GameObject) -> bool:
 
 func complete_building(structure: GameObject) -> bool:
 	# Consume materials
-	for material_name in structure.craft_requirements:
-		var required_amount = structure.craft_requirements[material_name]
-		InventoryManager.remove_items_by_name(material_name, required_amount)
+	for material_key in structure.material_requirements:
+		var required_amount = structure.material_requirements[material_key]
+		InventoryManager.remove_items_by_key(material_key, required_amount)
 	
 	building_completed.emit(structure)
 	print("Built ", structure.name, " - materials consumed")

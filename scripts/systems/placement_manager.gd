@@ -49,9 +49,9 @@ func get_snapped_position(mouse_pos: Vector2) -> Vector2:
 
 func confirm_structure_placement():
 	if preview_instance and placement_active:
-		for resource_name in preview_structure_data.craft_requirements.keys():
-			var required = preview_structure_data.craft_requirements[resource_name]
-			InventoryManager.remove_items_by_name(resource_name, required)
+		for material_key in preview_structure_data.material_requirements.keys():
+			var required = preview_structure_data.material_requirements[material_key]
+			InventoryManager.remove_items_by_key(material_key, required)
 		preview_instance.modulate = Color(1, 1, 1, 1) # make fully visible
 		DiscoveryManager.discover(preview_structure_data.registry_key)
 		preview_instance = null

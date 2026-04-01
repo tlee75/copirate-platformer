@@ -14,7 +14,7 @@ func _init():
 	category = "tool"
 	underwater_compatible = false
 	land_compatible = true
-	craft_requirements = {"Gold Coin": 3}
+	material_requirements = {"gold_coin": 3}
 	craft_time = 5.0  # seconds to craft
 	use_animation = "woodaxe_attack"
 	is_tool = true

@@ -28,7 +28,7 @@ func _init():
 	category = "tool"
 	underwater_compatible = false
 	land_compatible = true
-	craft_requirements = {"Gold Coin": 2}
+	material_requirements = {"gold_coin": 2}
 	is_tool = true
 	target_range = 60.0
 	target_spread = 20.0

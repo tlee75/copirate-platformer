@@ -124,32 +124,23 @@ func add_item(item: GameItem, amount: int = 1) -> bool:
 	inventory_changed.emit()
 	return true
 
-func remove_items_by_name(item_name: String, amount: int = 1) -> bool:
+func remove_items_by_key(registry_key: String, amount: int = 1) -> bool:
 	var remaining = amount
-	
-	# Remove from stacks, starting from the end to safely remove empty stacks
 	for i in range(inventory_items.size() - 1, -1, -1):
 		var stack = inventory_items[i]
-		if stack.item.name == item_name:
+		if stack.item.registry_key == registry_key:
 			var to_remove = min(remaining, stack.quantity)
 			stack.quantity -= to_remove
 			remaining -= to_remove
-			
-			print("Removed ", to_remove, "x ", item_name, " (", remaining, " remaining to remove)")
-			
-			# Clean up empty stack
 			if stack.quantity <= 0:
 				_cleanup_depleted_stack(stack, i)
-			
 			if remaining <= 0:
 				inventory_changed.emit()
 				if stack.is_in_quick_access():
 					quick_access_changed.emit()
 				return true
-	
 	if remaining > 0:
-		print("Could not remove all requested ", item_name, " (", remaining, " not found)")
-	
+		print("Could not remove all requested key='", registry_key, "' (", remaining, " not found)")
 	inventory_changed.emit()
 	return remaining == 0
 
@@ -178,7 +169,7 @@ func remove_stack(stack: ItemStack, amount: int = -1) -> bool:
 	if amount == -1:
 		amount = stack.quantity
 	
-	return remove_items_by_name(stack.item.name, amount)
+	return remove_items_by_key(stack.item.registry_key, amount)
 
 # ============================================================================
 # EQUIPMENT SYSTEM
@@ -412,10 +403,10 @@ func drop_item_stack(stack: ItemStack, amount: int = -1) -> bool:
 # UTILITY FUNCTIONS
 # ============================================================================
 
-func get_total_item_count(item_name: String) -> int:
+func get_total_item_count_by_key(registry_key: String) -> int:
 	var total = 0
 	for stack in inventory_items:
-		if stack.item.name == item_name:
+		if stack.item.registry_key == registry_key:
 			total += stack.quantity
 	return total
 

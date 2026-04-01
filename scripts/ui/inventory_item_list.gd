@@ -57,9 +57,6 @@ func refresh_items(items: Array[InventoryManager.ItemStack]):
 func refresh_structures(structures: Array[GameObject]):
 	print("DEBUG: refresh_structures called with structures: ", structures.size())
 	
-	# Store structures separately
-	var structure_items = structures
-	
 	# Clear existing display
 	_clear_item_list()
 	

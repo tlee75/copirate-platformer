@@ -69,7 +69,7 @@ func display_item_or_structure(object, is_structure: bool = false):
 	_set_description_text(display_obj, is_structure)
 	
 	# Materials go in the bottom icon grid
-	if display_obj.craft_requirements.size() > 0:
+	if display_obj.material_requirements.size() > 0:
 		_display_material_icons(display_obj)
 		materials_section.visible = true
 	else:
@@ -109,9 +109,9 @@ func _display_material_icons(item_or_structure):
 	for child in materials_grid.get_children():
 		child.queue_free()
 	
-	for material_name in item_or_structure.craft_requirements:
-		var required = item_or_structure.craft_requirements[material_name]
-		var available = InventoryManager.get_total_item_count(material_name)
+	for material_key in item_or_structure.material_requirements:
+		var required = item_or_structure.material_requirements[material_key]
+		var available = InventoryManager.get_total_item_count_by_key(material_key)
 		var has_enough = available >= required
 		
 		# Build a material card
@@ -127,7 +127,7 @@ func _display_material_icons(item_or_structure):
 		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		
 		# Look up the item icon from the pre-built dictionary
-		var material_item = GameObjectsDatabase.get_item_by_name(material_name)
+		var material_item = GameObjectsDatabase.game_objects_database.get(material_key)
 		if material_item and material_item.icon:
 			icon_rect.texture = material_item.icon
 		
@@ -136,7 +136,7 @@ func _display_material_icons(item_or_structure):
 		
 		# Material name label
 		var name_label = Label.new()
-		name_label.text = material_name
+		name_label.text = material_item.name if material_item else material_key.capitalize()
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_label.add_theme_font_size_override("font_size", 10)
 		card.add_child(name_label)
@@ -169,8 +169,8 @@ class StructureWrapper:
 		get: return structure.description
 	var category:
 		get: return structure.category
-	var craft_requirements:
-		get: return structure.craft_requirements
+	var material_requirements:
+		get: return structure.material_requirements
 
 func _clear_display():
 	item_name.text = "No Item Selected"
@@ -215,6 +215,6 @@ func clear_display():
 		materials_section.visible = false
 	visible = false
 
-func display_item_stats(object):
+func display_item_stats(_object):
 	# Implement your item stats display logic here
 	pass

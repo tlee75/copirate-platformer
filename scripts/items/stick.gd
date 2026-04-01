@@ -14,4 +14,3 @@ func _init():
 	fuel_value = 5
 	underwater_compatible = false
 	land_compatible = false
-	craft_requirements = {"Gold Coin": 1}

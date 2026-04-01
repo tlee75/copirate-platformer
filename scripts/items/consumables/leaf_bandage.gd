@@ -15,14 +15,14 @@ func _init():
 	category = "consumable"
 	underwater_compatible = false
 	land_compatible = true
-	craft_requirements = {"Gold Coin": 1}
+	material_requirements = {"gold_coin": 1}
 	use_animation = "consume"
 	craft_time = 5
 
 func is_consumable() -> bool:
 	return true
 
-func extra_use_startup(player, slot_data):
+func extra_use_startup(player, _slot_data):
 	if player and player.player_stats:
 		player_stats = player.player_stats
 		if player_stats.is_healing:

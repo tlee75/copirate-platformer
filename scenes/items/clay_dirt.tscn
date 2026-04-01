@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://bvyndutexh2ti"]
+
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_6s2fs"]
+[ext_resource type="Texture2D" uid="uid://7yhl6deywi2x" path="res://assets/resources/clay_dirt_icon_01.png" id="2_6s2fs"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1qibw"]
+atlas = ExtResource("2_6s2fs")
+region = Rect2(0, 0, 64, 27)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_s2o1f"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1qibw")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 1.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qg3m1"]
+radius = 5.09902
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_54bb7"]
+radius = 14.035668
+
+[node name="ClayDirt" type="RigidBody2D" unique_id=189852754]
+collision_layer = 8
+script = ExtResource("1_6s2fs")
+idle_animation = "idle"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=838680442]
+z_index = 1
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_s2o1f")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=293265740]
+shape = SubResource("CircleShape2D_qg3m1")
+
+[node name="PickupArea" type="Area2D" parent="." unique_id=1353225237]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=1198937143]
+shape = SubResource("CircleShape2D_54bb7")

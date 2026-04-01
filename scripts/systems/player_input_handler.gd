@@ -391,7 +391,7 @@ func set_player_menu_open(open: bool):
 func set_selected_stack(stack: InventoryManager.ItemStack):
 	selected_stack = stack
 
-func get_available_actions_for_stack(stack: InventoryManager.ItemStack, context: Dictionary = {}) -> Array[InventoryActionResolver.ActionData]:
+func get_available_actions_for_stack(stack: InventoryManager.ItemStack) -> Array[InventoryActionResolver.ActionData]:
 	return action_resolver.get_available_actions(stack)
 
 func get_current_input_mode() -> InventoryActionResolver.InputMethod:

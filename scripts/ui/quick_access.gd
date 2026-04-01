@@ -248,6 +248,7 @@ func _on_inventory_changed():
 
 func _on_action_executed(action_type: InventoryActionResolver.ActionType, stack: InventoryManager.ItemStack, success: bool):
 	"""Handle action execution feedback"""
+	print(action_type, stack, success)
 	if success:
 		refresh_display()
 

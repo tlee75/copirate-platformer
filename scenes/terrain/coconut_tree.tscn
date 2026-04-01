@@ -285,7 +285,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"hit_full",
-"speed": 10.0
+"speed": 20.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -314,7 +314,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"hit_partial",
-"speed": 10.0
+"speed": 20.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -396,7 +396,7 @@ stick_scene = ExtResource("4_xjayg")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=387605123]
 sprite_frames = SubResource("SpriteFrames_r0del")
-animation = &"break"
+animation = &"hit_full"
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1053338918]
 

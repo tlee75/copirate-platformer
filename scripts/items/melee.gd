@@ -17,9 +17,9 @@ func _init():
 	category = "unarmed"
 	underwater_compatible = false
 	land_compatible = true
-	craft_requirements = {"Gold Coin": 2}
 	is_tool = true
 	is_weapon = true
 	harvest_efficiency = 0.3
 	target_range = 40.0
 	target_spread = 15.0
+	droppable = false

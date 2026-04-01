@@ -261,7 +261,7 @@ func display_build_action(structure):
 	build_button.pressed.connect(emit_signal.bind("action_requested", structure))
 	button_container.add_child(build_button)
 
-func display_actions_for_item(stack, context = {}):
+func display_actions_for_item(stack, _context = {}):
 	# Store the current stack
 	current_stack = stack
 	
@@ -282,11 +282,11 @@ func display_actions_for_item(stack, context = {}):
 	
 	# Debug craft requirements
 	print("Craft button state for ", stack.item.name, ": ", "enabled" if can_craft else "disabled")
-	if not can_craft and stack.item.craft_requirements:
-		for material_name in stack.item.craft_requirements:
-			var required = stack.item.craft_requirements[material_name]
-			var available = InventoryManager.get_total_item_count(material_name)
-			print("  - Need ", required, "x ", material_name, ", have ", available)
+	if not can_craft and stack.item.material_requirements:
+		for material_key in stack.item.material_requirements:
+			var required = stack.item.material_requirements[material_key]
+			var available = InventoryManager.get_total_item_count_by_key(material_key)
+			print("  - Need ", required, "x ", material_key, ", have ", available)
 	
 	# Connect to start_crafting method
 	craft_button.pressed.connect(func(): start_crafting(stack.item))
