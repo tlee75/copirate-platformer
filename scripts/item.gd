@@ -30,8 +30,12 @@ var pending_item_stack: InventoryManager.ItemStack = null
 func is_consumable() -> bool:
 	return false
 
+func get_use_animation(_player) -> String:
+	return use_animation
+
 func use(player, target, item_stack = null):
-	if use_animation == "" or use_animation == null:
+	var use_anim = get_use_animation(player)
+	if use_anim == "" or use_anim == null:
 		print("WARNING: Item '%s' has no use_animation set!" % self.name)
 		return
 	if target:
@@ -43,7 +47,7 @@ func use(player, target, item_stack = null):
 	cleanup_connections(player)
 	anim_sprite.frame_changed.connect(_on_use_frame_changed.bind(player))
 	anim_sprite.animation_finished.connect(_on_use_animation_finished.bind(player))
-	anim_sprite.play(use_animation)
+	anim_sprite.play(use_anim)
 	
 	# For consumables, store the item stack so it can be cleaned up later
 	if is_consumable() and item_stack:

@@ -15,7 +15,7 @@ func _init():
 	stack_size = 1
 	craftable = false
 	category = "unarmed"
-	underwater_compatible = false
+	underwater_compatible = true
 	land_compatible = true
 	is_tool = true
 	is_weapon = true
@@ -23,3 +23,8 @@ func _init():
 	target_range = 40.0
 	target_spread = 15.0
 	droppable = false
+
+func get_use_animation(player) -> String:
+	if player.is_underwater:
+		return "swim_punch"
+	return "punch"

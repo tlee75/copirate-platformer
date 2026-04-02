@@ -322,3 +322,24 @@ position = Vector2(-129, 2142)
 
 [node name="RawFish" parent="." unique_id=668380287 instance=ExtResource("32_lhwp2")]
 position = Vector2(-85, 2144)
+
+[node name="Fish2" parent="." unique_id=181288531 instance=ExtResource("30_kkokr")]
+position = Vector2(1003, 2393)
+
+[node name="Fish3" parent="." unique_id=739021327 instance=ExtResource("30_kkokr")]
+position = Vector2(1266, 2597)
+
+[node name="Fish4" parent="." unique_id=355623012 instance=ExtResource("30_kkokr")]
+position = Vector2(1629, 2419)
+
+[node name="Fish5" parent="." unique_id=313543183 instance=ExtResource("30_kkokr")]
+position = Vector2(2008, 2656)
+
+[node name="Fish6" parent="." unique_id=1994768819 instance=ExtResource("30_kkokr")]
+position = Vector2(2385, 2396)
+
+[node name="Fish7" parent="." unique_id=835337388 instance=ExtResource("30_kkokr")]
+position = Vector2(2828, 2730)
+
+[node name="Fish8" parent="." unique_id=1714188608 instance=ExtResource("30_kkokr")]
+position = Vector2(2264, 3019)

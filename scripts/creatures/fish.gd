@@ -16,8 +16,8 @@ class_name Fish
 # Proximity flee range
 @export var flee_proximity_radius: float = 50.0
 
-# Allow contact capture (set false for kill-only fish)
-@export var is_capturable: bool = true
+# Allow contact capture
+@export var is_capturable: bool = false
 
 # Patrol state
 var patrol_direction: Vector2 = Vector2.RIGHT
@@ -95,13 +95,16 @@ func _patrol(delta: float):
 func _flee(delta: float):
 	flee_timer -= delta
 	if flee_timer <= 0.0:
-		state = State.PATROL
-		return
+		if player and global_position.distance_to(player.global_position) < flee_proximity_radius:
+			flee_timer = flee_duration
+			flee_direction = (global_position - player.global_position).normalized()
+		else:
+			state = State.PATROL
+			return
 	
 	var next_pos = global_position + flee_direction * flee_speed * delta
 	if not _is_water_at(next_pos):
-		# Try to reverse flee direction within water
-		flee_direction = -flee_direction
+		flee_direction = _find_best_flee_direction()
 	
 	global_position += flee_direction * flee_speed * delta
 	
@@ -137,6 +140,25 @@ func _on_capture_body_entered(body: Node2D):
 	if body.is_in_group("player"):
 		if body.add_loot(capture_item_key, 1):
 			queue_free()
+
+func _find_best_flee_direction() -> Vector2:
+	var away_from_player := Vector2.ZERO
+	if player:
+		away_from_player = (global_position - player.global_position).normalized()
+	
+	var best_dir := flee_direction
+	var best_score := -INF
+	for i in range(8):
+		var angle := i * (PI / 4.0)
+		var candidate := Vector2(cos(angle), sin(angle))
+		if not _is_water_at(global_position + candidate * 20.0):
+			continue
+		var score := candidate.dot(away_from_player)
+		if score > best_score:
+			best_score = score
+			best_dir = candidate
+	
+	return best_dir
 
 func _is_water_at(pos: Vector2) -> bool:
 	if not tilemap:
