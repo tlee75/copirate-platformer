@@ -77,12 +77,15 @@ func _has_space_for_item(item: GameItem, amount: int = 1) -> bool:
 # INVENTORY OPERATIONS (using centralized validation)
 # ============================================================================
 
-func add_item(item: GameItem, amount: int = 1) -> bool:
+func add_item(item: GameItem, amount: int = 1, force: bool = false) -> bool:
 	"""Add item to this object's inventory with validation"""
-	if not can_accept_item(item, amount):
+	if not force and not can_accept_item(item, amount):
 		var reason = get_rejection_reason(item, amount)
 		if reason != "":
 			print("Cannot add item: ", reason)
+		return false
+	if force and not _is_category_accepted(item.category):
+		print("Cannot force-add item: wrong category ", item.category)
 		return false
 	
 	var remaining = amount
@@ -98,7 +101,7 @@ func add_item(item: GameItem, amount: int = 1) -> bool:
 				return true
 	
 	# Create new stacks as needed
-	while remaining > 0 and inventory.size() < inventory_slots:
+	while remaining > 0 and (force or inventory.size() < inventory_slots):
 		var stack_size = min(remaining, item.stack_size)
 		var new_stack = InventoryManager.ItemStack.new(item, stack_size)
 		inventory.append(new_stack)

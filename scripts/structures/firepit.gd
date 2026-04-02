@@ -213,6 +213,9 @@ func process_cooking(delta_time: float):
 		# Check if item is done cooking
 		if cooking_slots[i]["cook_progress"] >= cooking_slots[i]["total_cook_time"]:
 			cook_item_complete(i)
+		
+		# Only cook one item at a time - stop after the first active slot
+		break
 
 ## Add this new function for cooking logic:
 #func process_cooking(delta_time: float):
@@ -298,11 +301,22 @@ func cook_item_complete(slot_index: int):
 		var cooked_item = GameObjectsDatabase.game_objects_database[cooked_item_name]
 		
 		# Replace the raw item with cooked item in the modern inventory
-		stack.item = cooked_item
 		print("Finished cooking ", raw_item.name, " -> ", cooked_item.name)
-		NotificationManager.notify(NotificationManager.NotificationType.ITEM_COOKED, "cooked_" + cooked_item.name, "Cooked " + cooked_item.name)
 		
-		# Clear cooking progress
+		# Remove one raw item
+		interactive_object.remove_item(raw_item.name, 1)
+		
+		# Add one cooked item to the firepit (force=true bypasses slot limit)
+		interactive_object.add_item(cooked_item, 1, true)
+	
+		# Notify player
+		NotificationManager.notify(
+			NotificationManager.NotificationType.ITEM_COOKED,
+			"cooked_" + cooked_item_name,
+			"Cooked " + raw_item.name + " → " + cooked_item.name
+		)
+		
+		# Reset progress for this slot so the next raw item cooks fresh
 		if cooking_slots.size() > slot_index:
 			cooking_slots[slot_index] = {}
 		
