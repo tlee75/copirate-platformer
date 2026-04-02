@@ -38,7 +38,7 @@ func _ready():
 	# Add interactive object component
 	interactive_object = InteractiveObjectComponent.new()
 	interactive_object.object_name = "Firepit"
-	interactive_object.inventory_slots = 6
+	interactive_object.inventory_slots = 2
 	interactive_object.accepted_categories = ["fuel", "food"]
 	add_child(interactive_object)
 
