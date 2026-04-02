@@ -29,4 +29,5 @@ func craft_item(item: GameItem) -> bool:
 	InventoryManager.add_item(item, 1)
 	item_crafted.emit(item, 1)
 	print("Crafted: ", item.name)
+	NotificationManager.notify(NotificationManager.NotificationType.ITEM_PICKUP, "crafted_" + item.name, "Crafted " + item.name)
 	return true

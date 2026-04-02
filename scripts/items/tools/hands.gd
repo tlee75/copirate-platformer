@@ -1,3 +1,4 @@
+# Bare handed tool
 extends GameItem
 class_name Hands
 
@@ -7,7 +8,6 @@ var hit_frames = {
 }
 
 func _init():
-	name = "Hands"
 	category = "unarmed"
 	is_tool = true
 	is_weapon = false

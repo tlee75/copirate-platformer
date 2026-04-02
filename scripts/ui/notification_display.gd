@@ -6,7 +6,7 @@ var _vbox: VBoxContainer
 const TYPE_COLORS: Dictionary = {
 	0: Color.WHITE,              # ITEM_PICKUP
 	1: Color(1.0, 0.65, 0.0),   # ITEM_COOKED (orange)
-	2: Color(1.0, 0.84, 0.0),   # RECIPE_DISCOVERED (gold)
+	2: Color(1.0, 0.84, 0.0),   # BLUEPRINT_DISCOVERED (gold)
 	3: Color(1.0, 1.0, 0.0),    # STAT_WARNING (yellow)
 	4: Color(1.0, 0.3, 0.3),    # STAT_DEPLETED (red)
 	5: Color(0.6, 0.9, 1.0),    # ENVIRONMENT (light cyan)

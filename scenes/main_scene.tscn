@@ -21,12 +21,8 @@
 [ext_resource type="PackedScene" uid="uid://noyk5n0awjav" path="res://scenes/ui/stats_display.tscn" id="18_beobj"]
 [ext_resource type="PackedScene" uid="uid://crl38kj8otjtc" path="res://scenes/obstacles/wood_crate.tscn" id="19_267kh"]
 [ext_resource type="PackedScene" uid="uid://bcbmqwa8ofwfq" path="res://scenes/ui/player_menu.tscn" id="19_pgk25"]
-[ext_resource type="PackedScene" uid="uid://buc368tv0cjic" path="res://scenes/items/pickaxe.tscn" id="20_86meh"]
-[ext_resource type="PackedScene" uid="uid://cqfe0i3jnrxp5" path="res://scenes/items/shovel.tscn" id="21_duuju"]
 [ext_resource type="PackedScene" uid="uid://6xilgovco188" path="res://scenes/ui/notification_display.tscn" id="21_lhwp2"]
-[ext_resource type="PackedScene" uid="uid://gc64jn5o6v6i" path="res://scenes/items/sword.tscn" id="22_8dxha"]
 [ext_resource type="PackedScene" uid="uid://bqjbr0fr548wk" path="res://scenes/terrain/berry_bush.tscn" id="23_j4epa"]
-[ext_resource type="PackedScene" uid="uid://bau4ht0cid8a1" path="res://scenes/items/woodaxe.tscn" id="25_5nybl"]
 [ext_resource type="Script" uid="uid://31qjwgftkyrw" path="res://scripts/systems/water_flow_manager.gd" id="27_j2yw6"]
 [ext_resource type="PackedScene" uid="uid://b5y8lh6n7kve" path="res://scenes/items/simple_rock.tscn" id="28_8pjrr"]
 [ext_resource type="Script" uid="uid://duwg2nwj6sc2e" path="res://scripts/systems/placement_manager.gd" id="29_0xxsb"]
@@ -238,15 +234,6 @@ position = Vector2(-624, 3888)
 [node name="WoodCrate8" parent="WoodCrates" unique_id=515948284 instance=ExtResource("19_267kh")]
 position = Vector2(-752, 3888)
 
-[node name="PickAxe" parent="." unique_id=2043021410 instance=ExtResource("20_86meh")]
-position = Vector2(111, 2083)
-
-[node name="Shovel" parent="." unique_id=1568805257 instance=ExtResource("21_duuju")]
-position = Vector2(6, 2085)
-
-[node name="Sword" parent="." unique_id=1231607444 instance=ExtResource("22_8dxha")]
-position = Vector2(64, 2088)
-
 [node name="Resources" type="Node" parent="." unique_id=1510119859]
 
 [node name="BerryBush2" parent="Resources" unique_id=1022453375 instance=ExtResource("23_j4epa")]
@@ -270,12 +257,6 @@ position = Vector2(-2744, 2240)
 
 [node name="ScallopShell3" parent="Resources" unique_id=2041329492 instance=ExtResource("30_pgk25")]
 position = Vector2(87, 2177)
-
-[node name="SimpleRock" parent="Resources" unique_id=115639006 instance=ExtResource("28_8pjrr")]
-position = Vector2(-111, 2103)
-
-[node name="WoodAxe" parent="." unique_id=715209706 instance=ExtResource("25_5nybl")]
-position = Vector2(-42, 2088)
 
 [node name="WaterFlowManager" type="Node" parent="." unique_id=2080095331]
 script = ExtResource("27_j2yw6")

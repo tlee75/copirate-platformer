@@ -7,7 +7,6 @@ var hit_frames = {
 }
 
 func _init():
-	name = "Sword"
 	description = "A sharp steel blade. Effective in close combat with decent damage output."
 	icon = load("res://assets/sprite-man/short_sword_icon_64x18.png")
 	stack_size = 1

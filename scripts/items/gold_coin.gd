@@ -2,7 +2,6 @@ extends GameItem
 class_name GoldCoin
 
 func _init():
-	name = "Gold Coin"
 	icon = load("res://assets/Pirate Treasure/Sprites/Gold Coin/01.png")
 	stack_size = 10
 	craftable = false

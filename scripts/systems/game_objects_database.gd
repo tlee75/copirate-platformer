@@ -10,6 +10,7 @@ func _ready():
 	_register_structures_from_dir("res://scripts/structures")
 	_register_pickup_scenes("res://scenes/items")
 	_validate_registrations()
+	DiscoveryManager.build_dependency_map()
 	print("Registered game objects: ", game_objects_database.keys())
 	print("Registered pickup scenes: ", pickup_scenes.keys())
 

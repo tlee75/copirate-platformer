@@ -5,7 +5,6 @@ class_name Stick
 @export var fuel_value: float = 10.0 # Seconds of burn time
 
 func _init():
-	name = "Stick"
 	description = "A small wooden branch. Burns well as fuel and useful for basic crafting."
 	stack_size = 99
 	category = "fuel"

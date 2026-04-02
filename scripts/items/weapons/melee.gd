@@ -1,3 +1,4 @@
+# Bare handed weapon
 extends GameItem
 class_name Melee
 
@@ -10,7 +11,6 @@ var hit_frames = {
 func _init():
 	use_animation = "punch"
 	target_action = "melee"
-	name = "Melee"
 	icon = load("res://assets/sprite-man/unarmed_icon_01.png")
 	stack_size = 1
 	craftable = false

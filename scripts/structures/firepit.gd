@@ -300,6 +300,7 @@ func cook_item_complete(slot_index: int):
 		# Replace the raw item with cooked item in the modern inventory
 		stack.item = cooked_item
 		print("Finished cooking ", raw_item.name, " -> ", cooked_item.name)
+		NotificationManager.notify(NotificationManager.NotificationType.ITEM_COOKED, "cooked_" + cooked_item.name, "Cooked " + cooked_item.name)
 		
 		# Clear cooking progress
 		if cooking_slots.size() > slot_index:

@@ -1,15 +1,14 @@
 extends GameItem
 
-class_name ClayDirt
+class_name SimpleRock
 
 @export var fuel_value: float = 0.0 # Seconds of burn time
 
 func _init():
-	name = "Clay Dirt"
 	stack_size = 99
 	category = "resource"
 	craftable = false
-	icon = load("res://assets/resources/clay_dirt_icon_01.png")
+	icon = load("res://assets/resources/simple_rock_icon_01.png")
 	fuel_value = 0
 	underwater_compatible = false
-	land_compatible = true
+	land_compatible = false

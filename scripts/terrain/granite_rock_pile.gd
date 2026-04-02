@@ -10,8 +10,7 @@ func _ready():
 	max_harvests = 2
 	loot_table = {
 		"interact": [
-			{ "item": "simple_rock", "type": "harvest", "weight": 1.0 },
-			{ "item": "stick", "type": "harvest", "weight": 1.0 }
+			{ "item": "simple_rock", "type": "harvest", "weight": 1.0 }
 		]
 	}
 	# Start with normal idle animation

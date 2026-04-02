@@ -10,7 +10,8 @@ func _ready():
 	max_harvests = 5
 	loot_table = {
 		"interact": [
-			{ "item": "raspberry", "type": "harvest", "weight": 1.0 }
+			{ "item": "raspberry", "type": "harvest", "weight": 0.60 },
+			{ "item": "fiber", "type": "harvest", "weight": 0.40 }
 		]
 	}
 	
