@@ -315,6 +315,7 @@ position = Vector2(-465, 2126)
 
 [node name="Fish" parent="." unique_id=1509415315 instance=ExtResource("30_kkokr")]
 position = Vector2(678, 2272)
+is_capturable = false
 
 [node name="CookedFish" parent="." unique_id=868243162 instance=ExtResource("31_kkokr")]
 position = Vector2(-129, 2142)

@@ -13,6 +13,12 @@ class_name Fish
 # Death drop
 @export var death_item_key: String = "raw_fish"  # Dropped when killed
 
+# Proximity flee range
+@export var flee_proximity_radius: float = 50.0
+
+# Allow contact capture (set false for kill-only fish)
+@export var is_capturable: bool = true
+
 # Patrol state
 var patrol_direction: Vector2 = Vector2.RIGHT
 var patrol_timer: float = 0.0
@@ -26,7 +32,7 @@ var tilemap: TileMap
 
 func _ready():
 	super._ready()
-	max_health = 1.0
+	max_health = 2.0
 	health = max_health
 	category = "fauna"
 	
@@ -51,11 +57,21 @@ func _ready():
 		capture_area.body_entered.connect(_on_capture_body_entered)
 
 func _update_ai(delta: float):
+	if state != State.FLEE and state != State.DEAD:
+		_check_player_proximity()
 	match state:
 		State.PATROL:
 			_patrol(delta)
 		State.FLEE:
 			_flee(delta)
+
+func _check_player_proximity():
+	if not player:
+		player = get_tree().get_first_node_in_group("player")
+	if player and global_position.distance_to(player.global_position) < flee_proximity_radius:
+		state = State.FLEE
+		flee_timer = flee_duration
+		flee_direction = (global_position - player.global_position).normalized()
 
 func _patrol(delta: float):
 	patrol_timer -= delta
@@ -116,7 +132,7 @@ func _on_death():
 
 func _on_capture_body_entered(body: Node2D):
 	"""Contact capture — player touches fish, gets live fish item."""
-	if state == State.DEAD:
+	if state == State.DEAD or not is_capturable:
 		return
 	if body.is_in_group("player"):
 		if body.add_loot(capture_item_key, 1):
