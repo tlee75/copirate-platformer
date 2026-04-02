@@ -340,7 +340,7 @@ func handle_use_action():
 			solo_item.use(self, null, selected_stack)
 		return
 
-	# E KEY — interact using hands
+	# interact using hands
 	if Input.is_action_just_pressed("interact"):
 		if target != null and hands and is_valid_target(target, hands):
 			hands.use(self, target, null)
@@ -777,7 +777,7 @@ func update_crosshair_targeting():
 		return
 
 	# ---------------------------------------------------------------
-	# INTERACT PIPELINE (E key): hands item only
+	# INTERACT PIPELINE: hands item only
 	# Range is hands.target_range
 	# ---------------------------------------------------------------
 
@@ -822,7 +822,7 @@ func find_use_target_at_position(world_pos: Vector2, selected_item: GameItem, me
 	return null
 
 func find_interact_target_at_position(world_pos: Vector2, hands: GameItem) -> GameObject:
-	"""Find the best interact target (E key / hands) at the cursor position."""
+	"""Find the best interact target (hands) at the cursor position."""
 	if world_pos.distance_to(global_position) > hands.target_range:
 		return null
 	return _find_valid_object_at(world_pos, hands)
@@ -918,7 +918,7 @@ func raycast_use_targets(origin: Vector2, direction: Vector2, selected_item: Gam
 	return null
 
 func raycast_interact_targets(origin: Vector2, direction: Vector2, hands: GameItem) -> GameObject:
-	"""Raycast to find best interact target (E key / hands)."""
+	"""Raycast to find best interact target (hands)."""
 	return generic_raycast_targeting(
 		origin, direction, hands.target_range, hands.target_spread,
 		func(o, d, r): return _raycast_for_item(o, d, r, hands)
