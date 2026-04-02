@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://4y11kmsmuruv"]
+
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_3cl0o"]
+[ext_resource type="Texture2D" uid="uid://dt1i0aj5nh4xr" path="res://assets/consumables/raw_fish_filet_1.png" id="2_hu8gx"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4dhpb"]
+radius = 13.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2hv6k"]
+atlas = ExtResource("2_hu8gx")
+region = Rect2(0, 0, 102, 102)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_w1bhs"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2hv6k")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 1.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_i25aj"]
+radius = 13.0
+
+[node name="RawFish" type="RigidBody2D" unique_id=668380287]
+collision_layer = 8
+script = ExtResource("1_3cl0o")
+idle_animation = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2086570236]
+shape = SubResource("CircleShape2D_4dhpb")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=829700654]
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("SpriteFrames_w1bhs")
+animation = &"idle"
+
+[node name="PickupArea" type="Area2D" parent="." unique_id=1594838265]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=8837572]
+shape = SubResource("CircleShape2D_i25aj")

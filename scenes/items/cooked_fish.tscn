@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://bu7b5emw3w7xh"]
+
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_ed6g4"]
+[ext_resource type="Texture2D" uid="uid://cgu3m7tfspcyr" path="res://assets/consumables/cooked_fish_filet_1.png" id="2_v7uom"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ybjx0"]
+radius = 12.0415945
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3l4ky"]
+atlas = ExtResource("2_v7uom")
+region = Rect2(0, 0, 103, 103)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_f71cl"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3l4ky")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 1.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bnnfc"]
+radius = 12.0415945
+
+[node name="CookedFish" type="RigidBody2D" unique_id=868243162]
+collision_layer = 8
+script = ExtResource("1_ed6g4")
+idle_animation = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1657652958]
+shape = SubResource("CircleShape2D_ybjx0")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=291622650]
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("SpriteFrames_f71cl")
+animation = &"idle"
+
+[node name="PickupArea" type="Area2D" parent="." unique_id=576803100]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=1669149535]
+shape = SubResource("CircleShape2D_bnnfc")

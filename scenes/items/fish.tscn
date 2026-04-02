@@ -1,0 +1,94 @@
+[gd_scene format=3 uid="uid://be6cnfnlmcmd6"]
+
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_fuupp"]
+[ext_resource type="Texture2D" uid="uid://uoxrslii25sj" path="res://assets/creatures/fish/orange_fish_idle_1.png" id="2_hjbla"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_u5gr5"]
+radius = 21.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uocfm"]
+atlas = ExtResource("2_hjbla")
+region = Rect2(0, 0, 102, 102)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r2s4c"]
+atlas = ExtResource("2_hjbla")
+region = Rect2(102, 0, 102, 102)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m230q"]
+atlas = ExtResource("2_hjbla")
+region = Rect2(204, 0, 102, 102)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cc2sd"]
+atlas = ExtResource("2_hjbla")
+region = Rect2(306, 0, 102, 102)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b12fr"]
+atlas = ExtResource("2_hjbla")
+region = Rect2(408, 0, 102, 102)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ieb1h"]
+atlas = ExtResource("2_hjbla")
+region = Rect2(510, 0, 102, 102)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cjkgq"]
+atlas = ExtResource("2_hjbla")
+region = Rect2(612, 0, 102, 102)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5sqbo"]
+atlas = ExtResource("2_hjbla")
+region = Rect2(714, 0, 102, 102)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ncdlq"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uocfm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r2s4c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m230q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cc2sd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b12fr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ieb1h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cjkgq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5sqbo")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 10.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gn7fw"]
+radius = 21.213203
+
+[node name="Fish" type="RigidBody2D" unique_id=1680532832]
+collision_layer = 8
+script = ExtResource("1_fuupp")
+idle_animation = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=723726416]
+position = Vector2(8, 1)
+shape = SubResource("CircleShape2D_u5gr5")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2002760297]
+sprite_frames = SubResource("SpriteFrames_ncdlq")
+animation = &"idle"
+
+[node name="PickupArea" type="Area2D" parent="." unique_id=1948783887]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=739039902]
+position = Vector2(8, 1)
+shape = SubResource("CircleShape2D_gn7fw")
