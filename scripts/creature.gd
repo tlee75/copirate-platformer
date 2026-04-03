@@ -56,7 +56,7 @@ func _on_death():
 	"""Override in subclasses for death behavior (drop loot, remove, etc.)."""
 	queue_free()
 
-func activate_use(target_action: String, _efficiency: float = 1.0):
+func activate_use(_target_action: String, _efficiency: float = 1.0):
 	"""Override GameObject.activate_use — weapons deal damage instead of harvesting."""
 	player = get_tree().get_first_node_in_group("player")
 	take_damage(1.0, player)

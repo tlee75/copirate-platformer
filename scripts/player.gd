@@ -2,8 +2,8 @@ extends CharacterBody2D
 
 class_name Player
 
-const WALK_SPEED := 100.0
-const RUN_SPEED := 250.0
+const WALK_SPEED := 200.0
+const RUN_SPEED := 300.0
 const JUMP_VELOCITY := -400.0
 const STEP_HEIGHT: float = 10.0  # Max height in pixels to auto-step over
 
@@ -14,6 +14,7 @@ const STEP_HEIGHT: float = 10.0  # Max height in pixels to auto-step over
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") as float
 var _step_cooldown: float = 0.0
 var was_airborne: bool = false
+var is_airborne: bool = false
 var is_trigger_action: bool = false
 var is_movement_locked: bool = false
 var is_sprint_swimming: bool = false
@@ -28,7 +29,7 @@ var was_running_when_jumped: bool = false
 var jump_speed: float = 0.0
 var tile_size: float = 32.0
 var is_dead: bool = false
-var attack_target = null 
+var attack_target = null
 var tool_target = null
 var last_frame_on_floor: bool = true
 var _water_jump_active: bool = false
@@ -126,7 +127,7 @@ func _setup_ui_manager_reference():
 	else:
 		print("WARNING: UI layer not found")
 
-func _physics_process(delta):	
+func _physics_process(delta):
 	if is_dead:
 		return
 
@@ -203,7 +204,7 @@ func _physics_process(delta):
 			vel.y += gravity * delta
 
 	#  WASD + Arrow key input
-	var left_pressed = Input.is_action_pressed("move_left") 
+	var left_pressed = Input.is_action_pressed("move_left")
 	var right_pressed = Input.is_action_pressed("move_right")
 	var up_pressed = Input.is_action_pressed("move_up")
 	var down_pressed = Input.is_action_pressed("move_down")
@@ -216,32 +217,20 @@ func _physics_process(delta):
 	
 	if dir != 0:
 		var current_speed: float
-		
+
 		if is_underwater:
-			# Always use swim speed when underwater, regardless of floor contact
 			is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
 			current_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
-			
-			# Update stats for sprint swimming
-			player_stats.set_sprinting_status(is_sprint_swimming)
 		elif not is_on_floor():
-			# Use locked jump speed when airborne
 			current_speed = jump_speed
-			player_stats.set_sprinting_status(false)
 		else:
-			# Use normal speed logic when on ground
 			var is_running = Input.is_key_pressed(KEY_SHIFT)
-			var base_speed = RUN_SPEED if is_running else WALK_SPEED
-			current_speed = base_speed
-			
-			# Update stats for land sprinting
-			player_stats.set_sprinting_status(is_running)
-		
+			current_speed = RUN_SPEED if is_running else WALK_SPEED
+
 		vel.x = dir * current_speed
 		last_move_dir = dir
 	else:
 		vel.x = move_toward(vel.x, 0, WALK_SPEED)
-		player_stats.set_sprinting_status(false)
 	
 	# Vertical movement
 	var vertical_dir = 0
@@ -269,7 +258,7 @@ func _physics_process(delta):
 			var near_top = offset_in_tile < 5.0 # Threshold to adjust in pixels
 	
 	# Swimming up/down when underwater
-			var is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
+			is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
 			var current_swim_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
 	
 	# Stop at water surface when swimming up
@@ -427,7 +416,7 @@ func handle_animations():
 				var target_anim = "run_jump" if use_running_anims else "jump"
 				if $AnimatedSprite2D.animation != target_anim:
 					$AnimatedSprite2D.play(target_anim)
-			elif velocity.y > 5:  # Going down  
+			elif velocity.y > 5:  # Going down
 				var target_anim = "run_fall" if use_running_anims else "fall"
 				if $AnimatedSprite2D.animation != target_anim:
 					$AnimatedSprite2D.play(target_anim)
@@ -651,9 +640,6 @@ func _on_stat_depleted(stat_name: String):
 				$AnimatedSprite2D.animation_finished.connect(_on_death_animation_finished)
 		"oxygen":
 			print("Player is suffocating!")
-		"stamina":
-			print("Player is exhausted!")
-			# Could reduce movement speed or prevent sprinting
 		"hunger":
 			print("Player is starving!")
 		"thirst":

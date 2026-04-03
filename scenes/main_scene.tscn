@@ -29,9 +29,7 @@
 [ext_resource type="PackedScene" uid="uid://cuu2vsbd7syoi" path="res://scenes/terrain/coconut_tree.tscn" id="30_02d50"]
 [ext_resource type="PackedScene" uid="uid://d3ybb65elgyad" path="res://scenes/creatures/fish.tscn" id="30_kkokr"]
 [ext_resource type="PackedScene" uid="uid://bbnkwhcolpqai" path="res://scenes/items/scallop_shell.tscn" id="30_pgk25"]
-[ext_resource type="PackedScene" uid="uid://bu7b5emw3w7xh" path="res://scenes/items/cooked_fish.tscn" id="31_kkokr"]
 [ext_resource type="PackedScene" uid="uid://c665se5n8hwv7" path="res://scenes/terrain/granite_rock_pile.tscn" id="32_kkokr"]
-[ext_resource type="PackedScene" uid="uid://4y11kmsmuruv" path="res://scenes/items/raw_fish.tscn" id="32_lhwp2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(6, 6)
@@ -138,7 +136,7 @@ script = ExtResource("1_4bgka")
 
 [node name="Player" parent="." unique_id=1352661183 groups=["player"] instance=ExtResource("2_02d50")]
 z_index = 1
-position = Vector2(346, 2208)
+position = Vector2(-3825, 2052)
 
 [node name="CursorArea" type="Area2D" parent="Player" unique_id=150247619]
 position = Vector2(33, 0)
@@ -241,6 +239,8 @@ position = Vector2(-752, 3888)
 
 [node name="BerryBush2" parent="Resources" unique_id=1022453375 instance=ExtResource("23_j4epa")]
 position = Vector2(-605, 2079)
+max_harvests = null
+regeneration_time = null
 
 [node name="TwoSecondTimer" type="Timer" parent="Resources" unique_id=1740078514]
 wait_time = 2.0
@@ -248,18 +248,19 @@ autostart = true
 
 [node name="BerryBush3" parent="Resources" unique_id=820907367 instance=ExtResource("23_j4epa")]
 position = Vector2(-4144, 2078)
+max_harvests = null
+regeneration_time = null
 
 [node name="BerryBush4" parent="Resources" unique_id=499914360 instance=ExtResource("23_j4epa")]
 position = Vector2(-6249, 2078)
+max_harvests = null
+regeneration_time = null
 
 [node name="ScallopShell" parent="Resources" unique_id=19340439 instance=ExtResource("30_pgk25")]
 position = Vector2(-2824, 2184)
 
 [node name="ScallopShell2" parent="Resources" unique_id=227435355 instance=ExtResource("30_pgk25")]
 position = Vector2(-2744, 2240)
-
-[node name="ScallopShell3" parent="Resources" unique_id=2041329492 instance=ExtResource("30_pgk25")]
-position = Vector2(87, 2177)
 
 [node name="WaterFlowManager" type="Node" parent="." unique_id=2080095331]
 script = ExtResource("27_j2yw6")
@@ -271,27 +272,43 @@ script = ExtResource("29_0xxsb")
 
 [node name="CoconutTree3" parent="CoconutTrees" unique_id=1605635901 instance=ExtResource("30_02d50")]
 position = Vector2(-930, 2043)
+max_harvests = null
+regeneration_time = null
 
 [node name="CoconutTree2" parent="CoconutTrees" unique_id=1813802444 instance=ExtResource("30_02d50")]
 position = Vector2(-803, 2043)
+max_harvests = null
+regeneration_time = null
 
 [node name="CoconutTree" parent="CoconutTrees" unique_id=1453547572 instance=ExtResource("30_02d50")]
 position = Vector2(-264, 2107)
+max_harvests = null
+regeneration_time = null
 
 [node name="CoconutTree4" parent="CoconutTrees" unique_id=420696797 instance=ExtResource("30_02d50")]
 position = Vector2(-3533, 2044)
+max_harvests = null
+regeneration_time = null
 
 [node name="CoconutTree5" parent="CoconutTrees" unique_id=1113339605 instance=ExtResource("30_02d50")]
 position = Vector2(-3027, 2074)
+max_harvests = null
+regeneration_time = null
 
 [node name="CoconutTree6" parent="CoconutTrees" unique_id=871801691 instance=ExtResource("30_02d50")]
 position = Vector2(-4992, 2076)
+max_harvests = null
+regeneration_time = null
 
 [node name="CoconutTree7" parent="CoconutTrees" unique_id=166988712 instance=ExtResource("30_02d50")]
 position = Vector2(-6733, 2172)
+max_harvests = null
+regeneration_time = null
 
 [node name="BerryBush" parent="CoconutTrees" unique_id=493298007 instance=ExtResource("23_j4epa")]
 position = Vector2(-3304, 2078)
+max_harvests = null
+regeneration_time = null
 
 [node name="SimpleRocks" type="Node" parent="." unique_id=1277372746]
 
@@ -308,20 +325,12 @@ position = Vector2(-7269, 2345)
 position = Vector2(-2608, 2304)
 
 [node name="GraniteRockPile" parent="SimpleRocks" unique_id=1919999788 instance=ExtResource("32_kkokr")]
-position = Vector2(-399, 2171)
-
-[node name="WoodCrate" parent="." unique_id=1440005507 instance=ExtResource("19_267kh")]
-position = Vector2(-465, 2126)
+position = Vector2(50, 2177)
+max_harvests = null
+regeneration_time = null
 
 [node name="Fish" parent="." unique_id=1509415315 instance=ExtResource("30_kkokr")]
 position = Vector2(678, 2272)
-is_capturable = false
-
-[node name="CookedFish" parent="." unique_id=868243162 instance=ExtResource("31_kkokr")]
-position = Vector2(-129, 2142)
-
-[node name="RawFish" parent="." unique_id=668380287 instance=ExtResource("32_lhwp2")]
-position = Vector2(-85, 2144)
 
 [node name="Fish2" parent="." unique_id=181288531 instance=ExtResource("30_kkokr")]
 position = Vector2(1003, 2393)
@@ -343,3 +352,21 @@ position = Vector2(2828, 2730)
 
 [node name="Fish8" parent="." unique_id=1714188608 instance=ExtResource("30_kkokr")]
 position = Vector2(2264, 3019)
+
+[node name="CoconutTree" parent="." unique_id=1923840550 instance=ExtResource("30_02d50")]
+position = Vector2(-4687, 2075)
+
+[node name="CoconutTree2" parent="." unique_id=490524226 instance=ExtResource("30_02d50")]
+position = Vector2(-4037, 2042)
+
+[node name="CoconutTree3" parent="." unique_id=1382184345 instance=ExtResource("30_02d50")]
+position = Vector2(-5603, 2075)
+
+[node name="CoconutTree4" parent="." unique_id=1990705325 instance=ExtResource("30_02d50")]
+position = Vector2(-5476, 2076)
+
+[node name="CoconutTree5" parent="." unique_id=1274674956 instance=ExtResource("30_02d50")]
+position = Vector2(-6101, 2043)
+
+[node name="GraniteRockPile" parent="." unique_id=1986582708 instance=ExtResource("32_kkokr")]
+position = Vector2(-3887, 2075)
