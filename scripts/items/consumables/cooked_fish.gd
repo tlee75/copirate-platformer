@@ -22,7 +22,7 @@ func is_consumable() -> bool:
 func extra_use_startup(player, _slot_data):
 	if player and player.player_stats:
 		player_stats = player.player_stats
-		player_stats.add_consumption_effect(16.0, 0.0, 0.0, 4)
+		player_stats.add_consumption_effect(3.0, 0.0, 0.0, 10)
 	else:
 		return false
 		
