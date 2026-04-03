@@ -30,4 +30,4 @@ func extra_use_startup(player, _slot_data):
 			return false
 		player_stats.is_eating = true
 		player_stats.set_hunger_regen_modifier(4)
-		player_stats.start_eating(4)
+		player_stats.start_eating(2)

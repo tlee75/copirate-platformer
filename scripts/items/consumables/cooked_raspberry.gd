@@ -28,7 +28,7 @@ func extra_use_startup(player, _slot_data):
 			return false
 		player_stats.is_eating = true
 		player_stats.set_hunger_regen_modifier(5)
-		player_stats.start_eating(10)
+		player_stats.start_eating(1)
 		player_stats.start_drinking(1)
 		
 		# Store slot data for removal after animation finishes
