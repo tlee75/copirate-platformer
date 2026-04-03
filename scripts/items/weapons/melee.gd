@@ -6,6 +6,7 @@ class_name Melee
 # Animation hit frame definition
 var hit_frames = {
 	"punch": [4], # List is required for single frames
+	"swim_punch": [2]
 }
 
 func _init():
@@ -23,6 +24,7 @@ func _init():
 	target_range = 40.0
 	target_spread = 15.0
 	droppable = false
+	blocks_movement = false
 
 func get_use_animation(player) -> String:
 	if player.is_underwater:

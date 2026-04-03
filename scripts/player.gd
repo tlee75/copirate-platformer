@@ -15,6 +15,8 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity") a
 var _step_cooldown: float = 0.0
 var was_airborne: bool = false
 var is_trigger_action: bool = false
+var is_movement_locked: bool = false
+var is_sprint_swimming: bool = false
 var cursor_area: Area2D
 var tilemap: TileMap
 var highlighted_tiles: Array[Vector2i] = []
@@ -40,7 +42,7 @@ var ui_manager: UIManager
 var player_stats: PlayerStats
 
 # Water movement effects
-var swim_speed: float = 150.0
+var swim_speed: float = 100.0
 var is_underwater: bool = false
 var is_at_breathable_surface: bool = false
 var water_depth: int = 0
@@ -129,7 +131,7 @@ func _physics_process(delta):
 		return
 
 	# Do not allow movement while in the middle of an animation
-	if is_trigger_action:
+	if is_movement_locked:
 		return
 
 	var vel: Vector2 = velocity
@@ -217,7 +219,7 @@ func _physics_process(delta):
 		
 		if is_underwater:
 			# Always use swim speed when underwater, regardless of floor contact
-			var is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
+			is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
 			current_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
 			
 			# Update stats for sprint swimming
@@ -249,7 +251,7 @@ func _physics_process(delta):
 		vertical_dir += 1
 
 	# Jump — runs before vertical swim so the flag prevents swim from overriding it
-	if Input.is_action_just_pressed("jump") and (is_on_floor() and not is_underwater or (is_underwater and is_at_breathable_surface)):
+	if Input.is_action_just_pressed("jump") and (is_on_floor() and not is_underwater or (is_underwater and is_at_breathable_surface and not is_trigger_action)):
 		vel.y = JUMP_VELOCITY
 		was_running_when_jumped = Input.is_key_pressed(KEY_SHIFT)
 		jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
@@ -406,9 +408,12 @@ func handle_animations():
 		if is_underwater:
 			# When airborne but underwater, use swimming animations
 			if abs(velocity.x) > 1.0:
-				# Swimming while moving
-				if $AnimatedSprite2D.animation != "swim":
-					$AnimatedSprite2D.play("swim")
+				if is_sprint_swimming:
+					if $AnimatedSprite2D.animation != "sprint_swim":
+						$AnimatedSprite2D.play("sprint_swim")
+				else:
+					if $AnimatedSprite2D.animation != "swim":
+						$AnimatedSprite2D.play("swim")
 			else:
 				# Swim while stationary
 				if $AnimatedSprite2D.animation != "swim_idle":
@@ -858,7 +863,7 @@ func _find_valid_tile_at(world_pos: Vector2, target_action: String) -> Vector2i:
 
 func check_object_compatibility(obj: GameObject, target_action: String) -> bool:
 	"""Check if an object can be targeted by this tool action"""
-	if target_action not in obj.loot_table:
+	if target_action not in obj.action_table:
 		return false
 	
 	# Interactable structures don't use harvest_remaining -- skip the check

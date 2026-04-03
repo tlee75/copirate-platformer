@@ -10,7 +10,7 @@ func _ready():
 
 	max_harvests = 3
 	var default_loot = [{ "item": gold_coin_scene, "type": "drop", "min": 1, "max": 3 }]
-	loot_table = {
+	action_table = {
 		"melee": default_loot,
 		"dig": default_loot,
 		"chop": default_loot,

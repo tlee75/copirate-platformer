@@ -9,7 +9,7 @@ var animated_sprite: AnimatedSprite2D
 # Harvesting specific properties
 var is_harvestable: bool
 var is_destructible: bool
-var loot_table: Dictionary = {}
+var action_table: Dictionary = {}
 var harvests_remaining: int = 0
 var player: Player
 var _last_target_action: String = ""
@@ -182,11 +182,11 @@ func regenerate():
 
 func _pick_harvest_item(target_action: String) -> String:
 	"""Weighted random pick from this action's harvest entries."""
-	if not loot_table.has(target_action):
+	if not action_table.has(target_action):
 		return ""
 	var harvest_entries = []
 	var weights = []
-	for entry in loot_table[target_action]:
+	for entry in action_table[target_action]:
 		if entry.get("type") == "harvest":
 			harvest_entries.append(entry)
 			weights.append(entry.get("weight", 1.0))
@@ -259,8 +259,8 @@ func use_finished_callback():
 			animated_sprite.play("break")
 			await animated_sprite.animation_finished
 		
-	# Drop loot from loot_table
-		LootDropper.drop_loot(loot_table, self, _last_target_action)
+	# Drop loot from action_table
+		LootDropper.drop_loot(action_table, self, _last_target_action)
 		print(name, " has been destroyed")
 		queue_free()
 	else:

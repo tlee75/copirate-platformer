@@ -8,7 +8,7 @@ func _ready():
 	is_harvestable = true
 	is_destructible = false
 	max_harvests = 5
-	loot_table = {
+	action_table = {
 		"interact": [
 			{ "item": "raspberry", "type": "harvest", "weight": 0.60 },
 			{ "item": "fiber", "type": "harvest", "weight": 0.40 }

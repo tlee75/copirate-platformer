@@ -31,7 +31,7 @@ func _ready():
 	
 	state = ObjectState.UNLIT
 
-	loot_table = {
+	action_table = {
 		"interact": []
 	}
 

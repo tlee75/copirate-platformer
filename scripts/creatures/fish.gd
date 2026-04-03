@@ -37,7 +37,7 @@ func _ready():
 	category = "fauna"
 	
 	# Targetable by sword and melee (for killing), and by interact (for contact capture)
-	loot_table = {
+	action_table = {
 		"slice": [],
 		"melee": [],
 		"interact": []

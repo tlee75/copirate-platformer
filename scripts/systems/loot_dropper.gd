@@ -3,15 +3,15 @@ extends Node
 # LootDropper: Autoload for spawning loot item pickups into the world.
 # Loot table format: { "action_type": [{ "item": PackedScene, "type": "drop", "chance": 1.0, "min": 1, "max": 4 }, ...] }
 
-func drop_loot(loot_table: Dictionary, origin: Node2D, target_action: String = "") -> void:
+func drop_loot(action_table: Dictionary, origin: Node2D, target_action: String = "") -> void:
 	var action_keys: Array = []
-	if target_action != "" and loot_table.has(target_action):
+	if target_action != "" and action_table.has(target_action):
 		action_keys = [target_action]
 	else:
-		action_keys = loot_table.keys()
+		action_keys = action_table.keys()
 	
 	for action_key in action_keys:
-		var entries = loot_table[action_key]
+		var entries = action_table[action_key]
 		for entry in entries:
 			if entry.get("type") != "drop":
 				continue

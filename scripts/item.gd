@@ -19,6 +19,7 @@ class_name GameItem
 @export var harvest_efficiency: float = 1.0   # 0.0-1.0, chance to retrieve loot per hit
 
 var droppable: bool = true
+var blocks_movement: bool = true
 var registry_key: String = ""
 var category: String = ""
 var icon: Texture2D
@@ -41,6 +42,7 @@ func use(player, target, item_stack = null):
 	if target:
 		player.attack_target = target
 	player.is_trigger_action = true
+	player.is_movement_locked = blocks_movement
 	print("trigger action true")
 	var anim_sprite = player.get_node("AnimatedSprite2D")
 	extra_use_startup(player, item_stack)
@@ -73,16 +75,17 @@ func handle_use_hit_frame(player, _anim, _frame):
 			return
 
 func _is_target_compatible(target) -> bool:
-	"""Check if this item's target_action matches a key in the target's loot_table"""
+	"""Check if this item's target_action matches a key in the target's action_table"""
 	if target_action == "":
 		return false
-	if "loot_table" in target and target.loot_table is Dictionary:
-		return target.loot_table.has(target_action)
+	if "action_table" in target and target.action_table is Dictionary:
+		return target.action_table.has(target_action)
 	return false
 
 func _on_use_animation_finished(player):
 	print("_on_use_animation_finished")
 	player.is_trigger_action = false
+	player.is_movement_locked = false
 	if typeof(player.attack_target) == TYPE_OBJECT and is_instance_valid(player.attack_target) and player.attack_target.has_method("use_finished_callback"):
 		player.attack_target.use_finished_callback()
 	extra_use_cleanup(player)

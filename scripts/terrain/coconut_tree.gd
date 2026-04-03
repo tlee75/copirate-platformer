@@ -11,7 +11,7 @@ func _ready():
 	is_harvestable = true
 	is_destructible = true
 	max_harvests = 10
-	loot_table = {
+	action_table = {
 		"chop": [
 			{ "item": "coconut", "type": "harvest", "weight": 2.0 },
 			{ "item": "stick", "type": "harvest", "weight": 1.0 },

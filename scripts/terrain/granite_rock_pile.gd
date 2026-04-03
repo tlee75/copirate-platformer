@@ -8,7 +8,7 @@ func _ready():
 	is_harvestable = true
 	is_destructible = false
 	max_harvests = 2
-	loot_table = {
+	action_table = {
 		"interact": [
 			{ "item": "simple_rock", "type": "harvest", "weight": 1.0 }
 		]
