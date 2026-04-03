@@ -25,14 +25,6 @@ func is_consumable() -> bool:
 func extra_use_startup(player, _slot_data):
 	if player and player.player_stats:
 		player_stats = player.player_stats
-		if player_stats.is_healing:
-			print("Already healing")
-			return false
-		player_stats.is_healing = true
-		player_stats.set_health_regen_modifier(5)
-		player_stats.start_healing(10)
-		
-		# Store slot data for removal after animation finishes
-		#pending_slot_data = slot_data
+		player_stats.add_consumption_effect(0.0, 0.0, 5.0, 10)
 	else:
 		print("no player stats")

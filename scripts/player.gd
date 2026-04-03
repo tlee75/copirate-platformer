@@ -109,8 +109,17 @@ func _input(event):
 		match event.keycode:
 			# Numpad 1 - Health controls
 			KEY_KP_1:
-				player_stats.debug_add_health(-10.0)   # Heal
-
+				player_stats.debug_modify_health(10.0)   # Heal
+			KEY_KP_2:
+				player_stats.debug_modify_health(-10.0)
+			KEY_KP_3:
+				player_stats.debug_modify_hunger(10.0)   # Eat
+			KEY_KP_4:
+				player_stats.debug_modify_hunger(-10.0)
+			KEY_KP_5:
+				player_stats.debug_modify_thirst(10.0)   # Drink
+			KEY_KP_6:
+				player_stats.debug_modify_thirst(-10.0) 
 			# Numpad Period - Empty all stats (but keep alive)
 			KEY_KP_PERIOD:
 				player_stats.debug_kill_player()     # Actually kill for death testing

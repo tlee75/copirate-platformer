@@ -26,15 +26,6 @@ func is_consumable() -> bool:
 func extra_use_startup(player, _slot_data):
 	if player and player.player_stats:
 		player_stats = player.player_stats
-		if player_stats.is_eating:
-			print("Already eating")
-			return false
-		player_stats.is_eating = true
-		player_stats.set_hunger_regen_modifier(5)
-		player_stats.start_eating(1)
-		player_stats.start_drinking(2)
-		
-		# Store slot data for removal after animation finishes
-		#pending_slot_data = slot_data
+		player_stats.add_consumption_effect(0.2, 0.4, 0.0, 10) # 0.2 hunger and 0.4 thirst per tick, over 5 seconds
 	else:
 		print("no player stats")

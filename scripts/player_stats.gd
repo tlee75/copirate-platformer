@@ -40,12 +40,10 @@ var current_hunger: float
 var current_thirst: float
 
 # Modifiers (multipliers applied to rates)
-var health_regen_modifier: float = 1.0
 var oxygen_usage_modifier: float = 1.0
 var oxygen_regen_modifier: float = 1.0
-var hunger_regen_modifier: float = 1.0
+
 var hunger_usage_modifier: float = 1.0
-var thirst_regen_modifier: float = 1.0
 var thirst_usage_modifier: float = 1.0
 
 # Status tracking
@@ -53,16 +51,8 @@ var is_underwater: bool = false
 var is_oxygen_depleted: bool = false
 var is_hunger_depleted: bool = false
 var is_thirst_depleted: bool = false
-var is_eating: bool = false
-var is_drinking: bool = false
-var is_healing: bool = false
 
-# Timer
-var health_drain_timer: float = 0.0
-
-var eating_time_remaining: float = 0.0
-var drinking_time_remaining: float = 0.0
-var healing_time_remaining: float = 0.0
+var active_effects: Array = []
 var stats_timer: Timer
 
 func _ready():
@@ -85,24 +75,6 @@ func update_oxygen(delta: float):
 		# Regenerate oxygen when on surface
 		var regen = oxygen_regen_rate * oxygen_regen_modifier * delta
 		modify_oxygen(regen)
-
-func update_hunger(delta: float):
-	if is_eating:
-		# Regenerate hunger when eating
-		modify_hunger(hunger_regen_rate * hunger_regen_modifier * delta)
-	elif current_hunger <= max_hunger:
-		# Deplete hunger
-		var usage = hunger_usage_rate * hunger_usage_modifier * delta
-		modify_hunger(-usage)
-
-func update_thirst(delta: float):
-	if is_drinking:
-		# Regenerate thirst when drinking
-		modify_thirst(thirst_regen_rate * hunger_regen_modifier * delta)
-	elif current_thirst <= max_thirst:
-		# Deplete hunger
-		var usage = thirst_usage_rate * hunger_usage_modifier * delta
-		modify_thirst(-usage)
 
 # Core modification functions
 func modify_health(amount: float):
@@ -167,14 +139,8 @@ func set_oxygen_regen_modifier(modifier: float):
 func set_hunger_usage_modifier(modifier: float):
 	hunger_usage_modifier = modifier
 
-func set_hunger_regen_modifier(modifier: float):
-	hunger_regen_modifier = modifier
-
 func set_thirst_usage_modifier(modifier: float):
 	thirst_usage_modifier = modifier
-
-func set_health_regen_modifier(modifier: float):
-	health_regen_modifier = modifier
 
 # Status update functions (called by player)
 func set_underwater_status(underwater: bool):
@@ -204,6 +170,8 @@ func reset_stats():
 	oxygen_changed.emit(current_oxygen, max_oxygen)
 	hunger_changed.emit(current_hunger, max_hunger)
 	thirst_changed.emit(current_thirst, max_thirst)
+	
+	active_effects.clear()
 
 func setup_timer(timer: Timer):
 	stats_timer = timer
@@ -212,46 +180,14 @@ func setup_timer(timer: Timer):
 		print("Timer setup complete")
 
 func _on_stats_timer_timeout():
-	handle_hunger_update()
-	handle_thirst_update()
+	handle_consumption_update()
 	handle_health_update()
 
-
-# Eat food
-func start_eating(duration: float):
-	# Add to existing time
-	is_eating = true
-	eating_time_remaining += duration
-	print("Added ", duration, " seconds of eating time. Total remaining: ", eating_time_remaining)
-
-# Drink
-func start_drinking(duration: float):
-	# Add to existing time
-	is_drinking = true
-	drinking_time_remaining += duration
-	print("Added ", duration, " seconds of drinking time. Total remaining: ", drinking_time_remaining)
-
-func start_healing(duration: float):
-	is_healing = true
-	healing_time_remaining += duration
-	print("Added ", duration, " seconds of healing time. Total remaining: ", healing_time_remaining)
-
 func handle_health_update():
-	# Handle bandage, medkit etc
-	if current_health < max_health:
-		if is_healing and healing_time_remaining > 0:
-			modify_health(health_regen_rate * health_regen_modifier)
-			healing_time_remaining -= stats_timer.wait_time
-			if healing_time_remaining <= 0:
-				is_healing = false
-				healing_time_remaining = 0
-				set_health_regen_modifier(1.0)
-				print("Healing finished")
-				
-		# Handle well fed healing
-		if current_hunger >= 80 and current_thirst >= 80:
-			modify_health(health_regen_rate * health_regen_modifier)
-		
+	# Well fed passive healing
+	if current_health < max_health and current_hunger >= 80 and current_thirst >= 80:
+		modify_health(health_regen_rate)
+	
 	# Drain health if resource is depleted
 	if current_oxygen <= 0.0:
 		modify_health(-oxygen_damage_rate)
@@ -259,39 +195,57 @@ func handle_health_update():
 		modify_health(-hunger_damage_rate)
 	if current_thirst <= 0.0:
 		modify_health(-thirst_damage_rate)
-	
-func handle_thirst_update():
-	# Handle thirst and duration
-	if is_drinking and drinking_time_remaining > 0:
-		modify_thirst(thirst_regen_rate * thirst_regen_modifier)
-		drinking_time_remaining -= stats_timer.wait_time
-		if drinking_time_remaining <= 0:
-			is_drinking = false
-			drinking_time_remaining = 0.0
-			set_health_regen_modifier(1.0)
-			print("Finished drinking")
-	else:
-		# Deplete thirst - fixed amount per timer tick
-		modify_thirst(-thirst_usage_rate * thirst_usage_modifier)
 
-func handle_hunger_update():	# Handle eating and duration
-	if is_eating and eating_time_remaining > 0:
-		print("Eating time: ", eating_time_remaining)
-		modify_hunger(hunger_regen_rate * hunger_regen_modifier)
-		eating_time_remaining -= stats_timer.wait_time
-		if eating_time_remaining <= 0:
-			is_eating = false
-			eating_time_remaining = 0.0
-			set_hunger_regen_modifier(1.0)
-			print("Finished eating")
-	else:
-		# Deplete hunger - fixed amount per timer tick
-		modify_hunger(-hunger_usage_rate * hunger_usage_modifier)
+func add_consumption_effect(hunger_per_tick: float, thirst_per_tick: float, health_per_tick: float, ticks: int):
+	active_effects.append({
+		"hunger_per_tick": hunger_per_tick,
+		"thirst_per_tick": thirst_per_tick,
+		"health_per_tick": health_per_tick,
+		"ticks_remaining": ticks
+	})
 
-func debug_add_health(amount: float = 10.0):
-	"""Debug: Add health (positive amount heals, negative damages)"""
+func handle_consumption_update():
+	var total_hunger_regen = 0.0
+	var total_thirst_regen = 0.0
+	var total_health_regen = 0.0
+
+	var i = active_effects.size() - 1
+	while i >= 0:
+		var effect = active_effects[i]
+		total_hunger_regen += effect["hunger_per_tick"]
+		total_thirst_regen += effect["thirst_per_tick"]
+		total_health_regen += effect["health_per_tick"]
+		effect["ticks_remaining"] -= 1
+		if effect["ticks_remaining"] <= 0:
+			active_effects.remove_at(i)
+		i -= 1
+
+	# Usage always applies
+	modify_hunger(-hunger_usage_rate * hunger_usage_modifier)
+	modify_thirst(-thirst_usage_rate * thirst_usage_modifier)
+
+	# Regen from active effects stacks on top
+	if total_hunger_regen > 0.0:
+		modify_hunger(total_hunger_regen)
+	if total_thirst_regen > 0.0:
+		modify_thirst(total_thirst_regen)
+	if total_health_regen > 0.0:
+		modify_health(total_health_regen)
+
+func debug_modify_health(amount: float = 10.0):
+	"""Debug: Modify health (positive amount heals, negative damages)"""
 	modify_health(amount)
 	print("DEBUG: Health changed by ", amount, " - Now: ", current_health, "/", max_health)
+
+func debug_modify_thirst(amount: float = 10.0):
+	"""Debug: Modify thirst (positive amount adds, negative removes)"""
+	modify_thirst(amount)
+	print("DEBUG: Thirst changed by ", amount, " - Now: ", current_thirst, "/", max_thirst)
+
+func debug_modify_hunger(amount: float = 10.0):
+	"""Debug: Modify hunger (positive amount adds, negative removes)"""
+	modify_hunger(amount)
+	print("DEBUG: Hunger changed by ", amount, " - Now: ", current_hunger, "/", max_hunger)
 
 func debug_kill_player():
 	"""Debug: Set health to 0 to test death"""
