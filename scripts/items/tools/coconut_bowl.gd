@@ -16,7 +16,7 @@ func _init():
 	land_compatible = true
 	material_requirements = {"coconut": 1}
 	craft_time = 5.0  # seconds to craft
-	use_animation = "interact"
+	primary_animation = "interact"
 	is_tool = true
 	is_weapon = false
 	harvest_efficiency = 1.0

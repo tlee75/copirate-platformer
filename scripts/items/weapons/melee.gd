@@ -10,7 +10,7 @@ var hit_frames = {
 }
 
 func _init():
-	use_animation = "punch"
+	primary_animation = "punch"
 	target_action = "melee"
 	icon = load("res://assets/sprite-man/unarmed_icon_01.png")
 	stack_size = 1
@@ -26,7 +26,7 @@ func _init():
 	droppable = false
 	blocks_movement = false
 
-func get_use_animation(player) -> String:
+func get_primary_animation(player) -> String:
 	if player.is_underwater:
 		return "swim_punch"
 	return "punch"

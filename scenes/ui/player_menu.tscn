@@ -308,5 +308,13 @@ layout_mode = 2
 layout_mode = 1
 script = ExtResource("12_w17s6")
 
+[node name="CloseButton" type="Button" parent="." unique_id=1645273830]
+layout_mode = 0
+offset_left = 1128.0
+offset_top = 2.0
+offset_right = 1146.0
+offset_bottom = 33.0
+text = "X"
+
 [editable path="TabContainer/Crafting/ContentSection/CraftingItemDetail"]
 [editable path="TabContainer/Building/ContentSection/BuildingItemDetail"]

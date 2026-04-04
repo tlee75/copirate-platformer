@@ -25,10 +25,11 @@ var category: String = ""
 var icon: Texture2D
 var material_requirements: Dictionary = {}
 var cooked_result_item_name: String = ""  # What this item becomes when cooked
-var use_animation = ""
+var primary_animation = ""
 var secondary_animation = ""
 var pending_item_stack: InventoryManager.ItemStack = null
 var transform_result_item: String = ""  # Registry key of item this transforms into on use
+var secondary_target_action: String = ""
 
 func is_consumable() -> bool:
 	return false
@@ -36,13 +37,13 @@ func is_consumable() -> bool:
 func has_secondary_action() -> bool:
 	return secondary_animation != ""
 
-func get_use_animation(_player) -> String:
-	return use_animation
+func get_primary_animation(_player) -> String:
+	return primary_animation
 
 func use(player, target, item_stack = null, is_secondary = false):
-	var use_anim = secondary_animation if is_secondary else get_use_animation(player)
+	var use_anim = secondary_animation if is_secondary else get_primary_animation(player)
 	if use_anim == "" or use_anim == null:
-		print("WARNING: Item '%s' has no use_animation set!" % self.name)
+		print("WARNING: Item '%s' has no animation set!" % self.name)
 		return
 	if target:
 		player.attack_target = target
@@ -53,27 +54,10 @@ func use(player, target, item_stack = null, is_secondary = false):
 	extra_use_startup(player, item_stack)
 	cleanup_connections(player)
 	anim_sprite.frame_changed.connect(_on_use_frame_changed.bind(player))
-	anim_sprite.animation_finished.connect(_on_use_animation_finished.bind(player))
+	anim_sprite.animation_finished.connect(_on_primary_animation_finished.bind(player))
 	anim_sprite.play(use_anim)
 	
 	# For consumables, store the item stack so it can be cleaned up later
-	if (is_consumable() or transform_result_item != "") and item_stack:
-		pending_item_stack = item_stack
-	else:
-		pending_item_stack = null
-
-func use_secondary(player, item_stack = null):
-	if secondary_animation == "":
-		return
-	player.is_trigger_action = true
-	player.is_movement_locked = blocks_movement
-	var anim_sprite = player.get_node("AnimatedSprite2D")
-	extra_use_startup(player, item_stack)
-	cleanup_connections(player)
-	anim_sprite.frame_changed.connect(_on_use_frame_changed.bind(player))
-	anim_sprite.animation_finished.connect(_on_use_animation_finished.bind(player))
-	anim_sprite.play(secondary_animation)
-
 	if (is_consumable() or transform_result_item != "") and item_stack:
 		pending_item_stack = item_stack
 	else:
@@ -104,8 +88,8 @@ func _is_target_compatible(target) -> bool:
 		return target.action_table.has(target_action)
 	return false
 
-func _on_use_animation_finished(player):
-	print("_on_use_animation_finished")
+func _on_primary_animation_finished(player):
+	print("_on_primary_animation_finished")
 	player.is_trigger_action = false
 	player.is_movement_locked = false
 	if typeof(player.attack_target) == TYPE_OBJECT and is_instance_valid(player.attack_target) and player.attack_target.has_method("use_finished_callback"):
@@ -148,5 +132,5 @@ func cleanup_connections(user):
 	var anim_sprite = user.get_node("AnimatedSprite2D")
 	if anim_sprite.frame_changed.is_connected(Callable(self, "_on_use_frame_changed")):
 		anim_sprite.frame_changed.disconnect(Callable(self, "_on_use_frame_changed"))
-	if anim_sprite.animation_finished.is_connected(Callable(self, "_on_use_animation_finished")):
-		anim_sprite.animation_finished.disconnect(Callable(self, "_on_use_animation_finished"))
+	if anim_sprite.animation_finished.is_connected(Callable(self, "_on_primary_animation_finished")):
+		anim_sprite.animation_finished.disconnect(Callable(self, "_on_primary_animation_finished"))

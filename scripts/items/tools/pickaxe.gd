@@ -15,7 +15,7 @@ func _init():
 	land_compatible = true
 	material_requirements = {"gold_coin": 3}
 	craft_time = 5.0  # seconds to craft
-	use_animation = "pickaxe_attack"
+	primary_animation = "pickaxe_attack"
 	is_tool = true
 	harvest_efficiency = 0.5
 	target_action = "mine"

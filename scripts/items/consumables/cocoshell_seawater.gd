@@ -17,7 +17,7 @@ func _init():
 	is_cookable = true
 	cook_time = 8.0
 	cooked_result_item_name = "cooked_cocoshell_water"
-	secondary_animation = "consume"
+	primary_animation = "consume"
 	target_action = "pour"
 	target_range = 50.0
 	transform_result_item = "coconut_bowl"

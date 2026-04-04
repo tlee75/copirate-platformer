@@ -30,6 +30,7 @@ var item_list: InventoryItemList
 var item_detail
 var action_panel
 var input_handler: PlayerInputHandler
+var close_button: Button
 
 var current_category: String = "all"
 var is_open: bool = false
@@ -93,6 +94,8 @@ func _setup_ui_references():
 	equipment_item_list = $TabContainer/Equipment/ContentSection/RightPanelSplit/EquipmentItemList
 	equipment_item_detail = $TabContainer/Equipment/ContentSection/RightPanelSplit/EquipmentItemDetail
 	equipment_action_panel = $TabContainer/Equipment/FooterSection/EquipmentActionPanel
+
+	close_button = $CloseButton
 
 func _setup_input_handler():
 	# Reference the singleton autoload instead of creating a new instance
@@ -169,6 +172,12 @@ func _connect_signals():
 
 	# Watch for tab changes
 	tab_container.tab_changed.connect(_on_tab_changed)
+
+	# Setup close button
+	if close_button:
+		close_button.pressed.connect(toggle_player_menu)
+	else:
+		print("WARN: No close button")
 
 func _initialize_ui():
 	print("DEBUG: PlayerMenu._initialize_ui() called")

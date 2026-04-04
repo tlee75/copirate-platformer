@@ -14,7 +14,7 @@ func _init():
 	is_cookable = true
 	cook_time = 8.0
 	cooked_result_item_name = "roasted_coconut"
-	secondary_animation = "consume"
+	primary_animation = "consume"
 
 func is_consumable() -> bool:
 	return true

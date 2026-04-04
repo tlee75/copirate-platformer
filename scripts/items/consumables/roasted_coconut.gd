@@ -13,7 +13,7 @@ func _init():
 	land_compatible = true
 	is_cookable = false
 	cook_time = 8.0
-	secondary_animation = "consume"
+	primary_animation = "consume"
 
 func is_consumable() -> bool:
 	return true

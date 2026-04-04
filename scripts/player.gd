@@ -331,9 +331,9 @@ func handle_use_action():
 	var hands = GameObjectsDatabase.game_objects_database.get("hands")
 
 	# LEFT CLICK — primary action: use item on target, melee fallback, or swing at air
-	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_quick_access() and not is_mouse_over_inventory():
+	if Input.is_action_just_pressed("primary_action") and not is_mouse_over_quick_access() and not is_mouse_over_inventory():
 		# Priority 1: Selected item's primary action on target
-		if item and can_use_item_in_current_environment(item) and item.use_animation != "" and target != null and is_valid_target(target, item):
+		if item and can_use_item_in_current_environment(item) and item.primary_animation != "" and target != null and is_valid_target(target, item):
 			item.use(self, target, selected_stack)
 			return
 		# Priority 2: Melee fallback on target
@@ -342,7 +342,7 @@ func handle_use_action():
 			return
 		# Priority 3: No target — swing selected item or punch
 		var solo_item = null
-		if item and can_use_item_in_current_environment(item) and item.use_animation != "" and not item.is_consumable():
+		if item and can_use_item_in_current_environment(item) and item.primary_animation != "":
 			solo_item = item
 		else:
 			solo_item = GameObjectsDatabase.game_objects_database.get("melee")
@@ -381,18 +381,19 @@ func try_use_item(stack: InventoryManager.ItemStack) -> bool:
 		stack.item.use(self, null, stack)
 	return true
 
-func is_valid_target(target: Variant, item: GameItem) -> bool:
+func is_valid_target(target: Variant, item: GameItem, action_override: String = "") -> bool:
 	"""Check if this item can be used on the target (tool action match, damage, or both)"""
+	var action = action_override if action_override != "" else item.target_action
 	if target == null:
 		return false
 	# Tile targets — need a matching target_action
 	if typeof(target) == TYPE_VECTOR2I:
-		if item.target_action == "":
+		if action == "":
 			return false
 		var tile_data = tilemap.get_cell_tile_data(0, target as Vector2i)
 		if not tile_data:
 			return false
-		match item.target_action:
+		match action:
 			"dig":
 				return tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable")
 			"fill":
@@ -401,7 +402,7 @@ func is_valid_target(target: Variant, item: GameItem) -> bool:
 	# Object targets
 	if typeof(target) == TYPE_OBJECT and is_instance_valid(target):
 		# Tool compatible?
-		if item.target_action != "" and target is GameObject and check_object_compatibility(target, item.target_action):
+		if action != "" and target is GameObject and check_object_compatibility(target, action):
 			return true
 	return false
 
@@ -727,9 +728,6 @@ func add_loot(item_name: String, amount: int):
 	if InventoryManager.add_item(game_item, amount):
 		NotificationManager.notify(NotificationManager.NotificationType.ITEM_PICKUP, "pickup_" + item_name, "Picked up " + game_item.name)
 		DiscoveryManager.discover(item_name)
-		
-		# Find the stack for this item
-		var stack = InventoryManager.find_item_stack(game_item.name)
 		return true
 	else:
 		return false
@@ -847,7 +845,7 @@ func find_interact_target_at_position(world_pos: Vector2, hands: GameItem) -> Ga
 		return null
 	return _find_valid_object_at(world_pos, hands)
 
-func _find_valid_object_at(world_pos: Vector2, item: GameItem) -> Variant:
+func _find_valid_object_at(world_pos: Vector2, item: GameItem, action_override: String = "") -> Variant:
 	"""Physics query at world_pos, return first object is_valid_target for item."""
 	var space_state = get_world_2d().direct_space_state
 	var query = PhysicsPointQueryParameters2D.new()
@@ -860,7 +858,7 @@ func _find_valid_object_at(world_pos: Vector2, item: GameItem) -> Variant:
 		var obj = collider
 		if collider is Area2D:
 			obj = collider.get_parent()
-		if obj != self and is_valid_target(obj, item):
+		if obj != self and is_valid_target(obj, item, action_override):
 			return obj
 	return null
 
@@ -988,7 +986,7 @@ func calculate_distance_to_target(origin: Vector2, target: Variant) -> float:
 	else:
 		return origin.distance_to(target.global_position)
 
-func _raycast_for_item(origin: Vector2, direction: Vector2, max_range: float, item: GameItem) -> Variant:
+func _raycast_for_item(origin: Vector2, direction: Vector2, max_range: float, item: GameItem, action_override: String = "") -> Variant:
 	"""Single raycast returning the first valid target for this item (object or tile)."""
 	var space_state = get_world_2d().direct_space_state
 	var query = PhysicsRayQueryParameters2D.create(origin, origin + direction * max_range)
@@ -1001,15 +999,16 @@ func _raycast_for_item(origin: Vector2, direction: Vector2, max_range: float, it
 		var obj = hit
 		if hit is Area2D:
 			obj = hit.get_parent()
-		if obj != self and is_valid_target(obj, item):
+		if obj != self and is_valid_target(obj, item, action_override):
 			return obj
-	# If item has a target_action, also check tiles along the ray
-	if item.target_action != "":
+	# If item has an action, also check tiles along the ray
+	var action = action_override if action_override != "" else item.target_action
+	if action != "":
 		var step_size = 16.0
 		var steps = int(max_range / step_size)
 		for i in range(1, steps + 1):
 			var test_pos = origin + direction * (i * step_size)
-			var tile = _find_valid_tile_at(test_pos, item.target_action)
+			var tile = _find_valid_tile_at(test_pos, action)
 			if tile != Vector2i(-999, -999):
 				return tile
 	return null

@@ -15,7 +15,7 @@ func _init():
 	land_compatible = true
 	material_requirements = {"simple_rock": 1, "stick": 1, "fiber": 1}
 	craft_time = 5.0  # seconds to craft
-	use_animation = "woodaxe_attack"
+	primary_animation = "woodaxe_attack"
 	is_tool = true
 	is_weapon = true
 	target_action = "chop"

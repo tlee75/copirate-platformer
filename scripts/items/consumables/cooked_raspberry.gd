@@ -15,7 +15,7 @@ func _init():
 	category = "food"
 	underwater_compatible = false
 	land_compatible = true
-	secondary_animation = "consume"
+	primary_animation = "consume"
 
 func is_consumable() -> bool:
 	return true

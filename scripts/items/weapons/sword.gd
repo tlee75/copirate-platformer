@@ -18,6 +18,6 @@ func _init():
 	is_weapon = true
 	target_range = 60.0
 	target_spread = 12.0
-	use_animation = "sword_attack"
+	primary_animation = "sword_attack"
 	harvest_efficiency = 0.5
 	target_action = "slice"

@@ -12,7 +12,7 @@ func _init():
 	is_tool = true
 	is_weapon = false
 	target_action = "interact"
-	use_animation = "interact"
+	primary_animation = "interact"
 	land_compatible = true
 	underwater_compatible = true
 	harvest_efficiency = 1.0
