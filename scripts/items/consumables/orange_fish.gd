@@ -1,5 +1,5 @@
 extends GameItem
-class_name FishItem
+class_name OrangeFish
 
 var hit_frames = {
 	"consume": [4],
@@ -7,7 +7,7 @@ var hit_frames = {
 var player_stats: PlayerStats
 
 func _init():
-	name = "Fish"
+	name = "Orange Fish"
 	icon = null  # TODO: load("res://assets/creatures/fish/fish_icon.png")
 	stack_size = 10
 	craftable = false

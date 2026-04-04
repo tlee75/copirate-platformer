@@ -3,7 +3,7 @@ class_name Fish
 
 # Movement
 @export var swim_speed: float = 40.0
-@export var flee_speed: float = 120.0
+@export var flee_speed: float = 200.0
 @export var flee_duration: float = 1.5
 @export var patrol_change_interval: float = 3.0
 
@@ -14,7 +14,10 @@ class_name Fish
 @export var death_item_key: String = "raw_fish"  # Dropped when killed
 
 # Proximity flee range
-@export var flee_proximity_radius: float = 50.0
+@export var flee_proximity_radius: float = 80.0
+
+# Minimum water depth (tiles) required for fish to enter
+@export var min_depth: int = 3
 
 # Allow contact capture
 @export var is_capturable: bool = false
@@ -26,6 +29,7 @@ var patrol_timer: float = 0.0
 # Flee state
 var flee_timer: float = 0.0
 var flee_direction: Vector2 = Vector2.ZERO
+var direction_change_cooldown: float = 0.0
 
 # Reference
 var tilemap: TileMap
@@ -74,25 +78,28 @@ func _check_player_proximity():
 		flee_direction = (global_position - player.global_position).normalized()
 
 func _patrol(delta: float):
+	direction_change_cooldown = max(0.0, direction_change_cooldown - delta)
 	patrol_timer -= delta
 	if patrol_timer <= 0.0:
-		# Change direction randomly
 		patrol_direction = Vector2.RIGHT if randf() > 0.5 else Vector2.LEFT
 		patrol_timer = patrol_change_interval + randf() * 2.0
-	
-	# Check if next position is still water
-	var next_pos = global_position + patrol_direction * swim_speed * delta
-	if not _is_water_at(next_pos):
-		patrol_direction = -patrol_direction
-		patrol_timer = patrol_change_interval
-	
-	global_position += patrol_direction * swim_speed * delta
-	
-	# Flip sprite to face movement direction
+
+	if direction_change_cooldown <= 0.0:
+		var next_pos = global_position + patrol_direction * swim_speed * delta
+		if not _is_any_water_at(next_pos):
+			patrol_direction = -patrol_direction
+			patrol_timer = patrol_change_interval
+			direction_change_cooldown = 0.4
+
+	var move_pos = global_position + patrol_direction * swim_speed * delta
+	if _is_any_water_at(move_pos):
+		global_position = move_pos
+
 	if animated_sprite:
 		animated_sprite.flip_h = patrol_direction.x < 0
 
 func _flee(delta: float):
+	direction_change_cooldown = max(0.0, direction_change_cooldown - delta)
 	flee_timer -= delta
 	if flee_timer <= 0.0:
 		if player and global_position.distance_to(player.global_position) < flee_proximity_radius:
@@ -101,13 +108,17 @@ func _flee(delta: float):
 		else:
 			state = State.PATROL
 			return
-	
-	var next_pos = global_position + flee_direction * flee_speed * delta
-	if not _is_water_at(next_pos):
-		flee_direction = _find_best_flee_direction()
-	
-	global_position += flee_direction * flee_speed * delta
-	
+
+	if direction_change_cooldown <= 0.0:
+		var next_pos = global_position + flee_direction * flee_speed * delta
+		if not _is_any_water_at(next_pos):
+			flee_direction = _find_best_flee_direction()
+			direction_change_cooldown = 0.2
+
+	var move_pos = global_position + flee_direction * flee_speed * delta
+	if _is_any_water_at(move_pos):
+		global_position = move_pos
+
 	if animated_sprite:
 		animated_sprite.flip_h = flee_direction.x < 0
 
@@ -145,29 +156,45 @@ func _find_best_flee_direction() -> Vector2:
 	var away_from_player := Vector2.ZERO
 	if player:
 		away_from_player = (global_position - player.global_position).normalized()
-	
-	var best_dir := flee_direction
+
+	var best_dir := -flee_direction  # default: reverse
 	var best_score := -INF
 	for i in range(8):
 		var angle := i * (PI / 4.0)
 		var candidate := Vector2(cos(angle), sin(angle))
-		if not _is_water_at(global_position + candidate * 20.0):
+		# Both the near step and the far step must be clear water
+		if not _is_any_water_at(global_position + candidate * 16.0):
+			continue
+		if not _is_any_water_at(global_position + candidate * 40.0):
 			continue
 		var score := candidate.dot(away_from_player)
 		if score > best_score:
 			best_score = score
 			best_dir = candidate
-	
+
 	return best_dir
 
 func _is_water_at(pos: Vector2) -> bool:
 	if not tilemap:
 		return true  # Assume water if no tilemap
 	var tile_pos = tilemap.local_to_map(tilemap.to_local(pos))
-	var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
-	if tile_data and tile_data.has_custom_data("is_water") and tile_data.get_custom_data("is_water"):
+	# Count consecutive water tiles from this position downward
+	var depth := 0
+	for i in range(min_depth):
+		var check_pos = tile_pos + Vector2i(0, i)
+		var tile_data = tilemap.get_cell_tile_data(0, check_pos)
+		if tile_data and tile_data.has_custom_data("is_water") and tile_data.get_custom_data("is_water"):
+			depth += 1
+		else:
+			break
+	return depth >= min_depth
+
+func _is_any_water_at(pos: Vector2) -> bool:
+	if not tilemap:
 		return true
-	return false
+	var tile_pos = tilemap.local_to_map(tilemap.to_local(pos))
+	var tile_data = tilemap.get_cell_tile_data(0, tile_pos)
+	return tile_data != null and tile_data.has_custom_data("is_water") and tile_data.get_custom_data("is_water")
 
 func get_hover_color() -> Color:
 	return Color(1.0, 1.3, 1.0, 1.0)  # Slight green for fauna
