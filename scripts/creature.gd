@@ -11,6 +11,8 @@ var state: State = State.PATROL
 
 # Sleep optimization
 var is_awake: bool = true
+@export var sleep_delay: float = 10.0   # seconds to keep moving after leaving screen
+var _sleep_timer: float = 0.0
 
 # Who last hit us (used for flee direction)
 var last_attacker: Node2D = null
@@ -29,8 +31,15 @@ func _ready():
 		notifier.screen_exited.connect(_on_screen_exited)
 
 func _physics_process(delta):
-	if not is_awake or state == State.DEAD:
+	if state == State.DEAD:
 		return
+	if not is_awake:
+		return
+	if _sleep_timer > 0.0:
+		_sleep_timer -= delta
+		if _sleep_timer <= 0.0:
+			is_awake = false
+			return
 	_update_ai(delta)
 
 func _update_ai(_delta: float):
@@ -70,6 +79,7 @@ func is_interactable() -> bool:
 
 func _on_screen_entered():
 	is_awake = true
+	_sleep_timer = 0.0
 
 func _on_screen_exited():
-	is_awake = false
+	_sleep_timer = sleep_delay
