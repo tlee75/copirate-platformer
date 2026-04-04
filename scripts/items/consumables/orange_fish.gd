@@ -17,7 +17,7 @@ func _init():
 	is_cookable = true
 	cook_time = 10.0
 	cooked_result_item_name = "cooked_fish"
-	use_animation = "consume"
+	secondary_animation = "consume"
 	description = "A live fish. Can be cooked for a meal."
 
 func is_consumable() -> bool:

@@ -16,7 +16,7 @@ func _init():
 	underwater_compatible = false
 	land_compatible = true
 	material_requirements = {"gold_coin": 1}
-	use_animation = "consume"
+	secondary_animation = "consume"
 	craft_time = 5
 
 func is_consumable() -> bool:

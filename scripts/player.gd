@@ -330,20 +330,19 @@ func handle_use_action():
 	var melee = GameObjectsDatabase.game_objects_database.get("melee")
 	var hands = GameObjectsDatabase.game_objects_database.get("hands")
 
-	# LEFT CLICK — use selected item, melee fallback, or swing at air
+	# LEFT CLICK — primary action: use item on target, melee fallback, or swing at air
 	if Input.is_action_just_pressed("mouse_left") and not is_mouse_over_quick_access() and not is_mouse_over_inventory():
-		# Priority 1: Selected item on target
-		if item and can_use_item_in_current_environment(item) and target != null and is_valid_target(target, item):
+		# Priority 1: Selected item's primary action on target
+		if item and can_use_item_in_current_environment(item) and item.use_animation != "" and target != null and is_valid_target(target, item):
 			item.use(self, target, selected_stack)
 			return
 		# Priority 2: Melee fallback on target
 		if target != null and melee and is_valid_target(target, melee):
 			melee.use(self, target, null)
 			return
-		# Priority 3: No target — swing at air
-		# Use selected item by itself if possible; otherwise always punch
+		# Priority 3: No target — swing selected item or punch
 		var solo_item = null
-		if item and can_use_item_in_current_environment(item) and item.use_animation != "":
+		if item and can_use_item_in_current_environment(item) and item.use_animation != "" and not item.is_consumable():
 			solo_item = item
 		else:
 			solo_item = GameObjectsDatabase.game_objects_database.get("melee")
@@ -352,14 +351,20 @@ func handle_use_action():
 			solo_item.use(self, null, selected_stack)
 		return
 
-	# interact using hands
+	# RIGHT CLICK — secondary action or hands interact
 	if Input.is_action_just_pressed("interact"):
+		# Priority 1: Hands interact with valid target
 		if target != null and hands and is_valid_target(target, hands):
 			hands.use(self, target, null)
 			return
-		# Fallback: call interact() directly on the target
+		# Priority 2: Fallback interact() on target
 		if target != null and typeof(target) == TYPE_OBJECT and is_instance_valid(target) and target.has_method("interact"):
 			target.interact()
+			return
+		# Priority 3: Selected item's secondary action (consume, etc.)
+		if item and can_use_item_in_current_environment(item) and item.has_secondary_action():
+			item.use(self, null, selected_stack, true)
+			return
 		return
 
 func try_use_item(stack: InventoryManager.ItemStack) -> bool:
@@ -370,7 +375,10 @@ func try_use_item(stack: InventoryManager.ItemStack) -> bool:
 	if not can_use_item_in_current_environment(stack.item):
 		print("Cannot use ", stack.item.name, " in current environment!")
 		return false
-	stack.item.use(self, null, stack)
+	if stack.item.has_secondary_action():
+		stack.item.use(self, null, stack, true)
+	else:
+		stack.item.use(self, null, stack)
 	return true
 
 func is_valid_target(target: Variant, item: GameItem) -> bool:
