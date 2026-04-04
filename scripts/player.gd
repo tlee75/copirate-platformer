@@ -3,9 +3,11 @@ extends CharacterBody2D
 class_name Player
 
 const WALK_SPEED := 200.0
-const RUN_SPEED := 300.0
+const LAND_SPRINT_MULTIPLIER := 1.5
+const RUN_SPEED := WALK_SPEED * LAND_SPRINT_MULTIPLIER
 const JUMP_VELOCITY := -400.0
 const STEP_HEIGHT: float = 10.0  # Max height in pixels to auto-step over
+const SWIM_SPRINT_MULTIPLIER := 1.5
 
 @export var max_cursor_distance: float = 80.0  # Adjustable in editor
 @export var default_interact_range: float = 80.0   # Default interaction range
@@ -18,6 +20,7 @@ var is_airborne: bool = false
 var is_trigger_action: bool = false
 var is_movement_locked: bool = false
 var is_sprint_swimming: bool = false
+var is_sprinting: bool = false
 var cursor_area: Area2D
 var tilemap: TileMap
 var highlighted_tiles: Array[Vector2i] = []
@@ -199,9 +202,9 @@ func _physics_process(delta):
 	# Detect walking off a ledge (became airborne without pressing jump)
 	var on_floor_now = is_on_floor()
 	if not on_floor_now and last_frame_on_floor and not Input.is_action_just_pressed("jump"):
-		var is_running = Input.is_key_pressed(KEY_SHIFT)
-		was_running_when_jumped = is_running
-		jump_speed = RUN_SPEED if is_running else WALK_SPEED
+		is_sprinting = Input.is_key_pressed(KEY_SHIFT)
+		was_running_when_jumped = is_sprinting
+		jump_speed = RUN_SPEED if is_sprinting else WALK_SPEED
 	last_frame_on_floor = on_floor_now
 
 	if not is_on_floor():
@@ -229,17 +232,23 @@ func _physics_process(delta):
 
 		if is_underwater:
 			is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
-			current_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
+			_update_sprint_modifiers()
+			current_speed = swim_speed * SWIM_SPRINT_MULTIPLIER if is_sprint_swimming else swim_speed
 		elif not is_on_floor():
 			current_speed = jump_speed
 		else:
-			var is_running = Input.is_key_pressed(KEY_SHIFT)
-			current_speed = RUN_SPEED if is_running else WALK_SPEED
+			is_sprinting = Input.is_key_pressed(KEY_SHIFT)
+			_update_sprint_modifiers()
+			current_speed = RUN_SPEED if is_sprinting else WALK_SPEED
 
 		vel.x = dir * current_speed
 		last_move_dir = dir
 	else:
 		vel.x = move_toward(vel.x, 0, WALK_SPEED)
+		if is_sprinting or is_sprint_swimming:
+			is_sprinting = false
+			is_sprint_swimming = false
+			_update_sprint_modifiers()
 	
 	# Vertical movement
 	var vertical_dir = 0
@@ -252,9 +261,12 @@ func _physics_process(delta):
 	if Input.is_action_just_pressed("jump") and (is_on_floor() and not is_underwater or (is_underwater and is_at_breathable_surface and not is_trigger_action)):
 		vel.y = JUMP_VELOCITY
 		was_running_when_jumped = Input.is_key_pressed(KEY_SHIFT)
-		jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
 		if is_underwater:
+			jump_speed = swim_speed * SWIM_SPRINT_MULTIPLIER if is_sprint_swimming else swim_speed
 			_water_jump_active = true
+		else:
+			jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
+
 
 	# Clear water jump flag once the upward arc is over
 	if _water_jump_active and vel.y >= 0:
@@ -268,7 +280,7 @@ func _physics_process(delta):
 	
 	# Swimming up/down when underwater
 			is_sprint_swimming = Input.is_key_pressed(KEY_SHIFT)
-			var current_swim_speed = swim_speed * 1.5 if is_sprint_swimming else swim_speed
+			var current_swim_speed = swim_speed * SWIM_SPRINT_MULTIPLIER if is_sprint_swimming else swim_speed
 	
 	# Stop at water surface when swimming up
 			if vertical_dir < 0 and is_at_breathable_surface and near_top:
@@ -448,8 +460,8 @@ func handle_animations():
 						$AnimatedSprite2D.play("swim")
 				else:
 					# Normal land animations
-					var is_running = Input.is_key_pressed(KEY_SHIFT)
-					var target_anim = "run" if is_running else "walk"
+					is_sprinting = Input.is_key_pressed(KEY_SHIFT)
+					var target_anim = "run" if is_sprinting else "walk"
 					# Only change animation if it's different from current
 					if $AnimatedSprite2D.animation != target_anim:
 						$AnimatedSprite2D.play(target_anim)
@@ -1044,3 +1056,13 @@ func clear_hover_target():
 		if is_instance_valid(current_hover_target):
 			current_hover_target._on_hover_exit()
 		current_hover_target = null
+
+func _update_sprint_modifiers() -> void:
+	var modifier: float = 1.0
+	if is_sprint_swimming:
+		modifier = SWIM_SPRINT_MULTIPLIER
+	elif is_sprinting:
+		modifier = LAND_SPRINT_MULTIPLIER
+	player_stats.set_hunger_usage_modifier(modifier)
+	player_stats.set_thirst_usage_modifier(modifier)
+		

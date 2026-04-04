@@ -7,6 +7,7 @@ signal oxygen_changed(current: float, max_value: float)
 signal hunger_changed(current: float, max_value: float)
 signal thirst_changed(current: float, max_value: float)
 signal stat_depleted(stat_name: String)
+signal effects_changed
 
 # Base stats
 @export  var max_health: float = 100.0
@@ -27,8 +28,8 @@ signal stat_depleted(stat_name: String)
 
 # Usage rates (per second)
 @export var oxygen_usage_rate: float = 10.0 # When underwater
-@export var hunger_usage_rate: float = 0.1
-@export var thirst_usage_rate: float = 0.2
+@export var hunger_usage_rate: float = 0.0278
+@export var thirst_usage_rate: float = 0.0556
 
 # Interval
 @export var health_drain_interval: float = 1.0 # seconds between health loss
@@ -196,6 +197,43 @@ func handle_health_update():
 	if current_thirst <= 0.0:
 		modify_health(-thirst_damage_rate)
 
+func get_net_rates() -> Dictionary:
+	var wait = stats_timer.wait_time if stats_timer else 1.0
+
+	var hunger_regen = 0.0
+	var thirst_regen = 0.0
+	var health_regen = 0.0
+	for effect in active_effects:
+		hunger_regen += effect["hunger_per_tick"]
+		thirst_regen += effect["thirst_per_tick"]
+		health_regen += effect["health_per_tick"]
+
+	var net_hunger = (hunger_regen - hunger_usage_rate * hunger_usage_modifier) / wait
+	var net_thirst = (thirst_regen - thirst_usage_rate * thirst_usage_modifier) / wait
+
+	var health_drain = 0.0
+	if current_oxygen <= 0.0: health_drain += oxygen_damage_rate
+	if current_hunger <= 0.0: health_drain += hunger_damage_rate
+	if current_thirst <= 0.0: health_drain += thirst_damage_rate
+	var well_fed = health_regen_rate if (current_health < max_health and current_hunger >= 80.0 and current_thirst >= 80.0) else 0.0
+	var net_health = (health_regen + well_fed - health_drain) / wait
+
+	var net_oxygen = 0.0
+	if is_underwater:
+		net_oxygen = -(oxygen_usage_rate * oxygen_usage_modifier)
+	elif current_oxygen < max_oxygen:
+		net_oxygen = oxygen_regen_rate * oxygen_regen_modifier
+
+	return {
+		"health": net_health,
+		"health_regen": health_regen / wait,
+		"oxygen": net_oxygen,
+		"hunger": net_hunger,
+		"hunger_regen": hunger_regen / wait,
+		"thirst": net_thirst,
+		"thirst_regen": thirst_regen / wait,
+	}
+
 func add_consumption_effect(hunger_per_tick: float, thirst_per_tick: float, health_per_tick: float, ticks: int):
 	active_effects.append({
 		"hunger_per_tick": hunger_per_tick,
@@ -203,6 +241,7 @@ func add_consumption_effect(hunger_per_tick: float, thirst_per_tick: float, heal
 		"health_per_tick": health_per_tick,
 		"ticks_remaining": ticks
 	})
+	effects_changed.emit()
 
 func handle_consumption_update():
 	var total_hunger_regen = 0.0

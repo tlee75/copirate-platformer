@@ -18,16 +18,15 @@ var _active: Dictionary = {}  # key -> { type, message, count, timer }
 const DISMISS_TIME: float = 5.0
 const MAX_NOTIFICATIONS: int = 6
 
-func notify(type: NotificationType, key: String, message: String) -> void:
+func notify(type: NotificationType, key: String, message: String, duration: float = DISMISS_TIME) -> void:
 	if _active.has(key):
 		_active[key].count += 1
-		_active[key].timer = DISMISS_TIME
+		_active[key].timer = duration
 		notification_updated.emit(key, _active[key].count)
 	else:
-		# If at max, remove the oldest
 		if _active.size() >= MAX_NOTIFICATIONS:
 			_remove_oldest()
-		_active[key] = { "type": type, "message": message, "count": 1, "timer": DISMISS_TIME }
+		_active[key] = { "type": type, "message": message, "count": 1, "timer": duration }
 		notification_added.emit(key, type, message, 1)
 
 func _process(delta: float) -> void:
