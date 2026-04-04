@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://nrlurk8w8qpl"]
+
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_2mw72"]
+[ext_resource type="Texture2D" uid="uid://douiekrl4odua" path="res://assets/tools/coconut_bowl_64x64_1.png" id="1_40ikq"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pbu60"]
+atlas = ExtResource("1_40ikq")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_v1i8o"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pbu60")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 1.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2mw72"]
+radius = 7.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gj703"]
+radius = 7.0
+
+[node name="CoconutBowl" type="RigidBody2D" unique_id=1230960114]
+collision_layer = 8
+script = ExtResource("1_2mw72")
+idle_animation = "idle"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1363181471]
+scale = Vector2(0.2, 0.2)
+sprite_frames = SubResource("SpriteFrames_v1i8o")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=705401248]
+shape = SubResource("CircleShape2D_2mw72")
+
+[node name="PickupArea" type="Area2D" parent="." unique_id=1612968189]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=1109690803]
+shape = SubResource("CircleShape2D_gj703")

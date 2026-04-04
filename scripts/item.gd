@@ -27,6 +27,7 @@ var material_requirements: Dictionary = {}
 var cooked_result_item_name: String = ""  # What this item becomes when cooked
 var use_animation = ""
 var pending_item_stack: InventoryManager.ItemStack = null
+var transform_result_item: String = ""  # Registry key of item this transforms into on use
 
 func is_consumable() -> bool:
 	return false
@@ -52,7 +53,7 @@ func use(player, target, item_stack = null):
 	anim_sprite.play(use_anim)
 	
 	# For consumables, store the item stack so it can be cleaned up later
-	if is_consumable() and item_stack:
+	if (is_consumable() or transform_result_item != "") and item_stack:
 		pending_item_stack = item_stack
 	else:
 		pending_item_stack = null
@@ -89,8 +90,25 @@ func _on_use_animation_finished(player):
 	if typeof(player.attack_target) == TYPE_OBJECT and is_instance_valid(player.attack_target) and player.attack_target.has_method("use_finished_callback"):
 		player.attack_target.use_finished_callback()
 	extra_use_cleanup(player)
+	var stored_target = player.attack_target
 	player.attack_target = null
-	
+
+	# Transform item into another item — only when a tile was actually targeted
+	if transform_result_item != "" and pending_item_stack and pending_item_stack.quantity > 0 and stored_target != null:
+		var result_item = GameObjectsDatabase.game_objects_database.get(transform_result_item)
+		if result_item:
+			InventoryManager.remove_stack(pending_item_stack, 1)
+			InventoryManager.add_item(result_item, 1)
+			InventoryManager.quick_access_changed.emit()
+			NotificationManager.notify(
+				NotificationManager.NotificationType.ITEM_COOKED,
+				"transform_" + transform_result_item,
+				"Filled " + self.name + " → " + result_item.name
+			)
+		pending_item_stack = null
+		cleanup_connections(player)
+		return
+
 	# Remove the consumable that was stored previously
 	if is_consumable() and pending_item_stack and pending_item_stack.quantity > 0 and pending_item_stack.item.name == self.name:
 		InventoryManager.use_item_stack(pending_item_stack)

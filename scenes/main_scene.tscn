@@ -29,14 +29,10 @@
 [ext_resource type="PackedScene" uid="uid://cuu2vsbd7syoi" path="res://scenes/terrain/coconut_tree.tscn" id="30_02d50"]
 [ext_resource type="PackedScene" uid="uid://d3ybb65elgyad" path="res://scenes/creatures/fish.tscn" id="30_kkokr"]
 [ext_resource type="PackedScene" uid="uid://bbnkwhcolpqai" path="res://scenes/items/scallop_shell.tscn" id="30_pgk25"]
-[ext_resource type="PackedScene" uid="uid://bu7b5emw3w7xh" path="res://scenes/items/cooked_fish.tscn" id="31_kkokr"]
-[ext_resource type="PackedScene" uid="uid://c6srbg7yhoev0" path="res://scenes/items/coconut.tscn" id="31_onjth"]
+[ext_resource type="PackedScene" uid="uid://nrlurk8w8qpl" path="res://scenes/items/coconut_bowl.tscn" id="31_pgk25"]
 [ext_resource type="PackedScene" uid="uid://c665se5n8hwv7" path="res://scenes/terrain/granite_rock_pile.tscn" id="32_kkokr"]
-[ext_resource type="PackedScene" uid="uid://4y11kmsmuruv" path="res://scenes/items/raw_fish.tscn" id="32_lhwp2"]
-[ext_resource type="PackedScene" uid="uid://q0jxcjkibwdh" path="res://scenes/items/cooked_raspberry.tscn" id="33_xa0eo"]
-[ext_resource type="PackedScene" uid="uid://77hcqy2emy6" path="res://scenes/items/leaf_bandage.tscn" id="34_3mjum"]
-[ext_resource type="PackedScene" uid="uid://81iityq5w6h5" path="res://scenes/items/raspberry.tscn" id="35_p27gv"]
-[ext_resource type="PackedScene" uid="uid://cq6q0hfmdu1wj" path="res://scenes/items/roasted_coconut.tscn" id="36_cn4eu"]
+[ext_resource type="PackedScene" uid="uid://gpmqntudt2j1" path="res://scenes/items/cocoshell_seawater.tscn" id="32_lhwp2"]
+[ext_resource type="PackedScene" uid="uid://bdemfwbbodxt7" path="res://scenes/items/cooked_cocoshell_water.tscn" id="33_lhwp2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(6, 6)
@@ -246,8 +242,6 @@ position = Vector2(-752, 3888)
 
 [node name="BerryBush2" parent="Resources" unique_id=1022453375 instance=ExtResource("23_j4epa")]
 position = Vector2(-605, 2079)
-max_harvests = null
-regeneration_time = null
 
 [node name="TwoSecondTimer" type="Timer" parent="Resources" unique_id=1740078514]
 wait_time = 2.0
@@ -255,13 +249,9 @@ autostart = true
 
 [node name="BerryBush3" parent="Resources" unique_id=820907367 instance=ExtResource("23_j4epa")]
 position = Vector2(-4144, 2078)
-max_harvests = null
-regeneration_time = null
 
 [node name="BerryBush4" parent="Resources" unique_id=499914360 instance=ExtResource("23_j4epa")]
 position = Vector2(-6249, 2078)
-max_harvests = null
-regeneration_time = null
 
 [node name="ScallopShell" parent="Resources" unique_id=19340439 instance=ExtResource("30_pgk25")]
 position = Vector2(-2824, 2184)
@@ -314,8 +304,21 @@ regeneration_time = null
 
 [node name="BerryBush" parent="CoconutTrees" unique_id=493298007 instance=ExtResource("23_j4epa")]
 position = Vector2(-3304, 2078)
-max_harvests = null
-regeneration_time = null
+
+[node name="CoconutTree8" parent="CoconutTrees" unique_id=1923840550 instance=ExtResource("30_02d50")]
+position = Vector2(-4687, 2075)
+
+[node name="CoconutTree9" parent="CoconutTrees" unique_id=490524226 instance=ExtResource("30_02d50")]
+position = Vector2(-4037, 2042)
+
+[node name="CoconutTree10" parent="CoconutTrees" unique_id=1382184345 instance=ExtResource("30_02d50")]
+position = Vector2(-5603, 2075)
+
+[node name="CoconutTree11" parent="CoconutTrees" unique_id=1990705325 instance=ExtResource("30_02d50")]
+position = Vector2(-5476, 2076)
+
+[node name="CoconutTree12" parent="CoconutTrees" unique_id=1274674956 instance=ExtResource("30_02d50")]
+position = Vector2(-6101, 2043)
 
 [node name="SimpleRocks" type="Node" parent="." unique_id=1277372746]
 
@@ -333,68 +336,50 @@ position = Vector2(-2608, 2304)
 
 [node name="GraniteRockPile" parent="SimpleRocks" unique_id=1919999788 instance=ExtResource("32_kkokr")]
 position = Vector2(50, 2177)
-max_harvests = null
-regeneration_time = null
-
-[node name="Fish" parent="." unique_id=1509415315 instance=ExtResource("30_kkokr")]
-position = Vector2(678, 2272)
-
-[node name="Fish2" parent="." unique_id=181288531 instance=ExtResource("30_kkokr")]
-position = Vector2(1003, 2393)
-
-[node name="Fish3" parent="." unique_id=739021327 instance=ExtResource("30_kkokr")]
-position = Vector2(1266, 2597)
-
-[node name="Fish4" parent="." unique_id=355623012 instance=ExtResource("30_kkokr")]
-position = Vector2(1629, 2419)
-
-[node name="Fish5" parent="." unique_id=313543183 instance=ExtResource("30_kkokr")]
-position = Vector2(2008, 2656)
-
-[node name="Fish6" parent="." unique_id=1994768819 instance=ExtResource("30_kkokr")]
-position = Vector2(2385, 2396)
-
-[node name="Fish7" parent="." unique_id=835337388 instance=ExtResource("30_kkokr")]
-position = Vector2(2828, 2730)
-
-[node name="Fish8" parent="." unique_id=1714188608 instance=ExtResource("30_kkokr")]
-position = Vector2(2264, 3019)
-
-[node name="CoconutTree" parent="." unique_id=1923840550 instance=ExtResource("30_02d50")]
-position = Vector2(-4687, 2075)
-
-[node name="CoconutTree2" parent="." unique_id=490524226 instance=ExtResource("30_02d50")]
-position = Vector2(-4037, 2042)
-
-[node name="CoconutTree3" parent="." unique_id=1382184345 instance=ExtResource("30_02d50")]
-position = Vector2(-5603, 2075)
-
-[node name="CoconutTree4" parent="." unique_id=1990705325 instance=ExtResource("30_02d50")]
-position = Vector2(-5476, 2076)
-
-[node name="CoconutTree5" parent="." unique_id=1274674956 instance=ExtResource("30_02d50")]
-position = Vector2(-6101, 2043)
 
 [node name="GraniteRockPile" parent="." unique_id=1986582708 instance=ExtResource("32_kkokr")]
 position = Vector2(-3887, 2075)
 
-[node name="Coconut" parent="." unique_id=1029079583 instance=ExtResource("31_onjth")]
-position = Vector2(-3767, 2021)
+[node name="Fauna" type="Node" parent="." unique_id=1027826087]
 
-[node name="CookedFish" parent="." unique_id=868243162 instance=ExtResource("31_kkokr")]
-position = Vector2(-3727, 2020)
+[node name="Fish9" parent="Fauna" unique_id=428466194 instance=ExtResource("30_kkokr")]
+position = Vector2(-2434, 2269)
 
-[node name="CookedRaspberry" parent="." unique_id=1013855393 instance=ExtResource("33_xa0eo")]
-position = Vector2(-3685, 2018)
+[node name="Fish10" parent="Fauna" unique_id=1792265650 instance=ExtResource("30_kkokr")]
+position = Vector2(-1952, 2241)
 
-[node name="LeafBandage" parent="." unique_id=1198542605 instance=ExtResource("34_3mjum")]
-position = Vector2(-3653, 2019)
+[node name="Fish11" parent="Fauna" unique_id=352832839 instance=ExtResource("30_kkokr")]
+position = Vector2(-1398, 2252)
 
-[node name="Raspberry" parent="." unique_id=267013526 instance=ExtResource("35_p27gv")]
-position = Vector2(-3621, 2014)
+[node name="Fish" parent="Fauna" unique_id=1509415315 instance=ExtResource("30_kkokr")]
+position = Vector2(678, 2272)
 
-[node name="RoastedCoconut" parent="." unique_id=1170731652 instance=ExtResource("36_cn4eu")]
-position = Vector2(-3883, 2027)
+[node name="Fish2" parent="Fauna" unique_id=181288531 instance=ExtResource("30_kkokr")]
+position = Vector2(1003, 2393)
 
-[node name="RawFish" parent="." unique_id=668380287 instance=ExtResource("32_lhwp2")]
-position = Vector2(-3934, 2019)
+[node name="Fish3" parent="Fauna" unique_id=739021327 instance=ExtResource("30_kkokr")]
+position = Vector2(1266, 2597)
+
+[node name="Fish4" parent="Fauna" unique_id=355623012 instance=ExtResource("30_kkokr")]
+position = Vector2(1629, 2419)
+
+[node name="Fish5" parent="Fauna" unique_id=313543183 instance=ExtResource("30_kkokr")]
+position = Vector2(2008, 2656)
+
+[node name="Fish6" parent="Fauna" unique_id=1994768819 instance=ExtResource("30_kkokr")]
+position = Vector2(2385, 2396)
+
+[node name="Fish7" parent="Fauna" unique_id=835337388 instance=ExtResource("30_kkokr")]
+position = Vector2(2828, 2730)
+
+[node name="Fish8" parent="Fauna" unique_id=1714188608 instance=ExtResource("30_kkokr")]
+position = Vector2(2264, 3019)
+
+[node name="CoconutBowl" parent="." unique_id=1230960114 instance=ExtResource("31_pgk25")]
+position = Vector2(-3701, 2035)
+
+[node name="CocoshellSeawater" parent="." unique_id=1654962597 instance=ExtResource("32_lhwp2")]
+position = Vector2(-3733, 2034)
+
+[node name="CookedCocoshellWater" parent="." unique_id=491690947 instance=ExtResource("33_lhwp2")]
+position = Vector2(-3766, 2033)

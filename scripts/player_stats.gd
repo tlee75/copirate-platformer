@@ -264,11 +264,11 @@ func handle_consumption_update():
 	modify_thirst(-thirst_usage_rate * thirst_usage_modifier)
 
 	# Regen from active effects stacks on top
-	if total_hunger_regen > 0.0:
+	if total_hunger_regen != 0.0:
 		modify_hunger(total_hunger_regen)
-	if total_thirst_regen > 0.0:
+	if total_thirst_regen != 0.0:
 		modify_thirst(total_thirst_regen)
-	if total_health_regen > 0.0:
+	if total_health_regen != 0.0:
 		modify_health(total_health_regen)
 
 func debug_modify_health(amount: float = 10.0):

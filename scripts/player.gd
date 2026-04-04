@@ -387,6 +387,8 @@ func is_valid_target(target: Variant, item: GameItem) -> bool:
 		match item.target_action:
 			"dig":
 				return tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable")
+			"fill":
+				return tile_data.has_custom_data("is_water") and tile_data.get_custom_data("is_water")
 		return false
 	# Object targets
 	if typeof(target) == TYPE_OBJECT and is_instance_valid(target):
@@ -865,6 +867,9 @@ func _find_valid_tile_at(world_pos: Vector2, target_action: String) -> Vector2i:
 	match target_action:
 		"dig":
 			if tile_data.has_custom_data("is_diggable") and tile_data.get_custom_data("is_diggable"):
+				return tile_pos
+		"fill":
+			if tile_data.has_custom_data("is_water") and tile_data.get_custom_data("is_water"):
 				return tile_pos
 	return Vector2i(-999, -999)
 

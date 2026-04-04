@@ -39,7 +39,7 @@ func _ready():
 	interactive_object = InteractiveObjectComponent.new()
 	interactive_object.object_name = "Firepit"
 	interactive_object.inventory_slots = 2
-	interactive_object.accepted_categories = ["fuel", "food"]
+	interactive_object.accepted_categories = ["fuel", "food", "resource"]
 	add_child(interactive_object)
 
 	# Connect to ResourceManager for fuel consumption
