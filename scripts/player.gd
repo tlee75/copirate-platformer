@@ -730,8 +730,6 @@ func add_loot(item_name: String, amount: int):
 		
 		# Find the stack for this item
 		var stack = InventoryManager.find_item_stack(game_item.name)
-		if stack and not stack.is_in_quick_access():
-			InventoryManager.assign_to_next_quick_access_slot(stack)
 		return true
 	else:
 		return false
