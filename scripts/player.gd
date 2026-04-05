@@ -193,11 +193,14 @@ func _physics_process(delta):
 			is_underwater = true
 			player_stats.set_underwater_status(is_underwater)
 	else:
-		water_depth = 0
-		is_at_breathable_surface = false
-		is_underwater = false
-		_water_jump_active = false
-		player_stats.set_underwater_status(is_underwater)
+		if is_on_floor() or not is_underwater or _water_jump_active:
+			_water_jump_active = false
+			water_depth = 0
+			is_at_breathable_surface = false
+			is_underwater = false
+			player_stats.set_underwater_status(is_underwater)
+
+	var fully_submerged = is_underwater and not is_at_breathable_surface
 
 	# Detect walking off a ledge (became airborne without pressing jump)
 	var on_floor_now = is_on_floor()
@@ -207,12 +210,10 @@ func _physics_process(delta):
 		jump_speed = RUN_SPEED if is_sprinting else WALK_SPEED
 	last_frame_on_floor = on_floor_now
 
-	if not is_on_floor():
-		if is_underwater:
-			# In water: dampen vertical movement to simulate water resistance
-			vel.y = move_toward(vel.y, 0, gravity *2 * delta)
+	if not is_on_floor() or fully_submerged:
+		if is_on_water_tile():
+			vel.y = move_toward(vel.y, 0, gravity * 2 * delta)
 		else:
-			# Normal land gravity
 			vel.y += gravity * delta
 
 	#  WASD + Arrow key input
@@ -267,13 +268,8 @@ func _physics_process(delta):
 		else:
 			jump_speed = RUN_SPEED if was_running_when_jumped else WALK_SPEED
 
-
-	# Clear water jump flag once the upward arc is over
-	if _water_jump_active and vel.y >= 0:
-		_water_jump_active = false
-
 	if vertical_dir != 0:
-		if is_underwater and not _water_jump_active:
+		if is_underwater and vel.y >= 0:
 			var tile_pixel_y = tile_pos.y * tile_size
 			var offset_in_tile = global_position.y - tile_pixel_y # 0 = top of tile, tile_size = bottom
 			var near_top = offset_in_tile < 5.0 # Threshold to adjust in pixels
@@ -455,13 +451,12 @@ func handle_animations():
 	else:
 		# On ground
 		if was_airborne:
-			# Just landed - play appropriate ground animation
 			was_airborne = false
-			var ground_anim = "run_ground" if was_running_when_jumped else "ground"
-			$AnimatedSprite2D.play(ground_anim)
-			# Connect to animation finished signal to transition to idle
-			if not $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
-				$AnimatedSprite2D.animation_finished.connect(_on_ground_animation_finished)
+			if not is_underwater:
+				var ground_anim = "run_ground" if was_running_when_jumped else "ground"
+				$AnimatedSprite2D.play(ground_anim)
+				if not $AnimatedSprite2D.animation_finished.is_connected(_on_ground_animation_finished):
+					$AnimatedSprite2D.animation_finished.connect(_on_ground_animation_finished)
 		elif $AnimatedSprite2D.animation != "ground":
 			# Only change animation if not currently playing ground animation
 			if abs(velocity.x) > 1.0:
