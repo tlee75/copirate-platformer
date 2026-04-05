@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://sw24d8lrbjmb"]
+
+[ext_resource type="Texture2D" uid="uid://cc2akhb2t75nl" path="res://assets/resources/plastic_scrap_64x64_1.png" id="1_d0k6c"]
+[ext_resource type="Script" uid="uid://dnb80ieknf1a8" path="res://scripts/pickups.gd" id="1_mqiql"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mqiql"]
+atlas = ExtResource("1_d0k6c")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lbwkt"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mqiql")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 1.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lbwkt"]
+size = Vector2(23, 19)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_clt4d"]
+size = Vector2(23, 19)
+
+[node name="PlasticScrap" type="RigidBody2D" unique_id=1438179313]
+collision_layer = 8
+script = ExtResource("1_mqiql")
+idle_animation = "idle"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=963765360]
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_lbwkt")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1022610183]
+position = Vector2(-0.5, 0.5)
+shape = SubResource("RectangleShape2D_lbwkt")
+
+[node name="PickupArea" type="Area2D" parent="." unique_id=473214240]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=360737170]
+position = Vector2(-0.5, 0.5)
+shape = SubResource("RectangleShape2D_clt4d")

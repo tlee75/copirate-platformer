@@ -85,6 +85,7 @@ func _create_structure_button(structure: GameObject, index: int) -> Control:
 	button.custom_minimum_size = Vector2(0, 64)
 	if structure.icon:
 		button.icon = structure.icon
+		button.add_theme_constant_override("icon_max_width", 64)
 	
 	# Highlight unviewed structures with a left border
 	if not DiscoveryManager.is_viewed(structure.registry_key):
@@ -146,6 +147,7 @@ func _create_item_button(stack: InventoryManager.ItemStack, index: int) -> Contr
 	button.custom_minimum_size = Vector2(0, 64)
 	if stack.item and stack.item.icon:
 		button.icon = stack.item.icon
+		button.add_theme_constant_override("icon_max_width", 64)
 
 	# Highlight unviewed items with a left border
 	if stack.item and not DiscoveryManager.is_viewed(stack.item.registry_key):

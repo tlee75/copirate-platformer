@@ -4,13 +4,14 @@ extends GameObject
 func _ready():
 	# Setup harvest
 	category = "terrain"
-	regeneration_time = 360.0 
+	regeneration_time = 5.0 
 	is_harvestable = true
 	is_destructible = false
-	max_harvests = 1
+	max_harvests = 2
 	action_table = {
 		"interact": [
-			{ "item": "simple_rock", "type": "harvest", "weight": 1.0 }
+			{ "item": "plastic_scrap", "type": "harvest", "weight": 0.5 },
+			{ "item": "metal_scrap", "type": "harvest", "weight": 0.5 }
 		]
 	}
 	# Start with normal idle animation

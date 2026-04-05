@@ -65,6 +65,7 @@ layout_mode = 1
 [node name="ContentSection" type="HSplitContainer" parent="TabContainer/Inventory" unique_id=1109574031]
 layout_mode = 2
 size_flags_vertical = 3
+dragging_enabled = false
 
 [node name="InventoryItemList" parent="TabContainer/Inventory/ContentSection" unique_id=1090114544 instance=ExtResource("2_bsps8")]
 layout_mode = 2
@@ -124,6 +125,7 @@ grow_vertical = 2
 layout_mode = 2
 size_flags_vertical = 3
 split_offsets = PackedInt32Array(200)
+dragging_enabled = false
 split_offset = 200
 
 [node name="EquipmentBodyDisplay" type="Control" parent="TabContainer/Equipment/ContentSection" unique_id=108800365]
@@ -133,6 +135,7 @@ script = ExtResource("10_t0p05")
 [node name="RightPanelSplit" type="HSplitContainer" parent="TabContainer/Equipment/ContentSection" unique_id=378727846]
 layout_mode = 2
 split_offsets = PackedInt32Array(200)
+dragging_enabled = false
 split_offset = 200
 
 [node name="EquipmentItemList" parent="TabContainer/Equipment/ContentSection/RightPanelSplit" unique_id=761273531 instance=ExtResource("2_bsps8")]
@@ -190,6 +193,7 @@ grow_vertical = 2
 [node name="ContentSection" type="HSplitContainer" parent="TabContainer/Crafting" unique_id=1545959031]
 layout_mode = 2
 size_flags_vertical = 3
+dragging_enabled = false
 
 [node name="CraftingItemList" parent="TabContainer/Crafting/ContentSection" unique_id=1936741220 instance=ExtResource("2_bsps8")]
 layout_mode = 2
@@ -269,6 +273,7 @@ grow_vertical = 2
 [node name="ContentSection" type="HSplitContainer" parent="TabContainer/Building" unique_id=1917080674]
 layout_mode = 2
 size_flags_vertical = 3
+dragging_enabled = false
 
 [node name="BuildingItemList" parent="TabContainer/Building/ContentSection" unique_id=864851173 instance=ExtResource("2_bsps8")]
 layout_mode = 2

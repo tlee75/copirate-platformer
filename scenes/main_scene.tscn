@@ -358,9 +358,6 @@ position = Vector2(-6249, 2078)
 
 [node name="SeaShells" type="Node" parent="Resources" unique_id=1414903471]
 
-[node name="ScallopShell" parent="Resources/SeaShells" unique_id=19340439 instance=ExtResource("30_pgk25")]
-position = Vector2(-2824, 2184)
-
 [node name="ScallopShell2" parent="Resources/SeaShells" unique_id=227435355 instance=ExtResource("30_pgk25")]
 position = Vector2(-2744, 2240)
 
