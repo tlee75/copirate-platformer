@@ -238,23 +238,130 @@ position = Vector2(-752, 3888)
 
 [node name="Resources" type="Node" parent="." unique_id=1510119859]
 
-[node name="BerryBush2" parent="Resources" unique_id=1022453375 instance=ExtResource("23_j4epa")]
-position = Vector2(-605, 2079)
+[node name="CoconutTrees" type="Node" parent="Resources" unique_id=213760523]
+
+[node name="CoconutTree3" parent="Resources/CoconutTrees" unique_id=1605635901 instance=ExtResource("30_02d50")]
+position = Vector2(-930, 2043)
+max_harvests = null
+regeneration_time = null
+
+[node name="CoconutTree2" parent="Resources/CoconutTrees" unique_id=1813802444 instance=ExtResource("30_02d50")]
+position = Vector2(-803, 2043)
+max_harvests = null
+regeneration_time = null
+
+[node name="CoconutTree" parent="Resources/CoconutTrees" unique_id=1453547572 instance=ExtResource("30_02d50")]
+position = Vector2(-264, 2107)
+max_harvests = null
+regeneration_time = null
+
+[node name="CoconutTree4" parent="Resources/CoconutTrees" unique_id=420696797 instance=ExtResource("30_02d50")]
+position = Vector2(-3533, 2044)
+max_harvests = null
+regeneration_time = null
+
+[node name="CoconutTree5" parent="Resources/CoconutTrees" unique_id=1113339605 instance=ExtResource("30_02d50")]
+position = Vector2(-3027, 2074)
+max_harvests = null
+regeneration_time = null
+
+[node name="CoconutTree6" parent="Resources/CoconutTrees" unique_id=871801691 instance=ExtResource("30_02d50")]
+position = Vector2(-4992, 2076)
+max_harvests = null
+regeneration_time = null
+
+[node name="CoconutTree7" parent="Resources/CoconutTrees" unique_id=166988712 instance=ExtResource("30_02d50")]
+position = Vector2(-6733, 2172)
+max_harvests = null
+regeneration_time = null
+
+[node name="BerryBush" parent="Resources/CoconutTrees" unique_id=493298007 instance=ExtResource("23_j4epa")]
+position = Vector2(-3304, 2078)
+
+[node name="CoconutTree8" parent="Resources/CoconutTrees" unique_id=1923840550 instance=ExtResource("30_02d50")]
+position = Vector2(-4687, 2075)
+
+[node name="CoconutTree9" parent="Resources/CoconutTrees" unique_id=490524226 instance=ExtResource("30_02d50")]
+position = Vector2(-4037, 2042)
+
+[node name="CoconutTree10" parent="Resources/CoconutTrees" unique_id=1382184345 instance=ExtResource("30_02d50")]
+position = Vector2(-5603, 2075)
+
+[node name="CoconutTree11" parent="Resources/CoconutTrees" unique_id=1990705325 instance=ExtResource("30_02d50")]
+position = Vector2(-5476, 2076)
+
+[node name="CoconutTree12" parent="Resources/CoconutTrees" unique_id=1274674956 instance=ExtResource("30_02d50")]
+position = Vector2(-6101, 2043)
+
+[node name="SimpleRocks" type="Node" parent="Resources" unique_id=1277372746]
+
+[node name="SimpleRock" parent="Resources/SimpleRocks" unique_id=568820042 instance=ExtResource("28_8pjrr")]
+position = Vector2(497, 2268)
+
+[node name="SimpleRock2" parent="Resources/SimpleRocks" unique_id=1451659254 instance=ExtResource("28_8pjrr")]
+position = Vector2(712, 2429)
+
+[node name="SimpleRock5" parent="Resources/SimpleRocks" unique_id=1978133877 instance=ExtResource("28_8pjrr")]
+position = Vector2(-7269, 2345)
+
+[node name="SimpleRock6" parent="Resources/SimpleRocks" unique_id=2120698065 instance=ExtResource("28_8pjrr")]
+position = Vector2(-2608, 2304)
+
+[node name="GraniteRockPile" parent="Resources/SimpleRocks" unique_id=1919999788 instance=ExtResource("32_kkokr")]
+position = Vector2(50, 2177)
+
+[node name="SunkPiles" type="Node" parent="Resources" unique_id=1760483262]
+
+[node name="SunkPile" parent="Resources/SunkPiles" unique_id=810528655 instance=ExtResource("31_pgk25")]
+position = Vector2(-2368, 2353)
+
+[node name="SunkPile2" parent="Resources/SunkPiles" unique_id=1026806043 instance=ExtResource("31_pgk25")]
+position = Vector2(-1568, 2353)
+
+[node name="SunkPile3" parent="Resources/SunkPiles" unique_id=2030299399 instance=ExtResource("31_pgk25")]
+position = Vector2(577, 2289)
+
+[node name="SunkPile4" parent="Resources/SunkPiles" unique_id=1240976978 instance=ExtResource("31_pgk25")]
+position = Vector2(896, 2417)
+
+[node name="SunkPile5" parent="Resources/SunkPiles" unique_id=1646957307 instance=ExtResource("31_pgk25")]
+position = Vector2(1216, 2705)
+
+[node name="SunkPile6" parent="Resources/SunkPiles" unique_id=1663870955 instance=ExtResource("31_pgk25")]
+position = Vector2(2272, 3601)
+
+[node name="SunkPile7" parent="Resources/SunkPiles" unique_id=649625459 instance=ExtResource("31_pgk25")]
+position = Vector2(576, 3569)
+
+[node name="SunkPile8" parent="Resources/SunkPiles" unique_id=1944520833 instance=ExtResource("31_pgk25")]
+position = Vector2(-160, 3953)
+
+[node name="RockPiles" type="Node" parent="Resources" unique_id=275127042]
+
+[node name="GraniteRockPile" parent="Resources/RockPiles" unique_id=1986582708 instance=ExtResource("32_kkokr")]
+position = Vector2(-1983, 2325)
 
 [node name="TwoSecondTimer" type="Timer" parent="Resources" unique_id=1740078514]
 wait_time = 2.0
 autostart = true
 
-[node name="BerryBush3" parent="Resources" unique_id=820907367 instance=ExtResource("23_j4epa")]
+[node name="BerryBushes" type="Node" parent="Resources" unique_id=1223188785]
+
+[node name="BerryBush2" parent="Resources/BerryBushes" unique_id=1022453375 instance=ExtResource("23_j4epa")]
+position = Vector2(-605, 2079)
+
+[node name="BerryBush3" parent="Resources/BerryBushes" unique_id=820907367 instance=ExtResource("23_j4epa")]
 position = Vector2(-4144, 2078)
 
-[node name="BerryBush4" parent="Resources" unique_id=499914360 instance=ExtResource("23_j4epa")]
+[node name="BerryBush4" parent="Resources/BerryBushes" unique_id=499914360 instance=ExtResource("23_j4epa")]
 position = Vector2(-6249, 2078)
 
-[node name="ScallopShell" parent="Resources" unique_id=19340439 instance=ExtResource("30_pgk25")]
+[node name="SeaShells" type="Node" parent="Resources" unique_id=1414903471]
+
+[node name="ScallopShell" parent="Resources/SeaShells" unique_id=19340439 instance=ExtResource("30_pgk25")]
 position = Vector2(-2824, 2184)
 
-[node name="ScallopShell2" parent="Resources" unique_id=227435355 instance=ExtResource("30_pgk25")]
+[node name="ScallopShell2" parent="Resources/SeaShells" unique_id=227435355 instance=ExtResource("30_pgk25")]
 position = Vector2(-2744, 2240)
 
 [node name="WaterFlowManager" type="Node" parent="." unique_id=2080095331]
@@ -262,81 +369,6 @@ script = ExtResource("27_j2yw6")
 
 [node name="PlacementManager" type="Node" parent="." unique_id=2123466378]
 script = ExtResource("29_0xxsb")
-
-[node name="CoconutTrees" type="Node" parent="." unique_id=213760523]
-
-[node name="CoconutTree3" parent="CoconutTrees" unique_id=1605635901 instance=ExtResource("30_02d50")]
-position = Vector2(-930, 2043)
-max_harvests = null
-regeneration_time = null
-
-[node name="CoconutTree2" parent="CoconutTrees" unique_id=1813802444 instance=ExtResource("30_02d50")]
-position = Vector2(-803, 2043)
-max_harvests = null
-regeneration_time = null
-
-[node name="CoconutTree" parent="CoconutTrees" unique_id=1453547572 instance=ExtResource("30_02d50")]
-position = Vector2(-264, 2107)
-max_harvests = null
-regeneration_time = null
-
-[node name="CoconutTree4" parent="CoconutTrees" unique_id=420696797 instance=ExtResource("30_02d50")]
-position = Vector2(-3533, 2044)
-max_harvests = null
-regeneration_time = null
-
-[node name="CoconutTree5" parent="CoconutTrees" unique_id=1113339605 instance=ExtResource("30_02d50")]
-position = Vector2(-3027, 2074)
-max_harvests = null
-regeneration_time = null
-
-[node name="CoconutTree6" parent="CoconutTrees" unique_id=871801691 instance=ExtResource("30_02d50")]
-position = Vector2(-4992, 2076)
-max_harvests = null
-regeneration_time = null
-
-[node name="CoconutTree7" parent="CoconutTrees" unique_id=166988712 instance=ExtResource("30_02d50")]
-position = Vector2(-6733, 2172)
-max_harvests = null
-regeneration_time = null
-
-[node name="BerryBush" parent="CoconutTrees" unique_id=493298007 instance=ExtResource("23_j4epa")]
-position = Vector2(-3304, 2078)
-
-[node name="CoconutTree8" parent="CoconutTrees" unique_id=1923840550 instance=ExtResource("30_02d50")]
-position = Vector2(-4687, 2075)
-
-[node name="CoconutTree9" parent="CoconutTrees" unique_id=490524226 instance=ExtResource("30_02d50")]
-position = Vector2(-4037, 2042)
-
-[node name="CoconutTree10" parent="CoconutTrees" unique_id=1382184345 instance=ExtResource("30_02d50")]
-position = Vector2(-5603, 2075)
-
-[node name="CoconutTree11" parent="CoconutTrees" unique_id=1990705325 instance=ExtResource("30_02d50")]
-position = Vector2(-5476, 2076)
-
-[node name="CoconutTree12" parent="CoconutTrees" unique_id=1274674956 instance=ExtResource("30_02d50")]
-position = Vector2(-6101, 2043)
-
-[node name="SimpleRocks" type="Node" parent="." unique_id=1277372746]
-
-[node name="SimpleRock" parent="SimpleRocks" unique_id=568820042 instance=ExtResource("28_8pjrr")]
-position = Vector2(497, 2268)
-
-[node name="SimpleRock2" parent="SimpleRocks" unique_id=1451659254 instance=ExtResource("28_8pjrr")]
-position = Vector2(712, 2429)
-
-[node name="SimpleRock5" parent="SimpleRocks" unique_id=1978133877 instance=ExtResource("28_8pjrr")]
-position = Vector2(-7269, 2345)
-
-[node name="SimpleRock6" parent="SimpleRocks" unique_id=2120698065 instance=ExtResource("28_8pjrr")]
-position = Vector2(-2608, 2304)
-
-[node name="GraniteRockPile" parent="SimpleRocks" unique_id=1919999788 instance=ExtResource("32_kkokr")]
-position = Vector2(50, 2177)
-
-[node name="GraniteRockPile" parent="." unique_id=1986582708 instance=ExtResource("32_kkokr")]
-position = Vector2(-2464, 2356)
 
 [node name="Fauna" type="Node" parent="." unique_id=1027826087]
 
@@ -372,6 +404,3 @@ position = Vector2(2828, 2730)
 
 [node name="Fish8" parent="Fauna" unique_id=1714188608 instance=ExtResource("30_kkokr")]
 position = Vector2(2264, 3019)
-
-[node name="SunkPile" parent="." unique_id=810528655 instance=ExtResource("31_pgk25")]
-position = Vector2(-2368, 2353)

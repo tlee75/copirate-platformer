@@ -44,7 +44,7 @@ script = ExtResource("1_sbyvp")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1640287966]
 sprite_frames = SubResource("SpriteFrames_e37ec")
-animation = &"hit_full"
+animation = &"idle_full"
 autoplay = "idle_full"
 
 [node name="Area2D" type="Area2D" parent="." unique_id=4475509]
