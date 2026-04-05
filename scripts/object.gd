@@ -239,8 +239,8 @@ func activate_use(target_action: String, efficiency: float = 1.0):
 
 # Handle destruction after the hit animation has completed
 func use_finished_callback():
-	# Let the hit animation finish before deciding next state
-	if animated_sprite and animated_sprite.is_playing():
+	# Let the hit animation finish before deciding next state.
+	if animated_sprite and animated_sprite.is_playing() and not animated_sprite.sprite_frames.get_animation_loop(animated_sprite.animation):
 		await animated_sprite.animation_finished
 	
 	if harvests_remaining > 0:

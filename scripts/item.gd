@@ -106,7 +106,7 @@ func _on_primary_animation_finished(player):
 			InventoryManager.add_item(result_item, 1)
 			InventoryManager.quick_access_changed.emit()
 			NotificationManager.notify(
-				NotificationManager.NotificationType.ITEM_COOKED,
+				NotificationManager.NotificationType.ITEM_PICKUP,
 				"transform_" + transform_result_item,
 				"Filled " + self.name + " → " + result_item.name
 			)

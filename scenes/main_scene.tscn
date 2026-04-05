@@ -29,10 +29,8 @@
 [ext_resource type="PackedScene" uid="uid://cuu2vsbd7syoi" path="res://scenes/terrain/coconut_tree.tscn" id="30_02d50"]
 [ext_resource type="PackedScene" uid="uid://d3ybb65elgyad" path="res://scenes/creatures/fish.tscn" id="30_kkokr"]
 [ext_resource type="PackedScene" uid="uid://bbnkwhcolpqai" path="res://scenes/items/scallop_shell.tscn" id="30_pgk25"]
-[ext_resource type="PackedScene" uid="uid://nrlurk8w8qpl" path="res://scenes/items/coconut_bowl.tscn" id="31_pgk25"]
+[ext_resource type="PackedScene" uid="uid://crw1kr5jrbicb" path="res://scenes/terrain/sunk_pile.tscn" id="31_pgk25"]
 [ext_resource type="PackedScene" uid="uid://c665se5n8hwv7" path="res://scenes/terrain/granite_rock_pile.tscn" id="32_kkokr"]
-[ext_resource type="PackedScene" uid="uid://gpmqntudt2j1" path="res://scenes/items/cocoshell_seawater.tscn" id="32_lhwp2"]
-[ext_resource type="PackedScene" uid="uid://bdemfwbbodxt7" path="res://scenes/items/cooked_cocoshell_water.tscn" id="33_lhwp2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ru564"]
 size = Vector2(6, 6)
@@ -139,7 +137,7 @@ script = ExtResource("1_4bgka")
 
 [node name="Player" parent="." unique_id=1352661183 groups=["player"] instance=ExtResource("2_02d50")]
 z_index = 1
-position = Vector2(-2815, 2131)
+position = Vector2(-2784, 2137)
 
 [node name="CursorArea" type="Area2D" parent="Player" unique_id=150247619]
 position = Vector2(33, 0)
@@ -338,7 +336,7 @@ position = Vector2(-2608, 2304)
 position = Vector2(50, 2177)
 
 [node name="GraniteRockPile" parent="." unique_id=1986582708 instance=ExtResource("32_kkokr")]
-position = Vector2(-3887, 2075)
+position = Vector2(-2464, 2356)
 
 [node name="Fauna" type="Node" parent="." unique_id=1027826087]
 
@@ -375,11 +373,5 @@ position = Vector2(2828, 2730)
 [node name="Fish8" parent="Fauna" unique_id=1714188608 instance=ExtResource("30_kkokr")]
 position = Vector2(2264, 3019)
 
-[node name="CoconutBowl" parent="." unique_id=1230960114 instance=ExtResource("31_pgk25")]
-position = Vector2(-3701, 2035)
-
-[node name="CocoshellSeawater" parent="." unique_id=1654962597 instance=ExtResource("32_lhwp2")]
-position = Vector2(-3733, 2034)
-
-[node name="CookedCocoshellWater" parent="." unique_id=491690947 instance=ExtResource("33_lhwp2")]
-position = Vector2(-3766, 2033)
+[node name="SunkPile" parent="." unique_id=810528655 instance=ExtResource("31_pgk25")]
+position = Vector2(-2368, 2353)
